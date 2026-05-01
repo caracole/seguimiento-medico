@@ -442,6 +442,7 @@ canvas { width: 100% !important; }
   <div class="nav-tab" onclick="showPanel('timeline')" data-i18n="tab_timeline">Cronología</div>
   <div class="nav-tab" onclick="showPanel('antecedentes')" data-i18n="tab_antec">Antecedentes</div>
   <div class="nav-tab" onclick="showPanel('correlaciones')" data-i18n="tab_corr">Correlaciones</div>
+  <div class="nav-tab" onclick="showPanel('farmacovigilancia')" style="color:var(--danger)" data-i18n="tab_farma">⚠ Farmacovigilancia</div>
   <div class="nav-tab" onclick="showPanel('importar')" data-i18n="tab_import">+ Añadir PDF</div>
 </div>
 
@@ -661,6 +662,218 @@ canvas { width: 100% !important; }
   </div>
 </div>
 
+<!-- ===== PANEL FARMACOVIGILANCIA ===== -->
+<div id="panel-farmacovigilancia" class="panel">
+  <div class="section-title">⚠ Farmacovigilancia — Interacciones & Contraindicaciones</div>
+
+  <!-- AVISO -->
+  <div style="background:rgba(192,57,43,0.08);border:1px solid rgba(192,57,43,0.4);border-radius:var(--radius);padding:16px 20px;margin-bottom:24px;font-size:14px">
+    <strong style="color:var(--danger)">Fuentes:</strong>
+    <span style="color:var(--muted)"> CIMA/AEMPS (Agencia Española de Medicamentos y Productos Sanitarios) · Fichas técnicas oficiales de cada medicamento · Este análisis es de carácter informativo y no sustituye el criterio médico.</span>
+  </div>
+
+  <!-- ALERTA CRITICA -->
+  <div style="background:rgba(192,57,43,0.12);border:2px solid var(--danger);border-radius:var(--radius);padding:20px 24px;margin-bottom:20px">
+    <div style="font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--danger);margin-bottom:12px">🚨 INTERACCIÓN CRÍTICA — REQUIERE ATENCIÓN MÉDICA</div>
+    <div style="font-size:16px;font-weight:600;margin-bottom:8px">Haloperidol + Donepezilo → Doble prolongación del intervalo QTc</div>
+    <div style="font-size:14px;color:var(--muted);line-height:1.7">
+      <strong style="color:var(--text)">Ambos medicamentos prolongan el intervalo QTc de forma independiente.</strong>
+      Su combinación puede producir arritmias ventriculares graves (Torsade de pointes), síncope o muerte súbita.
+      La ficha técnica del donepezilo (CIMA) lista explícitamente "otros antipsicóticos" como medicamentos a evitar en combinación.
+      La ficha técnica del haloperidol (CIMA) advierte sobre mayor mortalidad en pacientes de edad avanzada con demencia.
+      <br><br>
+      <span style="color:var(--danger)">⚠ Contraindicación relativa en paciente con insuficiencia tricuspídea moderada (cardiopatía preexistente).</span>
+      <br>
+      <strong>Recomendación CIMA:</strong> Monitorización ECG. Suspender si QTc &gt; 500 ms.
+    </div>
+    <div style="margin-top:12px;font-family:var(--mono);font-size:10px;color:var(--muted)">
+      Fuente: CIMA FT Haloperidol Esteve · CIMA FT Aricept/Donepezilo · CIMA FT Donepezilo Pensa
+    </div>
+  </div>
+
+  <!-- INTERACCIONES IMPORTANTES -->
+  <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--warn);margin-bottom:16px">⚠ INTERACCIONES IMPORTANTES</div>
+
+  <!-- Dabigatran + AAS -->
+  <div style="background:var(--surface);border:1px solid var(--warn);border-radius:var(--radius);padding:18px 22px;margin-bottom:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+      <div style="font-size:15px;font-weight:600">💊 Dabigatrán 150mg + Adiro 100mg (AAS)</div>
+      <span style="background:#e65100;color:white;font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:20px">RIESGO ALTO</span>
+    </div>
+    <div style="font-size:14px;color:var(--muted);line-height:1.7">
+      Según la ficha técnica de Pradaxa (CIMA): <strong style="color:var(--text)">"el uso concomitante de los antiagregantes AAS o clopidogrel dobla aproximadamente los índices de episodios de sangrado mayor"</strong> con dabigatrán.
+      El riesgo de sangrado gastrointestinal grave aumenta especialmente en mayores de 75 años con la dosis de 150mg/12h.
+      <br><br>
+      <span style="color:var(--warn)">⚠ La paciente tiene 87 años y toma ambos medicamentos (o los tenía prescritos).</span>
+    </div>
+    <div style="margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--muted)">Fuente: CIMA FT Pradaxa 150mg · CIMA FT Adiro 100mg</div>
+  </div>
+
+  <!-- Dabigatran + Funcion renal -->
+  <div style="background:var(--surface);border:1px solid var(--warn);border-radius:var(--radius);padding:18px 22px;margin-bottom:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+      <div style="font-size:15px;font-weight:600">🫘 Dabigatrán 150mg → Función renal deteriorada</div>
+      <span style="background:#e65100;color:white;font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:20px">VIGILANCIA OBLIGATORIA</span>
+    </div>
+    <div style="font-size:14px;color:var(--muted);line-height:1.7">
+      La AEMPS recomienda evaluar la función renal <strong style="color:var(--text)">al menos una vez al año</strong> en pacientes mayores de 75 años tratados con dabigatrán.
+      El dabigatrán está <strong style="color:var(--danger)">contraindicado con FG &lt; 30 ml/min</strong> y requiere ajuste de dosis con FG 30-50 ml/min.
+      <br><br>
+      Evolución del FG en la paciente: <strong style="color:var(--ok)">83</strong> (01/2022) → <strong style="color:var(--ok)">75.97</strong> (02/2025) → <strong style="color:var(--warn)">70.8</strong> (03/2025) → <strong style="color:var(--warn)">62.45</strong> (04/2024).
+      <br>
+      <span style="color:var(--warn)">⚠ Tendencia descendente. Con FG entre 50-80: usar con precaución. Monitorización semestral recomendada.</span>
+    </div>
+    <div style="margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--muted)">Fuente: AEMPS Nota Informativa MUH(FV) 21/2011 · CIMA FT Pradaxa 150mg</div>
+  </div>
+
+  <!-- Atorvastatina + Glucosa -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px;margin-bottom:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+      <div style="font-size:15px;font-weight:600">📈 Atorvastatina 20mg → Efecto hiperglucemiante</div>
+      <span style="background:var(--accent2);color:white;font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:20px">A VIGILAR</span>
+    </div>
+    <div style="font-size:14px;color:var(--muted);line-height:1.7">
+      Las estatinas pueden aumentar la glucosa en sangre. La ficha técnica de atorvastatina (CIMA) indica que en pacientes con factores de riesgo (glucemia basal elevada, triglicéridos altos) puede producir hiperglucemia.
+      <br><br>
+      <span style="color:var(--warn)">⚠ La paciente tiene glucemia basal frecuentemente elevada (102-120 mg/dL) y triglicéridos altos (125-187 mg/dL). La Atorvastatina podría contribuir a este patrón.</span>
+      <br>
+      Nota: la ficha técnica precisa que este riesgo "es compensado por la reducción del riesgo cardiovascular con estatinas, por tanto no debe ser razón para interrumpir el tratamiento".
+    </div>
+    <div style="margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--muted)">Fuente: CIMA FT Atorvastatina Sandoz 40mg · CIMA FT Atorvastatina Normon 40mg</div>
+  </div>
+
+  <!-- Donepezilo + Memantina QTc -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px;margin-bottom:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+      <div style="font-size:15px;font-weight:600">🧠 Donepezilo + Memantina — Combinación</div>
+      <span style="background:var(--ok);color:white;font-family:var(--mono);font-size:10px;padding:3px 10px;border-radius:20px">GENERALMENTE SEGURO</span>
+    </div>
+    <div style="font-size:14px;color:var(--muted);line-height:1.7">
+      Según la ficha técnica CIMA de Domex (combinación donepezilo/memantina): <strong style="color:var(--text)">"no se han observado interacciones relevantes entre memantina y donepezilo"</strong>. La inhibición de la acetilcolinesterasa por donepezilo no se ve afectada por la memantina.
+      <br><br>
+      <span style="color:var(--ok)">✓ Esta combinación es reconocida y puede administrarse conjuntamente de forma segura.</span>
+      <br>
+      Nota: el empeoramiento de conducta observado en la paciente fue atribuido a la memantina por el médico, pero no está documentado como interacción en CIMA.
+    </div>
+    <div style="margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--muted)">Fuente: CIMA FT Domex · CIMA FT Donepezilo/Memantina TecniGen</div>
+  </div>
+
+  <!-- TABLEAU RÉCAPITULATIF -->
+  <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--muted);margin:28px 0 16px">TABLA RESUMEN — TODOS LOS MEDICAMENTOS</div>
+  <div class="data-table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Medicamento</th>
+          <th>Dosis</th>
+          <th>Interacción principal</th>
+          <th>Con</th>
+          <th>Nivel</th>
+          <th>Fuente CIMA</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Dabigatrán</strong></td>
+          <td>150mg/12h</td>
+          <td>Doble riesgo sangrado</td>
+          <td>AAS (Adiro)</td>
+          <td><span class="badge-bad">🔴 Alto</span></td>
+          <td>FT Pradaxa 150mg</td>
+        </tr>
+        <tr>
+          <td><strong>Dabigatrán</strong></td>
+          <td>150mg/12h</td>
+          <td>Acumulación tóxica si FG↓</td>
+          <td>Función renal</td>
+          <td><span class="badge-bad">🔴 Vigilancia</span></td>
+          <td>AEMPS MUH 21/2011</td>
+        </tr>
+        <tr>
+          <td><strong>Haloperidol</strong></td>
+          <td>gotas</td>
+          <td>Prolongación QTc</td>
+          <td>Donepezilo</td>
+          <td><span class="badge-bad">🔴 Crítico</span></td>
+          <td>FT Haloperidol Esteve</td>
+        </tr>
+        <tr>
+          <td><strong>Donepezilo</strong></td>
+          <td>5mg</td>
+          <td>Prolongación QTc</td>
+          <td>Haloperidol</td>
+          <td><span class="badge-bad">🔴 Crítico</span></td>
+          <td>FT Aricept/Donepezilo</td>
+        </tr>
+        <tr>
+          <td><strong>Atorvastatina</strong></td>
+          <td>20mg</td>
+          <td>Hiperglucemia potencial</td>
+          <td>Perfil metabólico</td>
+          <td><span class="badge-warn">🟡 Vigilar</span></td>
+          <td>FT Atorvastatina Normon</td>
+        </tr>
+        <tr>
+          <td><strong>Adiro (AAS)</strong></td>
+          <td>100mg</td>
+          <td>Riesgo sangrado aumentado</td>
+          <td>Dabigatrán</td>
+          <td><span class="badge-bad">🔴 Alto</span></td>
+          <td>FT Adiro 100mg</td>
+        </tr>
+        <tr>
+          <td><strong>Donepezilo</strong></td>
+          <td>5mg</td>
+          <td>Sin interacción relevante</td>
+          <td>Memantina</td>
+          <td><span class="badge-ok">🟢 Seguro</span></td>
+          <td>FT Domex/TecniGen</td>
+        </tr>
+        <tr>
+          <td><strong>Dabigatrán</strong></td>
+          <td>150mg/12h</td>
+          <td>Sin interacción CYP450</td>
+          <td>Atorvastatina</td>
+          <td><span class="badge-ok">🟢 Seguro</span></td>
+          <td>FT Pradaxa 150mg</td>
+        </tr>
+        <tr>
+          <td><strong>Tiotropio</strong></td>
+          <td>18mcg</td>
+          <td>Sin interacciones documentadas</td>
+          <td>Resto tto.</td>
+          <td><span class="badge-ok">🟢 Seguro</span></td>
+          <td>FT Spiriva</td>
+        </tr>
+        <tr>
+          <td><strong>Pantoprazol</strong></td>
+          <td>20mg</td>
+          <td>Sin interacciones relevantes</td>
+          <td>Resto tto.</td>
+          <td><span class="badge-ok">🟢 Seguro</span></td>
+          <td>FT Pantoprazol</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- RECOMMANDATIONS -->
+  <div style="margin-top:28px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px">
+    <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--accent2);margin-bottom:14px">📋 RECOMENDACIONES PARA EL MÉDICO</div>
+    <div style="font-size:14px;color:var(--muted);line-height:2">
+      <div>🔴 <strong style="color:var(--text)">ECG de control</strong> — Monitorizar intervalo QTc ante combinación Haloperidol + Donepezilo</div>
+      <div>🔴 <strong style="color:var(--text)">Revisar indicación Adiro + Dabigatrán</strong> — Combinación que dobla el riesgo de sangrado mayor en ≥75 años</div>
+      <div>🟡 <strong style="color:var(--text)">Control renal semestral</strong> — FG en tendencia descendente (83→62 ml/min). Ajuste dosis Dabigatrán si FG &lt;50</div>
+      <div>🟡 <strong style="color:var(--text)">Vitamina D</strong> — Deficiencia crónica no tratada (12-27 ng/mL). Valorar suplementación</div>
+      <div>🟡 <strong style="color:var(--text)">Colesterol LDL</strong> — 202 mg/dL con Atorvastatina 20mg. Valorar aumento de dosis o cambio de estatina</div>
+      <div>🟢 <strong style="color:var(--text)">Donepezilo + Memantina</strong> — Combinación segura según CIMA</div>
+    </div>
+    <div style="margin-top:14px;font-family:var(--mono);font-size:10px;color:var(--muted)">
+      Análisis basado en fichas técnicas CIMA/AEMPS · Mayo 2026 · Elaborado por P.-H. Giraud × Claude (Anthropic)
+    </div>
+  </div>
+</div>
+
 <!-- ===== PANEL IMPORTAR ===== -->
 <div id="panel-importar" class="panel">
   <div class="section-title" data-i18n="add_pdf">Añadir nuevos documentos PDF</div>
@@ -836,7 +1049,7 @@ const PARAMS = {
 ================================================================ */
 const T = {
   es: {
-    tab_corr:"Correlaciones", tab_resumen:"Resumen", tab_curvas:"Curvas", tab_tabla:"Tabla",
+    tab_corr:"Correlaciones", tab_farma:"⚠ Farmacovigilancia", tab_resumen:"Resumen", tab_curvas:"Curvas", tab_tabla:"Tabla",
     tab_timeline:"Cronología", tab_antec:"Antecedentes", tab_import:"+ Añadir PDF",
     last_values:"Últimos valores conocidos", key_charts:"Evolución de parámetros clave",
     all_charts:"Todos los parámetros — curvas de evolución",
