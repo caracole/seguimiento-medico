@@ -608,9 +608,25 @@ const PATIENT = {
 
 /* Toutes les mesures extraites, triées chronologiquement */
 const MESURES = [
-  /* 25/02/2022 — Hematología (valeurs partielles dans le texte) */
+  /* 13/01/2022 — Analítica previa al TEP (mencionada en informe alta) */
   { date: "2022-01-13", src: "Hematología", vals: {
-    hemoglobina: 14.5, plaquetas: 347,
+    hemoglobina: 14.5, plaquetas: 347, creatinina: 0.62, filtrado: 83,
+  }},
+  /* 16/01/2022 — Vithas Urgencias (día del 2º TEP) */
+  { date: "2022-01-16", src: "Vithas Urgencias", vals: {
+    hemoglobina: 14.8, hematocrito: 44.9, vcm: 90.3,
+    leucocitos: 10.3, neutrofilos: 6.32, linfocitos: 2.34, monocitos: 1.40, plaquetas: 363,
+    glucosa: 91, urea: 47, creatinina: 0.78, sodio: 140, potasio: 4.1,
+    inr: 0.90,
+  }},
+  /* 16/01/2022 — Vithas Alta hospitalización TEP (analíticas durante ingreso) */
+  { date: "2022-01-16b", src: "Vithas Alta TEP", vals: {
+    hemoglobina: 14.5, hematocrito: 43.5, leucocitos: 8.30, plaquetas: 347,
+    glucosa: 264, urea: 56, creatinina: 0.62, filtrado: 83.56,
+    sodio: 138, potasio: 3.80,
+    gpt: 42, ggt: 301, fosfatasa: 261,
+    pcr: 66.44, ferritina: 222,
+    troponina: 76.68, bnp: 11924,
   }},
   /* 25/02/2022 — 1ère visite Hematología */
   { date: "2022-02-25", src: "Hematología", vals: {
@@ -631,7 +647,7 @@ const MESURES = [
     fibrinogeno: 503,
   }},
   /* 28/10/2022 — Urgencias bronquitis */
-  { date: "2022-10-28", src: "Urgencias", vals: {
+  { date: "2022-10-28", src: "Urgencias HGC", vals: {
     glucosa: 156, urea: 48, creatinina: 0.81, filtrado: 66.89,
     sodio: 137, potasio: 4.77,
     pcr: 22.90, fibrinogeno: 701,
@@ -639,21 +655,7 @@ const MESURES = [
     leucocitos: 6.20, neutrofilos: 4.70, linfocitos: 1.10,
     monocitos: 0.40, plaquetas: 214,
   }},
-  /* 12/02/2025 — Hematología analítica completa */
-  { date: "2025-02-12", src: "Hematología", vals: {
-    hemoglobina: 15.1, hematocrito: 45.1, vcm: 92.7,
-    leucocitos: 8.20, neutrofilos: 4.60, linfocitos: 2.50,
-    monocitos: 0.80, plaquetas: 246, vsg: 25,
-    glucosa: 120, urea: 33, creatinina: 0.72, filtrado: 75.97,
-    sodio: 138, potasio: 4.39, fosforo: 2.3,
-    proteinas: 6.28, albumina: 3.80,
-    colesterol: 271, hdl: 52, ldl: 185, trigliceridos: 187,
-    hba1c: 5.88, tsh: 0.886,
-    vitamina_d: 12.33, vitamina_b12: 254, folico: 10.73,
-    ferritina: 117, hierro: 134,
-    fibrinogeno: 503,
-  }},
-  /* 25/04/2024 — Bilan labo complet (le plus récent et complet) */
+  /* 25/04/2024 — Bilan labo complet Centro Salud */
   { date: "2024-04-25", src: "Laboratorio", vals: {
     hemoglobina: 13.8, hematocrito: 41.7, vcm: 92.1,
     hematies: 4.53, leucocitos: 8.4, plaquetas: 236,
@@ -668,6 +670,29 @@ const MESURES = [
     ferritina: 77, hierro: 105,
     pcr: 4.16, bnp: 73.6,
     gpt: 11, fosfatasa: 89, ggt: 46,
+  }},
+  /* 12/02/2025 — Hematología analítica completa HGC */
+  { date: "2025-02-12", src: "Hematología HGC", vals: {
+    hemoglobina: 15.1, hematocrito: 45.1, vcm: 92.7,
+    leucocitos: 8.20, neutrofilos: 4.60, linfocitos: 2.50,
+    monocitos: 0.80, plaquetas: 246, vsg: 25,
+    glucosa: 120, urea: 33, creatinina: 0.72, filtrado: 75.97,
+    sodio: 138, potasio: 4.39, fosforo: 2.3,
+    proteinas: 6.28, albumina: 3.80,
+    colesterol: 271, hdl: 52, ldl: 185, trigliceridos: 187,
+    hba1c: 5.88, tsh: 0.886,
+    vitamina_d: 12.33, vitamina_b12: 254, folico: 10.73,
+    ferritina: 117, hierro: 134,
+    fibrinogeno: 503,
+  }},
+  /* 10/03/2025 — Vithas Laboratorio (le plus récent) */
+  { date: "2025-03-10", src: "Vithas Laboratorio", vals: {
+    hemoglobina: 14.5, hematocrito: 46.8, vcm: 98.1,
+    leucocitos: 8.6, neutrofilos: 4.96, linfocitos: 2.45, monocitos: 0.90, plaquetas: 263,
+    urea: 37, creatinina: 0.76, filtrado: 70.8,
+    vitamina_b12: 269, folico: 7.9,
+    gpt: 12, ggt: 40, fosfatasa: 87,
+    tsh: 1.45, inr: 1.00,
   }},
 ];
 
@@ -697,7 +722,9 @@ const PARAMS = {
   urea:         { label: "Urea",             unit: "mg/dL",     ref: [10,50],    color: "#8b8a3a" },
   sodio:        { label: "Sodio",            unit: "mmol/L",    ref: [134,145],  color: "#3a8b8b" },
   potasio:      { label: "Potasio",          unit: "mmol/L",    ref: [3.5,5],    color: "#3a6a8b" },
-  bnp:          { label: "BNP",              unit: "pg/mL",     ref: [20,125],   color: "#8b3a5a" },
+  bnp:          { label: "BNP/NT-ProBNP",   unit: "pg/mL",     ref: [20,125],   color: "#8b3a5a" },
+  troponina:    { label: "Troponina",        unit: "ng/L",      ref: [0,14],     color: "#c0392b" },
+  inr:          { label: "INR",              unit: "",          ref: [0.85,1.25],color: "#6a5a8b" },
 };
 
 /* ================================================================
@@ -1005,7 +1032,11 @@ function buildTable() {
 const EVENTS = [
   { date: "2016", type: "urgencias", title: "TVP + TEP bilateral (Francia)", text: "Tras viaje a Alemania. Tratado con Xarelto." },
   { date: "2021-09", type: "neurologia", title: "Ictus isquémico vertebrobasilar", text: "Inicio de deterioro cognitivo. MMSE 25/30.", pdf: "Documentacion-Clinica___p1-p114_-057_Neurologia.pdf" },
-  { date: "2022-01-14", type: "urgencias", title: "2º episodio TEP", text: "Inicio anticoagulación con Enoxaparina → Xarelto 20mg/día.", pdf: "Documentacion-Clinica___p1-p114_-051_Hematologia.pdf" },
+  { date: "2022-01-14", type: "urgencias", title: "2º episodio TEP — Ingreso Hospital General", text: "Ingresa por disnea. TAC: defectos de repleción bilaterales TEP agudo. Inicio Enoxaparina 60mg/12h + O2 domiciliario 2l/24h.", pdf: "Documentacion-Clinica___p1-p114_-051_Hematologia.pdf" },
+  { date: "2022-01-16", type: "laboratorio", title: "Vithas Urgencias — Analítica TEP agudo", text: "FC 70 · SaO2 94% · Troponina 76.68 ⚠️ → 65.34 · NT-ProBNP 11.924 ⚠️ · PCR 66.44 ⚠️ · Glucosa 264 ⚠️", pdf: "VITHAS_Analisis_2022-01-16.pdf", vals: [
+    {k:"hemoglobina", v:14.8}, {k:"leucocitos", v:10.3, bad:true}, {k:"monocitos", v:1.40, bad:true},
+    {k:"troponina", v:76.68, bad:true}, {k:"pcr", v:66.44, bad:true}
+  ]},
   { date: "2022-02-07", type: "hematologia", title: "1ª cita Hematología — No acude", text: "Paciente no acude a la cita.", pdf: "Documentacion-Clinica___p1-p114_-050_Hematologia.pdf" },
   { date: "2022-02-25", type: "hematologia", title: "1ª visita Hematología", text: "Crea 0.62 · FG 83 · Hb 14.5 g/dL · PQ 347.000. Inicio Xarelto.", pdf: "Documentacion-Clinica___p1-p114_-049_Hematologia.pdf" },
   { date: "2022-04-22", type: "neurologia", title: "Neurología — MMSE 22/30", text: "Fluctuación. Añade memantina.", pdf: "Documentacion-Clinica___p1-p114_-056_Neurologia.pdf" },
@@ -1024,9 +1055,12 @@ const EVENTS = [
   ]},
   { date: "2024-07-10", type: "hematologia", title: "Hematología — Visita presencial", text: "Hb 13.8 · Plaq 236.000. Inicio Dabigatrán.", pdf: "Documentacion-Clinica___p1-p114_-045_Hematologia.pdf" },
   { date: "2024-10-09", type: "neurologia", title: "Neurología — Alzheimer sospecha", text: "MMSE 16/30. Pfeiffer 8/10. Alucinaciones visuales. Solicita RM cerebral.", pdf: "Documentacion-Clinica___p1-p114_-052_Neurologia.pdf" },
-  { date: "2025-02-12", type: "hematologia", title: "Hematología — Última visita", text: "No toma anticoagulante por decisión familiar. Alta médica.", pdf: "Documentacion-Clinica___p1-p114_-041_Hematologia.pdf", vals: [
+  { date: "2025-02-12", type: "hematologia", title: "Hematología — Última visita HGC", text: "No toma anticoagulante por decisión familiar. Alta médica.", pdf: "Documentacion-Clinica___p1-p114_-041_Hematologia.pdf", vals: [
     {k:"hemoglobina", v:15.1}, {k:"glucosa", v:120, bad:true}, {k:"colesterol", v:271, bad:true},
     {k:"vitamina_d", v:12.33, bad:true}, {k:"vsg", v:25, bad:true}
+  ]},
+  { date: "2025-03-10", type: "laboratorio", title: "Vithas Laboratorio — Analítica más reciente", text: "VCM 98.1 ⚠️ (macrocitosis leve). Función renal estable FG 70.8. TSH 1.45 normal. Serología: Treponema negativo.", pdf: "VITHAS_Analisis_2025-03-10.pdf", vals: [
+    {k:"hemoglobina", v:14.5}, {k:"vcm", v:98.1, bad:true}, {k:"creatinina", v:0.76}, {k:"tsh", v:1.45}
   ]},
 ];
 
