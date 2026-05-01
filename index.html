@@ -190,7 +190,8 @@ canvas { width: 100% !important; }
   white-space: nowrap;
 }
 .data-table tr:hover td { background: var(--surface2); }
-.badge-ok   { background: #e8f5e9; color: #1e8449; border-radius: 4px; padding: 1px 6px; font-size: 10px; }
+.data-table th:hover { color: var(--accent2); background: var(--border); }
+    .badge-ok   { background: #e8f5e9; color: #1e8449; border-radius: 4px; padding: 1px 6px; font-size: 10px; }
 .badge-warn { background: #fef9e7; color: #d68910; border-radius: 4px; padding: 1px 6px; font-size: 10px; }
 .badge-bad  { background: #fdedec; color: #c0392b; border-radius: 4px; padding: 1px 6px; font-size: 10px; }
 
@@ -997,21 +998,65 @@ function buildAllCharts() {
 /* ================================================================
    TABLE
 ================================================================ */
+let tableState = { keys: [], data: [], sortCol: 'date', sortDir: 1 };
+
 function buildTable() {
   const sorted = [...MESURES].sort((a,b) => a.date.localeCompare(b.date));
   const allKeys = new Set();
   sorted.forEach(m => Object.keys(m.vals).forEach(k => allKeys.add(k)));
   const keys = [...allKeys].filter(k => PARAMS[k]);
+  tableState.keys = keys;
+  tableState.data = sorted;
+  tableState.sortCol = 'date';
+  tableState.sortDir = 1;
+  renderTable();
+}
 
+function sortTable(col) {
+  if (tableState.sortCol === col) {
+    tableState.sortDir *= -1;
+  } else {
+    tableState.sortCol = col;
+    tableState.sortDir = 1;
+  }
+  renderTable();
+}
+
+function renderTable() {
+  const { keys, data, sortCol, sortDir } = tableState;
   const head = document.getElementById('table-head');
   const body = document.getElementById('table-body');
-  head.innerHTML = '';
-  body.innerHTML = '';
 
+  /* En-têtes avec flèches */
+  const thDate   = sortCol === 'date'   ? (sortDir === 1 ? ' ↑' : ' ↓') : ' ↕';
+  const thSource = sortCol === 'source' ? (sortDir === 1 ? ' ↑' : ' ↓') : ' ↕';
+
+  head.innerHTML = '';
   const tr = document.createElement('tr');
-  tr.innerHTML = `<th>Date</th><th>Source</th>` + keys.map(k => `<th>${PARAMS[k].label}</th>`).join('');
+  tr.innerHTML =
+    `<th style="cursor:pointer;user-select:none" onclick="sortTable('date')">Fecha${thDate}</th>` +
+    `<th style="cursor:pointer;user-select:none" onclick="sortTable('source')">Fuente${thSource}</th>` +
+    keys.map(k => {
+      const arrow = sortCol === k ? (sortDir === 1 ? ' ↑' : ' ↓') : ' ↕';
+      return `<th style="cursor:pointer;user-select:none" onclick="sortTable('${k}')">${PARAMS[k].label}${arrow}</th>`;
+    }).join('');
   head.appendChild(tr);
 
+  /* Tri des lignes */
+  const sorted = [...data].sort((a, b) => {
+    let va, vb;
+    if (sortCol === 'date')   { va = a.date;  vb = b.date; }
+    else if (sortCol === 'source') { va = a.src; vb = b.src; }
+    else {
+      va = a.vals[sortCol] ?? -Infinity;
+      vb = b.vals[sortCol] ?? -Infinity;
+    }
+    if (va < vb) return -sortDir;
+    if (va > vb) return  sortDir;
+    return 0;
+  });
+
+  body.innerHTML = '';
   sorted.forEach(m => {
     const tr = document.createElement('tr');
     let cells = `<td>${fmtDate(m.date)}</td><td>${m.src}</td>`;
