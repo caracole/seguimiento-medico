@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Seguimiento Médico — M.E., J.</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #f7f4ef;
+  --surface: #ffffff;
+  --surface2: #f0ece4;
+  --border: #ddd8ce;
+  --text: #1a1714;
+  --muted: #8a8278;
+  --accent: #8b3a3a;
+  --accent2: #3a6b8b;
+  --accent3: #3a8b5a;
+  --accent4: #8b7a3a;
+  --danger: #c0392b;
+  --warn: #d68910;
+  --ok: #1e8449;
+  --radius: 12px;
+  --mono: 'JetBrains Mono', monospace;
+  --serif: 'Crimson Pro', Georgia, serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* HEADER */
+.header {
+  background: var(--accent);
+  color: white;
+  padding: 24px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.header-title { font-size: 26px; font-weight: 300; letter-spacing: 0.5px; }
+.header-title strong { font-weight: 600; }
+.header-meta { font-family: var(--mono); font-size: 11px; opacity: 0.8; line-height: 2; text-align: right; }
+.header-badge {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  display: inline-block;
+  margin-top: 4px;
+}
+
+/* NAV TABS */
+.nav {
+  background: var(--surface);
+  border-bottom: 2px solid var(--border);
+  display: flex;
+  gap: 0;
+  padding: 0 32px;
+  overflow-x: auto;
+}
+.nav-tab {
+  padding: 14px 20px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all .2s;
+  white-space: nowrap;
+  color: var(--muted);
+  margin-bottom: -2px;
+}
+.nav-tab:hover { color: var(--text); }
+.nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* MAIN */
+.main { padding: 28px 32px; max-width: 1200px; margin: 0 auto; }
+
+/* PANELS */
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* SECTION TITLE */
+.section-title {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* KPI CARDS */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 32px;
+}
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+.kpi-card.ok::before { background: var(--ok); }
+.kpi-card.warn::before { background: var(--warn); }
+.kpi-card.danger::before { background: var(--danger); }
+.kpi-label { font-family: var(--mono); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.kpi-value { font-size: 28px; font-weight: 300; color: var(--text); }
+.kpi-unit { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.kpi-date { font-family: var(--mono); font-size: 9px; color: var(--muted); margin-top: 4px; }
+.kpi-trend { font-family: var(--mono); font-size: 10px; margin-top: 4px; }
+.kpi-trend.up { color: var(--danger); }
+.kpi-trend.down { color: var(--ok); }
+.kpi-trend.stable { color: var(--muted); }
+
+/* CHART CONTAINER */
+.chart-section { margin-bottom: 32px; }
+.chart-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(480px, 1fr)); gap: 20px; }
+.chart-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.chart-card-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.chart-card-sub {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+canvas { width: 100% !important; }
+
+/* TABLE */
+.data-table-wrap { overflow-x: auto; }
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.data-table th {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+  background: var(--surface2);
+}
+.data-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.data-table tr:hover td { background: var(--surface2); }
+.data-table th:hover { color: var(--accent2); background: var(--border); }
+    .badge-ok   { background: #e8f5e9; color: #1e8449; border-radius: 4px; padding: 1px 6px; font-size: 10px; }
+.badge-warn { background: #fef9e7; color: #d68910; border-radius: 4px; padding: 1px 6px; font-size: 10px; }
+.badge-bad  { background: #fdedec; color: #c0392b; border-radius: 4px; padding: 1px 6px; font-size: 10px; }
+
+/* TIMELINE */
+.timeline { position: relative; padding-left: 24px; }
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 7px; top: 0; bottom: 0;
+  width: 2px;
+  background: var(--border);
+}
+.timeline-item { position: relative; margin-bottom: 20px; }
+.timeline-dot {
+  position: absolute;
+  left: -20px; top: 6px;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--surface);
+  background: var(--accent);
+}
+.timeline-dot.urgencias { background: var(--danger); }
+.timeline-dot.neurologia { background: var(--accent2); }
+.timeline-dot.hematologia { background: var(--accent); }
+.timeline-dot.laboratorio { background: var(--ok); }
+.timeline-date {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+.timeline-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+.timeline-service {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.timeline-service.urgencias { color: var(--danger); }
+.timeline-service.neurologia { color: var(--accent2); }
+.timeline-service.hematologia { color: var(--accent); }
+.timeline-service.laboratorio { color: var(--ok); }
+.timeline-text { font-size: 14px; color: var(--muted); }
+.timeline-values {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.tval {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+}
+.tval.bad { background: #fdedec; border-color: #e8b4b1; color: var(--danger); }
+.tval.warn { background: #fef9e7; border-color: #f7dc6f; color: var(--warn); }
+
+/* IMPORT ZONE */
+.import-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 40px;
+  text-align: center;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all .2s;
+  margin-bottom: 24px;
+}
+.import-zone:hover { border-color: var(--accent); color: var(--accent); background: #fdf8f8; }
+.import-zone-icon { font-size: 36px; margin-bottom: 12px; }
+.import-zone-text { font-family: var(--mono); font-size: 12px; }
+
+/* ANTECEDENTES */
+.antec-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.antec-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent2);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+.antec-card h3 { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent2); margin-bottom: 10px; }
+.antec-item { font-size: 14px; color: var(--muted); padding: 3px 0; border-bottom: 1px dotted var(--border); }
+.antec-item:last-child { border: none; }
+
+/* PDF VIEWER MODAL */
+.pdf-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  align-items: center;
+  justify-content: center;
+}
+.pdf-modal.open { display: flex; }
+.pdf-modal-box {
+  background: var(--surface);
+  border-radius: var(--radius);
+  width: 90vw;
+  max-width: 900px;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+}
+.pdf-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+  flex-shrink: 0;
+}
+.pdf-modal-title { font-family: var(--mono); font-size: 12px; color: var(--text); }
+.pdf-modal-close {
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--muted);
+  border: none;
+  background: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all .15s;
+  line-height: 1;
+}
+.pdf-modal-close:hover { background: var(--border); color: var(--text); }
+.pdf-modal-body { flex: 1; overflow: hidden; position: relative; }
+.pdf-modal-body iframe { width: 100%; height: 100%; border: none; }
+.pdf-drop-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 16px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background .2s;
+  padding: 40px;
+  text-align: center;
+}
+.pdf-drop-zone:hover { background: var(--surface2); }
+.pdf-drop-zone-icon { font-size: 48px; }
+.pdf-drop-zone-title { font-family: var(--mono); font-size: 13px; color: var(--text); }
+.pdf-drop-zone-sub { font-family: var(--mono); font-size: 11px; }
+.pdf-drop-zone-hint {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--accent);
+  margin-top: 8px;
+}
+
+/* Bouton PDF sur les entrées */
+.btn-pdf {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
+}
+.btn-pdf:hover { border-color: var(--accent2); color: var(--accent2); background: #f0f5fb; }
+  .main { padding: 16px; }
+  .chart-grid { grid-template-columns: 1fr; }
+  .header { padding: 16px; }
+  .nav { padding: 0 8px; }
+}
+
+/* LANG TOGGLE */
+.lang-toggle {
+  position: fixed;
+  top: 12px; right: 16px;
+  z-index: 100;
+  display: flex;
+  gap: 6px;
+}
+.lang-btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.1);
+  color: white;
+  cursor: pointer;
+  transition: all .15s;
+}
+.lang-btn.active { background: rgba(255,255,255,0.3); }
+</style>
+</head>
+<body>
+
+<div class="lang-toggle">
+  <button class="lang-btn active" onclick="setLang('es')">ES</button>
+  <button class="lang-btn" onclick="setLang('fr')">FR</button>
+</div>
+
+<div class="header">
+  <div>
+    <div class="header-title"><strong>M.E., J.</strong></div>
+    <div style="font-family:var(--mono);font-size:12px;opacity:.8;margin-top:4px">
+      Nac. **/**/1938 · 87 años · SIP ******** · Hª ******
+    </div>
+    <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+      <span class="header-badge">TEP recurrente</span>
+      <span class="header-badge">Ictus VB 09/2021</span>
+      <span class="header-badge">Deterioro cognitivo</span>
+      <span class="header-badge">Dislipemia</span>
+      <span class="header-badge">EPOC · SAOS</span>
+    </div>
+  </div>
+  <div class="header-meta">
+    <span data-i18n="hospital">Hospital General de Castellón</span><br>
+    <span data-i18n="updated">Actualizado</span>: Abril 2025<br>
+    <span data-i18n="docs">Documentos</span>: 24 PDFs
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <div class="nav-tab active" onclick="showPanel('resumen')" data-i18n="tab_resumen">Resumen</div>
+  <div class="nav-tab" onclick="showPanel('curvas')" data-i18n="tab_curvas">Curvas</div>
+  <div class="nav-tab" onclick="showPanel('tabla')" data-i18n="tab_tabla">Tabla</div>
+  <div class="nav-tab" onclick="showPanel('timeline')" data-i18n="tab_timeline">Cronología</div>
+  <div class="nav-tab" onclick="showPanel('antecedentes')" data-i18n="tab_antec">Antecedentes</div>
+  <div class="nav-tab" onclick="showPanel('correlaciones')" data-i18n="tab_corr">Correlaciones</div>
+  <div class="nav-tab" onclick="showPanel('importar')" data-i18n="tab_import">+ Añadir PDF</div>
+</div>
+
+<div class="main">
+
+<!-- ===== PANEL RESUMEN ===== -->
+<div id="panel-resumen" class="panel active">
+  <div class="section-title" data-i18n="last_values">Últimos valores conocidos</div>
+  <div class="kpi-grid" id="kpi-grid"></div>
+  <div class="section-title" data-i18n="key_charts">Evolución de parámetros clave</div>
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-card-title" data-i18n="hemoglobina">Hemoglobina</div>
+      <div class="chart-card-sub">g/dL · Ref: 12.0 – 18.0</div>
+      <canvas id="chart-hb" height="180"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title" data-i18n="glucosa">Glucosa</div>
+      <div class="chart-card-sub">mg/dL · Ref: 70 – 110</div>
+      <canvas id="chart-gluc" height="180"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title" data-i18n="colesterol">Colesterol total</div>
+      <div class="chart-card-sub">mg/dL</div>
+      <canvas id="chart-col" height="180"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title" data-i18n="creatinina">Creatinina & Filtrado glomerular</div>
+      <div class="chart-card-sub">mg/dL / ml/min</div>
+      <canvas id="chart-crea" height="180"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL CURVAS ===== -->
+<div id="panel-curvas" class="panel">
+  <div class="section-title" data-i18n="all_charts">Todos los parámetros — curvas de evolución</div>
+  <div class="chart-grid" id="all-charts-grid"></div>
+</div>
+
+<!-- ===== PANEL TABLA ===== -->
+<div id="panel-tabla" class="panel">
+  <div class="section-title" data-i18n="synth_table">Tabla de síntesis cronológica</div>
+  <div class="data-table-wrap">
+    <table class="data-table" id="synth-table">
+      <thead id="table-head"></thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== PANEL TIMELINE ===== -->
+<div id="panel-timeline" class="panel">
+  <div class="section-title" data-i18n="clinical_timeline">Cronología clínica</div>
+  <div class="timeline" id="timeline"></div>
+</div>
+
+<!-- ===== PANEL ANTECEDENTES ===== -->
+<div id="panel-antecedentes" class="panel">
+  <div class="section-title" data-i18n="background">Antecedentes médicos</div>
+  <div class="antec-grid">
+    <div class="antec-card">
+      <h3 data-i18n="resp">Respiratorio</h3>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">infancia</span> · TBC (TAC 2017: hallazgos compatibles)</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">&gt;40 años</span> · Ex-fumadora (4 cig/día)</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">ant. 2022</span> · EPOC</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">ant. 2022</span> · SAOS — BiPAP (Navarra)</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">2016</span> · TVP + TEP bilateral — Francia</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">14/01/2022</span> · 2º TEP — Ingreso HGC</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">ant. 10/2022</span> · OCD 16h a 2 lpm</div>
+    </div>
+    <div class="antec-card">
+      <h3 data-i18n="neuro">Neurológico</h3>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">09/2021</span> · Ictus isquémico vertebrobasilar</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">09/2021</span> · Deterioro cognitivo desde ictus — en estudio Neurología</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">11/11/2021</span> · MMSE 25/30 → Deterioro leve</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">22/04/2022</span> · MMSE 22/30 → Moderado-leve · Fluctuación</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">04/2024</span> · Pfeiffer 8/10 · Barthel 80/100</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">09/10/2024</span> · MMSE 16/30 → Deterioro moderado</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">10/2024</span> · Sospecha Enfermedad Alzheimer · Alucinaciones visuales</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">10/2024</span> · Solicitud RM cerebral</div>
+    </div>
+    <div class="antec-card">
+      <h3 data-i18n="cardio">Cardiovascular</h3>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">ant. 2022</span> · Dislipemia</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">ant. 2022</span> · Insuficiencia tricuspídea moderada</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">ant. 2022</span> · Elevación hemidiafragma derecho</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">11/2021</span> · Ecocardio TT: sin cambios vs 2017</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">11/01/2022</span> · Ecocardio: FE &gt;65%, VD levemente aumentado (contexto TEP)</div>
+    </div>
+    <div class="antec-card">
+      <h3 data-i18n="treatment">Tratamiento habitual</h3>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">ant. 2022</span> · Adiro 100mg (antiagregante)</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">ant. 2022</span> · Melitraceno / Flupentixol 10mg/0.5mg</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">ant. 2022</span> · Donepezilo 5mg (Alzheimer)</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">ant. 2022</span> · Bromuro de Tiotropio 18mcg (EPOC)</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">ant. 2022</span> · Atorvastatina 20mg (colesterol)</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">ant. 2022</span> · Pantoprazol 20mg (gastroprotector)</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">01/2022</span> · Rivaroxaban 20mg/día (anticoagulante)</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">04/2022</span> · Memantina (cognitivo)</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">01/2024</span> · Amoxicilina + Clavulánico (flemón — temporal)</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">07/2024</span> · Dabigatrán 150mg/12h (reemplaza Rivaroxaban)</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">10/2024</span> · Haloperidol gotas (agitación/demencia)</div>
+    </div>
+    <div class="antec-card">
+      <h3 data-i18n="urgencias_ant">Urgencias</h3>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">14/01/2022</span> · TEP agudo — Ingreso HGC · Troponina 76.68 ⚠️ · NT-ProBNP 11.924 ⚠️</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">28/10/2022</span> · Bronquitis aguda — SaO2 92% · PCR 22.9 ⚠️</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">23/01/2024</span> · Flemón dentario — TA 150/62 · FC 71 · SaO2 95%</div>
+    </div>
+    <div class="antec-card">
+      <h3 data-i18n="cognitive">Seguimiento cognitivo (MMSE)</h3>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">09/2021</span> · Ingreso por ictus VB — MMSE inicial 16/30</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">11/11/2021</span> · MMSE 25/30 → Leve (recuperación post-ictus)</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">22/04/2022</span> · MMSE 22/30 → Moderado-leve · Fluctuación</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">04/2024</span> · Pfeiffer 8/10 · Barthel 80/100</div>
+      <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">09/10/2024</span> · MMSE 16/30 → Deterioro moderado</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANEL CORRELACIONES ===== -->
+<div id="panel-correlaciones" class="panel">
+  <div class="section-title" data-i18n="tab_corr">Correlaciones clínicas</div>
+
+  <!-- AVISO -->
+  <div style="background:var(--surface);border:1px solid var(--warn);border-radius:var(--radius);padding:14px 18px;margin-bottom:24px;font-size:14px;color:var(--muted)">
+    ⚠️ <strong style="color:var(--warn)">Nota metodológica</strong> —
+    Las correlaciones mostradas son observacionales. La observancia terapéutica es parcial o incierta para varios medicamentos.
+    Las zonas <span style="color:#e06c00">🟡 amarillas</span> indican periodos de observancia incierta o abandono documentado.
+    Este análisis no sustituye el criterio médico.
+  </div>
+
+  <!-- TIMELINE MEDICAMENTOS -->
+  <div class="section-title">Observancia terapéutica</div>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:28px;overflow-x:auto">
+    <canvas id="chart-meds" height="220"></canvas>
+  </div>
+
+  <!-- CORRELACIONES -->
+  <div class="section-title">Análisis de correlaciones</div>
+  <div class="chart-grid">
+
+    <!-- 1. Vitamina D vs Cognitivo -->
+    <div class="chart-card" style="border-left:3px solid #c8a000">
+      <div class="chart-card-title">🧠 Vitamina D → Deterioro cognitivo</div>
+      <div class="chart-card-sub">Vitamina D (ng/mL) · MMSE (/30) · Ref VitD: 30–100</div>
+      <canvas id="corr-vitd-mmse" height="200"></canvas>
+      <div style="margin-top:10px;font-size:12px;color:var(--muted);font-family:var(--mono)">
+        💡 La VitD está crónicamente baja (12–27 ng/mL, ref &gt;30) durante todo el período documentado.
+        La deficiencia de VitD se asocia con aceleración del deterioro cognitivo.
+        <strong style="color:var(--danger)">No consta tratamiento sustitutivo prescrito.</strong>
+      </div>
+    </div>
+
+    <!-- 2. Colesterol vs Atorvastatina -->
+    <div class="chart-card" style="border-left:3px solid #7a3a8b">
+      <div class="chart-card-title">💊 Colesterol total → Atorvastatina</div>
+      <div class="chart-card-sub">Colesterol total (mg/dL) · LDL (mg/dL)</div>
+      <canvas id="corr-col-statin" height="200"></canvas>
+      <div style="margin-top:10px;font-size:12px;color:var(--muted);font-family:var(--mono)">
+        💡 A pesar de Atorvastatina 20mg desde ant. 2022, el colesterol sube de 230 → 281 mg/dL.
+        El LDL supera ampliamente el objetivo (&lt;116 mg/dL). Posible dosis insuficiente o
+        <strong style="color:var(--warn)">observancia irregular.</strong>
+      </div>
+    </div>
+
+    <!-- 3. VCM vs B12 y Folatos -->
+    <div class="chart-card" style="border-left:3px solid #a06000">
+      <div class="chart-card-title">🔬 Macrocitosis → Vitamina B12 & Folatos</div>
+      <div class="chart-card-sub">VCM (fL) · B12 (pg/mL/10) · Ácido fólico (ng/mL)</div>
+      <canvas id="corr-vcm-b12" height="200"></canvas>
+      <div style="margin-top:10px;font-size:12px;color:var(--muted);font-family:var(--mono)">
+        💡 VCM en progresiva elevación (90 → 98.1 fL ⚠️). Los folatos caen de 10.24 → 7.9 ng/mL.
+        B12 estuvo baja en 2022 (152 ⚠️) luego se normalizó. La macrocitosis con folatos bajos
+        puede indicar <strong style="color:var(--warn)">déficit nutricional o interacción medicamentosa.</strong>
+      </div>
+    </div>
+
+    <!-- 4. PCR/Fibrinógeno vs Eventos -->
+    <div class="chart-card" style="border-left:3px solid #8b3a3a">
+      <div class="chart-card-title">🔥 Inflamación → PCR & Fibrinógeno</div>
+      <div class="chart-card-sub">PCR (mg/L) · Fibrinógeno (mg/dL/10)</div>
+      <canvas id="corr-inflam" height="200"></canvas>
+      <div style="margin-top:10px;font-size:12px;color:var(--muted);font-family:var(--mono)">
+        💡 PCR muy elevada en contexto TEP (66.44 ⚠️) y bronquitis (22.9 ⚠️).
+        Fibrinógeno elevado de forma persistente (503–701 mg/dL ⚠️).
+        El fibrinógeno alto es un <strong style="color:var(--danger)">factor de riesgo trombótico independiente,</strong>
+        relevante dado el historial de TEP recurrente.
+      </div>
+    </div>
+
+    <!-- 5. Glucosa vs Eventos agudos -->
+    <div class="chart-card" style="border-left:3px solid #8b6a3a">
+      <div class="chart-card-title">📈 Glucosa → Picos en episodios agudos</div>
+      <div class="chart-card-sub">Glucosa (mg/dL) · HbA1c (%) · Ref: 70–110</div>
+      <canvas id="corr-gluc-hba1c" height="200"></canvas>
+      <div style="margin-top:10px;font-size:12px;color:var(--muted);font-family:var(--mono)">
+        💡 Glucosa basal normal (91–102 mg/dL). Picos marcados en episodios agudos: 264 ⚠️ (TEP 01/2022),
+        156 ⚠️ (bronquitis 10/2022). HbA1c siempre normal (5.66–6.01%).
+        Los picos son probablemente <strong style="color:var(--ok)">hiperglucemia de estrés,</strong> no diabéticos.
+      </div>
+    </div>
+
+    <!-- 6. Función renal -->
+    <div class="chart-card" style="border-left:3px solid #3a8b7a">
+      <div class="chart-card-title">🫘 Función renal → Creatinina & Filtrado</div>
+      <div class="chart-card-sub">Creatinina (mg/dL) · Filtrado CKD-EPI (ml/min)</div>
+      <canvas id="corr-renal" height="200"></canvas>
+      <div style="margin-top:10px;font-size:12px;color:var(--muted);font-family:var(--mono)">
+        💡 Función renal estable pero con tendencia a la baja: FG 83 (01/2022) → 62.45 (04/2024) → 70.8 (03/2025).
+        Importante porque <strong style="color:var(--warn)">el Dabigatrán requiere ajuste de dosis según FG.</strong>
+        Con FG &lt;60: contraindicado. Vigilar evolución.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== PANEL IMPORTAR ===== -->
+<div id="panel-importar" class="panel">
+  <div class="section-title" data-i18n="add_pdf">Añadir nuevos documentos PDF</div>
+  <div class="import-zone" onclick="document.getElementById('file-input').click()" id="drop-zone">
+    <div class="import-zone-icon">📄</div>
+    <div class="import-zone-text" data-i18n="drop_text">Arrastra PDFs aquí o haz clic para seleccionar</div>
+    <div style="font-size:12px;color:var(--muted);margin-top:8px" data-i18n="drop_sub">Formatos soportados: informes de laboratorio, notas de evolución CCEE, informes de urgencias</div>
+  </div>
+  <input type="file" id="file-input" accept=".pdf" multiple style="display:none" onchange="handleFiles(this.files)"/>
+  <div id="import-log" style="font-family:var(--mono);font-size:12px;color:var(--muted)"></div>
+</div>
+
+</div><!-- /main -->
+
+<!-- PDF VIEWER MODAL -->
+<div class="pdf-modal" id="pdf-modal">
+  <div class="pdf-modal-box">
+    <div class="pdf-modal-header">
+      <div class="pdf-modal-title" id="pdf-modal-title">Document PDF</div>
+      <button class="pdf-modal-close" onclick="closePdfModal()">✕</button>
+    </div>
+    <div class="pdf-modal-body" id="pdf-modal-body">
+      <div class="pdf-drop-zone" id="pdf-drop-zone"
+           onclick="document.getElementById('pdf-file-input').click()"
+           ondragover="event.preventDefault();this.style.background='var(--surface2)'"
+           ondragleave="this.style.background=''"
+           ondrop="handlePdfDrop(event)">
+        <div class="pdf-drop-zone-icon">📄</div>
+        <div class="pdf-drop-zone-title" id="pdf-drop-title">Selecciona o arrastra el PDF correspondiente</div>
+        <div class="pdf-drop-zone-sub" id="pdf-drop-sub">Haz clic aquí o arrastra el archivo PDF de tu ordenador</div>
+        <div class="pdf-drop-hint" id="pdf-drop-hint" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-family:var(--mono);font-size:11px;color:var(--accent);margin-top:8px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<input type="file" id="pdf-file-input" accept=".pdf" style="display:none" onchange="loadPdfFile(this)"/>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+/* ================================================================
+   DONNÉES EXTRAITES DE TOUS LES PDFs
+================================================================ */
+const PATIENT = {
+  nom: "M.E., J.",
+  naissance: "**/**/1938",
+  sip: "********",
+  hc: "******"
+};
+
+/* Toutes les mesures extraites, triées chronologiquement */
+const MESURES = [
+  /* 13/01/2022 — Analítica previa al TEP (mencionada en informe alta) */
+  { date: "2022-01-13", src: "Hematología", vals: {
+    hemoglobina: 14.5, plaquetas: 347, creatinina: 0.62, filtrado: 83,
+  }},
+  /* 16/01/2022 — Vithas Urgencias (día del 2º TEP) */
+  { date: "2022-01-16", src: "Vithas Urgencias", vals: {
+    hemoglobina: 14.8, hematocrito: 44.9, vcm: 90.3,
+    leucocitos: 10.3, neutrofilos: 6.32, linfocitos: 2.34, monocitos: 1.40, plaquetas: 363,
+    glucosa: 91, urea: 47, creatinina: 0.78, sodio: 140, potasio: 4.1,
+    inr: 0.90,
+  }},
+  /* 16/01/2022 — Vithas Alta hospitalización TEP (analíticas durante ingreso) */
+  { date: "2022-01-16b", src: "Vithas Alta TEP", vals: {
+    hemoglobina: 14.5, hematocrito: 43.5, leucocitos: 8.30, plaquetas: 347,
+    glucosa: 264, urea: 56, creatinina: 0.62, filtrado: 83.56,
+    sodio: 138, potasio: 3.80,
+    gpt: 42, ggt: 301, fosfatasa: 261,
+    pcr: 66.44, ferritina: 222,
+    troponina: 76.68, bnp: 11924,
+  }},
+  /* 25/02/2022 — 1ère visite Hematología */
+  { date: "2022-02-25", src: "Hematología", vals: {
+    creatinina: 0.62, filtrado: 83,
+  }},
+  /* 28/09/2022 — Hoja anamnesis Hematología */
+  { date: "2022-09-28", src: "Hematología", vals: {
+    glucosa: 121, urea: 40, creatinina: 0.77, filtrado: 71.27,
+    sodio: 142, potasio: 4.22, albumina: 3.60,
+    colesterol: 230, hdl: 54,
+    hemoglobina: 14.1, hematocrito: 43.0, vcm: 95.2,
+    leucocitos: 6.90, neutrofilos: 4.00, linfocitos: 2.10,
+    monocitos: 0.60, plaquetas: 239,
+    vitamina_d: 27.10, vitamina_b12: 152.0, folico: 10.24,
+    hba1c: 5.66, tsh: 0.601,
+    ldl: 151, trigliceridos: 125,
+    ferritina: 66, pcr: 0.62,
+    fibrinogeno: 503,
+  }},
+  /* 28/10/2022 — Urgencias bronquitis */
+  { date: "2022-10-28", src: "Urgencias HGC", vals: {
+    glucosa: 156, urea: 48, creatinina: 0.81, filtrado: 66.89,
+    sodio: 137, potasio: 4.77,
+    pcr: 22.90, fibrinogeno: 701,
+    hemoglobina: 13.9, hematocrito: 42.3, vcm: 92.6,
+    leucocitos: 6.20, neutrofilos: 4.70, linfocitos: 1.10,
+    monocitos: 0.40, plaquetas: 214,
+  }},
+  /* 25/04/2024 — Bilan labo complet Centro Salud */
+  { date: "2024-04-25", src: "Laboratorio", vals: {
+    hemoglobina: 13.8, hematocrito: 41.7, vcm: 92.1,
+    hematies: 4.53, leucocitos: 8.4, plaquetas: 236,
+    linfocitos: 41, monocitos: 11.5, eosinofilos: 2.7,
+    vsg: 20,
+    glucosa: 102.2, urea: 45.3, creatinina: 0.85, filtrado: 62.45,
+    sodio: 139, potasio: 4.26,
+    colesterol: 281.7, hdl: 54.93, ldl: 202, trigliceridos: 126.2,
+    hba1c: 6.01, tsh: 1.16,
+    albumina: 3.7, proteinas: 6.12,
+    vitamina_d: 15.96, vitamina_b12: 234, folico: 9.55,
+    ferritina: 77, hierro: 105,
+    pcr: 4.16, bnp: 73.6,
+    gpt: 11, fosfatasa: 89, ggt: 46,
+  }},
+  /* 12/02/2025 — Hematología analítica completa HGC */
+  { date: "2025-02-12", src: "Hematología HGC", vals: {
+    hemoglobina: 15.1, hematocrito: 45.1, vcm: 92.7,
+    leucocitos: 8.20, neutrofilos: 4.60, linfocitos: 2.50,
+    monocitos: 0.80, plaquetas: 246, vsg: 25,
+    glucosa: 120, urea: 33, creatinina: 0.72, filtrado: 75.97,
+    sodio: 138, potasio: 4.39, fosforo: 2.3,
+    proteinas: 6.28, albumina: 3.80,
+    colesterol: 271, hdl: 52, ldl: 185, trigliceridos: 187,
+    hba1c: 5.88, tsh: 0.886,
+    vitamina_d: 12.33, vitamina_b12: 254, folico: 10.73,
+    ferritina: 117, hierro: 134,
+    fibrinogeno: 503,
+  }},
+  /* 10/03/2025 — Vithas Laboratorio (le plus récent) */
+  { date: "2025-03-10", src: "Vithas Laboratorio", vals: {
+    hemoglobina: 14.5, hematocrito: 46.8, vcm: 98.1,
+    leucocitos: 8.6, neutrofilos: 4.96, linfocitos: 2.45, monocitos: 0.90, plaquetas: 263,
+    urea: 37, creatinina: 0.76, filtrado: 70.8,
+    vitamina_b12: 269, folico: 7.9,
+    gpt: 12, ggt: 40, fosfatasa: 87,
+    tsh: 1.45, inr: 1.00,
+  }},
+];
+
+/* Paramètres avec leurs métadonnées */
+const PARAMS = {
+  hemoglobina:  { label: "Hemoglobina",      unit: "g/dL",      ref: [12,18],    color: "#8b3a3a" },
+  hematocrito:  { label: "Hematocrito",      unit: "%",         ref: [37,52],    color: "#c0634c" },
+  leucocitos:   { label: "Leucocitos",       unit: "x10³/µL",   ref: [4.8,10.8], color: "#3a6b8b" },
+  plaquetas:    { label: "Plaquetas",        unit: "x10³/µL",   ref: [130,400],  color: "#5b8b3a" },
+  glucosa:      { label: "Glucosa",          unit: "mg/dL",     ref: [70,110],   color: "#8b6a3a" },
+  hba1c:        { label: "HbA1c",            unit: "%",         ref: [4,6.5],    color: "#a05c2a" },
+  creatinina:   { label: "Creatinina",       unit: "mg/dL",     ref: [0.51,0.95],color: "#3a8b7a" },
+  filtrado:     { label: "Filtrado glom.",   unit: "ml/min",    ref: [60,200],   color: "#2a7a8b" },
+  colesterol:   { label: "Colesterol total", unit: "mg/dL",     ref: null,       color: "#7a3a8b" },
+  hdl:          { label: "Colesterol HDL",   unit: "mg/dL",     ref: [40,65],    color: "#5a3a8b" },
+  ldl:          { label: "Colesterol LDL",   unit: "mg/dL",     ref: [null,116], color: "#8b3a7a" },
+  trigliceridos:{ label: "Triglicéridos",    unit: "mg/dL",     ref: [50,165],   color: "#8b5a3a" },
+  vitamina_d:   { label: "Vitamina D",       unit: "ng/mL",     ref: [30,100],   color: "#c8a000" },
+  vitamina_b12: { label: "Vitamina B12",     unit: "pg/mL",     ref: [180,914],  color: "#a06000" },
+  tsh:          { label: "TSH",              unit: "mUI/L",     ref: [0.38,5.33],color: "#3a5a8b" },
+  ferritina:    { label: "Ferritina",        unit: "ng/mL",     ref: [20,300],   color: "#6b4a2a" },
+  pcr:          { label: "PCR",              unit: "mg/L",      ref: [1,10],     color: "#8b3a3a" },
+  fibrinogeno:  { label: "Fibrinógeno",      unit: "mg/dL",     ref: [200,400],  color: "#6a3a8b" },
+  vsg:          { label: "VSG",              unit: "mm/h",      ref: [0,10],     color: "#8b6a6a" },
+  albumina:     { label: "Albúmina",         unit: "g/dL",      ref: [3.5,5.2],  color: "#4a8b6a" },
+  proteinas:    { label: "Proteínas totales",unit: "g/dL",      ref: [6.6,8],    color: "#6a8b4a" },
+  urea:         { label: "Urea",             unit: "mg/dL",     ref: [10,50],    color: "#8b8a3a" },
+  sodio:        { label: "Sodio",            unit: "mmol/L",    ref: [134,145],  color: "#3a8b8b" },
+  potasio:      { label: "Potasio",          unit: "mmol/L",    ref: [3.5,5],    color: "#3a6a8b" },
+  bnp:          { label: "BNP/NT-ProBNP",   unit: "pg/mL",     ref: [20,125],   color: "#8b3a5a" },
+  troponina:    { label: "Troponina",        unit: "ng/L",      ref: [0,14],     color: "#c0392b" },
+  inr:          { label: "INR",              unit: "",          ref: [0.85,1.25],color: "#6a5a8b" },
+};
+
+/* ================================================================
+   TRADUCTIONS
+================================================================ */
+const T = {
+  es: {
+    tab_corr:"Correlaciones", tab_resumen:"Resumen", tab_curvas:"Curvas", tab_tabla:"Tabla",
+    tab_timeline:"Cronología", tab_antec:"Antecedentes", tab_import:"+ Añadir PDF",
+    last_values:"Últimos valores conocidos", key_charts:"Evolución de parámetros clave",
+    all_charts:"Todos los parámetros — curvas de evolución",
+    synth_table:"Tabla de síntesis cronológica",
+    clinical_timeline:"Cronología clínica",
+    background:"Antecedentes médicos",
+    add_pdf:"Añadir nuevos documentos PDF",
+    drop_text:"Arrastra PDFs aquí o haz clic para seleccionar",
+    drop_sub:"Formatos soportados: informes de laboratorio, notas de evolución CCEE, informes de urgencias",
+    resp:"Respiratorio", neuro:"Neurológico", cardio:"Cardiovascular",
+    treatment:"Tratamiento habitual", urgencias_ant:"Urgencias", cognitive:"Cognitivo (MMSE)",
+    hospital:"Hospital General de Castellón", updated:"Actualizado", docs:"Documentos",
+    hemoglobina:"Hemoglobina", glucosa:"Glucosa", colesterol:"Colesterol total",
+    creatinina:"Creatinina & Filtrado glomerular",
+    normal:"Normal", alto:"Alto", bajo:"Bajo",
+    date:"Fecha", source:"Fuente",
+  },
+  fr: {
+    tab_resumen:"Résumé", tab_curvas:"Courbes", tab_tabla:"Tableau",
+    tab_timeline:"Chronologie", tab_antec:"Antécédents", tab_import:"+ Ajouter PDF",
+    last_values:"Dernières valeurs connues", key_charts:"Évolution des paramètres clés",
+    all_charts:"Tous les paramètres — courbes d'évolution",
+    synth_table:"Tableau de synthèse chronologique",
+    clinical_timeline:"Chronologie clinique",
+    background:"Antécédents médicaux",
+    add_pdf:"Ajouter de nouveaux documents PDF",
+    drop_text:"Glissez des PDFs ici ou cliquez pour sélectionner",
+    drop_sub:"Formats supportés : bilans de laboratoire, notes d'évolution, rapports d'urgences",
+    resp:"Respiratoire", neuro:"Neurologique", cardio:"Cardiovasculaire",
+    treatment:"Traitement habituel", urgencias_ant:"Urgences", cognitive:"Cognitif (MMSE)",
+    hospital:"Hôpital Général de Castellón", updated:"Mis à jour", docs:"Documents",
+    hemoglobina:"Hémoglobine", glucosa:"Glycémie", colesterol:"Cholestérol total",
+    creatinina:"Créatinine & Filtration glomérulaire",
+    normal:"Normal", alto:"Élevé", bajo:"Bas",
+    date:"Date", source:"Source",
+  }
+};
+let currentLang = 'es';
+
+function setLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.dataset.i18n;
+    if (T[lang][k]) el.textContent = T[lang][k];
+  });
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
+}
+
+/* ================================================================
+   NAVIGATION
+================================================================ */
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  event.target.classList.add('active');
+
+  if (name === 'curvas' && !window.allChartsBuilt) buildAllCharts();
+  if (name === 'tabla') buildTable();
+  if (name === 'timeline') buildTimeline();
+  if (name === 'correlaciones' && !window.corrBuilt) buildCorrelaciones();
+}
+
+/* ================================================================
+   UTILITAIRES
+================================================================ */
+function getStatus(key, val) {
+  const p = PARAMS[key];
+  if (!p || !p.ref) return 'ok';
+  const [lo, hi] = p.ref;
+  if (lo !== null && val < lo) return 'bad';
+  if (hi !== null && val > hi) return 'bad';
+  return 'ok';
+}
+
+function fmtDate(iso) {
+  const [y,m,d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+function getSeriesForParam(key) {
+  const pts = [];
+  MESURES.forEach(m => {
+    if (m.vals[key] !== undefined) {
+      pts.push({ x: m.date, y: m.vals[key], src: m.src });
+    }
+  });
+  return pts.sort((a,b) => a.x.localeCompare(b.x));
+}
+
+/* ================================================================
+   KPI CARDS
+================================================================ */
+function buildKPIs() {
+  const grid = document.getElementById('kpi-grid');
+  const keyParams = ['hemoglobina','glucosa','colesterol','creatinina','filtrado','hba1c','vitamina_d','vitamina_b12','ferritina','pcr','tsh','albumina'];
+
+  keyParams.forEach(key => {
+    const series = getSeriesForParam(key);
+    if (!series.length) return;
+    const last = series[series.length - 1];
+    const prev = series.length > 1 ? series[series.length - 2] : null;
+    const p = PARAMS[key];
+    const status = getStatus(key, last.y);
+    const trend = prev ? (last.y > prev.y ? 'up' : last.y < prev.y ? 'down' : 'stable') : 'stable';
+    const trendIcon = trend === 'up' ? '↑' : trend === 'down' ? '↓' : '→';
+
+    const card = document.createElement('div');
+    card.className = `kpi-card ${status === 'bad' ? 'danger' : 'ok'}`;
+    card.innerHTML = `
+      <div class="kpi-label">${p.label}</div>
+      <div class="kpi-value">${last.y}<span class="kpi-unit"> ${p.unit}</span></div>
+      <div class="kpi-date">${fmtDate(last.x)} · ${last.src}</div>
+      ${prev ? `<div class="kpi-trend ${trend}">${trendIcon} vs ${prev.y} ${p.unit} (${fmtDate(prev.x)})</div>` : ''}
+    `;
+    grid.appendChild(card);
+  });
+}
+
+/* ================================================================
+   CHART.JS HELPERS
+================================================================ */
+Chart.defaults.font.family = "'JetBrains Mono', monospace";
+Chart.defaults.font.size = 10;
+Chart.defaults.color = '#8a8278';
+
+function makeRefPlugin(lo, hi, color) {
+  return {
+    id: 'refZone',
+    beforeDraw(chart) {
+      if (lo === null && hi === null) return;
+      const {ctx, chartArea: {left,right,top,bottom}, scales: {y}} = chart;
+      ctx.save();
+      ctx.fillStyle = 'rgba(60,180,100,0.06)';
+      const yTop = hi !== null ? y.getPixelForValue(Math.min(hi, y.max)) : top;
+      const yBot = lo !== null ? y.getPixelForValue(Math.max(lo, y.min)) : bottom;
+      ctx.fillRect(left, yTop, right-left, yBot-yTop);
+      ctx.restore();
+    }
+  };
+}
+
+function buildLineChart(canvasId, key, extraKeys) {
+  const p = PARAMS[key];
+  const series = getSeriesForParam(key);
+  if (!series.length) return;
+
+  const labels = series.map(s => fmtDate(s.x));
+  const datasets = [{
+    label: p.label,
+    data: series.map(s => s.y),
+    borderColor: p.color,
+    backgroundColor: p.color + '20',
+    pointBackgroundColor: series.map(s => {
+      const st = getStatus(key, s.y);
+      return st === 'bad' ? '#c0392b' : p.color;
+    }),
+    pointRadius: 5,
+    pointHoverRadius: 7,
+    tension: 0.3,
+    fill: false,
+    yAxisID: 'y',
+  }];
+
+  if (extraKeys) {
+    extraKeys.forEach(ek => {
+      const ep = PARAMS[ek];
+      const es = getSeriesForParam(ek);
+      if (!es.length) return;
+      // align to same labels
+      const dmap = {};
+      series.forEach((s,i) => dmap[s.x] = null);
+      es.forEach(s => dmap[s.x] = s.y);
+      datasets.push({
+        label: ep.label,
+        data: series.map(s => dmap[s.x] ?? null),
+        borderColor: ep.color,
+        backgroundColor: ep.color + '20',
+        pointRadius: 5,
+        tension: 0.3,
+        fill: false,
+        yAxisID: 'y2',
+        borderDash: [5,3],
+      });
+    });
+  }
+
+  const ref = p.ref || [null, null];
+  const ctx = document.getElementById(canvasId);
+  if (!ctx) return;
+
+  new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: datasets.length > 1, position: 'bottom', labels: { boxWidth: 12, padding: 10 } },
+        tooltip: {
+          callbacks: {
+            afterLabel: (ctx) => {
+              const val = ctx.raw;
+              if (!val) return '';
+              const st = getStatus(key, val);
+              return st === 'bad' ? '⚠ Fuera de rango' : '✓ Normal';
+            }
+          }
+        }
+      },
+      scales: {
+        x: { grid: { color: '#f0ece4' } },
+        y: {
+          grid: { color: '#f0ece4' },
+          title: { display: true, text: p.unit },
+          ticks: { maxTicksLimit: 5 },
+        },
+        ...(extraKeys ? { y2: {
+          position: 'right',
+          grid: { drawOnChartArea: false },
+          title: { display: true, text: PARAMS[extraKeys[0]].unit },
+          ticks: { maxTicksLimit: 5 },
+        }} : {})
+      }
+    },
+    plugins: [makeRefPlugin(ref[0], ref[1])]
+  });
+}
+
+/* ================================================================
+   BUILD CHARTS
+================================================================ */
+function buildMainCharts() {
+  buildLineChart('chart-hb', 'hemoglobina');
+  buildLineChart('chart-gluc', 'glucosa');
+  buildLineChart('chart-col', 'colesterol');
+  buildLineChart('chart-crea', 'creatinina', ['filtrado']);
+}
+
+window.allChartsBuilt = false;
+function buildAllCharts() {
+  const grid = document.getElementById('all-charts-grid');
+  grid.innerHTML = '';
+  Object.keys(PARAMS).forEach(key => {
+    const series = getSeriesForParam(key);
+    if (series.length < 2) return; // au moins 2 points pour une courbe
+    const p = PARAMS[key];
+    const div = document.createElement('div');
+    div.className = 'chart-card';
+    const refStr = p.ref ? `Ref: ${p.ref.filter(v=>v!==null).join(' – ')} ${p.unit}` : '';
+    div.innerHTML = `
+      <div class="chart-card-title">${p.label}</div>
+      <div class="chart-card-sub">${p.unit}${refStr ? ' · ' + refStr : ''}</div>
+      <canvas id="allchart-${key}" height="160"></canvas>
+    `;
+    grid.appendChild(div);
+    setTimeout(() => buildLineChart('allchart-' + key, key), 50);
+  });
+  window.allChartsBuilt = true;
+}
+
+/* ================================================================
+   TABLE
+================================================================ */
+let tableState = { keys: [], data: [], sortCol: 'date', sortDir: 1 };
+
+function buildTable() {
+  const sorted = [...MESURES].sort((a,b) => a.date.localeCompare(b.date));
+  const allKeys = new Set();
+  sorted.forEach(m => Object.keys(m.vals).forEach(k => allKeys.add(k)));
+  const keys = [...allKeys].filter(k => PARAMS[k]);
+  tableState.keys = keys;
+  tableState.data = sorted;
+  tableState.sortCol = 'date';
+  tableState.sortDir = 1;
+  renderTable();
+}
+
+function sortTable(col) {
+  if (tableState.sortCol === col) {
+    tableState.sortDir *= -1;
+  } else {
+    tableState.sortCol = col;
+    tableState.sortDir = 1;
+  }
+  renderTable();
+}
+
+function renderTable() {
+  const { keys, data, sortCol, sortDir } = tableState;
+  const head = document.getElementById('table-head');
+  const body = document.getElementById('table-body');
+
+  /* En-têtes avec flèches */
+  const thDate   = sortCol === 'date'   ? (sortDir === 1 ? ' ↑' : ' ↓') : ' ↕';
+  const thSource = sortCol === 'source' ? (sortDir === 1 ? ' ↑' : ' ↓') : ' ↕';
+
+  head.innerHTML = '';
+  const tr = document.createElement('tr');
+  tr.innerHTML =
+    `<th style="cursor:pointer;user-select:none" onclick="sortTable('date')">Fecha${thDate}</th>` +
+    `<th style="cursor:pointer;user-select:none" onclick="sortTable('source')">Fuente${thSource}</th>` +
+    keys.map(k => {
+      const arrow = sortCol === k ? (sortDir === 1 ? ' ↑' : ' ↓') : ' ↕';
+      return `<th style="cursor:pointer;user-select:none" onclick="sortTable('${k}')">${PARAMS[k].label}${arrow}</th>`;
+    }).join('');
+  head.appendChild(tr);
+
+  /* Tri des lignes */
+  const sorted = [...data].sort((a, b) => {
+    let va, vb;
+    if (sortCol === 'date')   { va = a.date;  vb = b.date; }
+    else if (sortCol === 'source') { va = a.src; vb = b.src; }
+    else {
+      va = a.vals[sortCol] ?? -Infinity;
+      vb = b.vals[sortCol] ?? -Infinity;
+    }
+    if (va < vb) return -sortDir;
+    if (va > vb) return  sortDir;
+    return 0;
+  });
+
+  body.innerHTML = '';
+  sorted.forEach(m => {
+    const tr = document.createElement('tr');
+    let cells = `<td>${fmtDate(m.date)}</td><td>${m.src}</td>`;
+    keys.forEach(k => {
+      const v = m.vals[k];
+      if (v === undefined) { cells += '<td style="color:#ccc">—</td>'; return; }
+      const st = getStatus(k, v);
+      cells += `<td><span class="${st==='bad'?'badge-bad':'badge-ok'}">${v}</span></td>`;
+    });
+    tr.innerHTML = cells;
+    body.appendChild(tr);
+  });
+}
+
+/* ================================================================
+   TIMELINE
+================================================================ */
+const EVENTS = [
+  { date: "2016", type: "urgencias", title: "TVP + TEP bilateral (Francia)", text: "Tras viaje a Alemania. Tratado con Xarelto." },
+  { date: "2021-09", type: "neurologia", title: "Ictus isquémico vertebrobasilar", text: "Inicio de deterioro cognitivo. MMSE 25/30.", pdf: "Documentacion-Clinica___p1-p114_-057_Neurologia.pdf" },
+  { date: "2022-01-14", type: "urgencias", title: "2º episodio TEP — Ingreso Hospital General", text: "Ingresa por disnea. TAC: defectos de repleción bilaterales TEP agudo. Inicio Enoxaparina 60mg/12h + O2 domiciliario 2l/24h.", pdf: "Documentacion-Clinica___p1-p114_-051_Hematologia.pdf" },
+  { date: "2022-01-16", type: "laboratorio", title: "Vithas Urgencias — Analítica TEP agudo", text: "FC 70 · SaO2 94% · Troponina 76.68 ⚠️ → 65.34 · NT-ProBNP 11.924 ⚠️ · PCR 66.44 ⚠️ · Glucosa 264 ⚠️", pdf: "VITHAS_Analisis_2022-01-16.pdf", vals: [
+    {k:"hemoglobina", v:14.8}, {k:"leucocitos", v:10.3, bad:true}, {k:"monocitos", v:1.40, bad:true},
+    {k:"troponina", v:76.68, bad:true}, {k:"pcr", v:66.44, bad:true}
+  ]},
+  { date: "2022-02-07", type: "hematologia", title: "1ª cita Hematología — No acude", text: "Paciente no acude a la cita.", pdf: "Documentacion-Clinica___p1-p114_-050_Hematologia.pdf" },
+  { date: "2022-02-25", type: "hematologia", title: "1ª visita Hematología", text: "Crea 0.62 · FG 83 · Hb 14.5 g/dL · PQ 347.000. Inicio Xarelto.", pdf: "Documentacion-Clinica___p1-p114_-049_Hematologia.pdf" },
+  { date: "2022-04-22", type: "neurologia", title: "Neurología — MMSE 22/30", text: "Fluctuación. Añade memantina.", pdf: "Documentacion-Clinica___p1-p114_-056_Neurologia.pdf" },
+  { date: "2022-09-28", type: "hematologia", title: "Control Hematología", text: "Analítica completa.", pdf: "Documentacion-Clinica___p1-p114_-048_Hematologia.pdf", vals: [
+    {k:"hemoglobina", v:14.1}, {k:"glucosa", v:121, bad:true}, {k:"colesterol", v:230}, {k:"vitamina_d", v:27.10, bad:true}
+  ]},
+  { date: "2022-10-21", type: "neurologia", title: "Neurología", text: "Empeoró conducta con memantina. Persisten fallos memoria.", pdf: "Documentacion-Clinica___p1-p114_-055_Neurologia.pdf" },
+  { date: "2022-10-28", type: "urgencias", title: "Urgencias — Bronquitis aguda", text: "Disnea y tos 4-5 días. SaO2 92%.", pdf: "Documentacion-Clinica___p1-p114_-024_Urgencias.pdf", vals: [
+    {k:"hemoglobina", v:13.9}, {k:"glucosa", v:156, bad:true}, {k:"pcr", v:22.9, bad:true}, {k:"fibrinogeno", v:701, bad:true}
+  ]},
+  { date: "2023-02-06", type: "hematologia", title: "Hematología — Consulta telefónica", text: "Está en Navarra. No ha realizado analítica.", pdf: "Documentacion-Clinica___p1-p114_-047_Hematologia.pdf" },
+  { date: "2024-01-23", type: "urgencias", title: "Urgencias — Flemón dentario", text: "TA 150/62. FC 71. SaO2 95%. Tto: Amoxicilina + Prednisona.", pdf: "Documentacion-Clinica___p1-p114_-019_Urgencias.pdf" },
+  { date: "2024-04-25", type: "laboratorio", title: "Analítica completa — Centro Salud", text: "Bilan le plus complet.", pdf: "resultados_pruebas_laboratorio_2024-05-06.pdf", vals: [
+    {k:"hemoglobina", v:13.8}, {k:"glucosa", v:102.2}, {k:"colesterol", v:281.7, bad:true},
+    {k:"vitamina_d", v:15.96, bad:true}, {k:"monocitos", v:11.5, bad:true}
+  ]},
+  { date: "2024-07-10", type: "hematologia", title: "Hematología — Visita presencial", text: "Hb 13.8 · Plaq 236.000. Inicio Dabigatrán.", pdf: "Documentacion-Clinica___p1-p114_-045_Hematologia.pdf" },
+  { date: "2024-10-09", type: "neurologia", title: "Neurología — Alzheimer sospecha", text: "MMSE 16/30. Pfeiffer 8/10. Alucinaciones visuales. Solicita RM cerebral.", pdf: "Documentacion-Clinica___p1-p114_-052_Neurologia.pdf" },
+  { date: "2025-02-12", type: "hematologia", title: "Hematología — Última visita HGC", text: "No toma anticoagulante por decisión familiar. Alta médica.", pdf: "Documentacion-Clinica___p1-p114_-041_Hematologia.pdf", vals: [
+    {k:"hemoglobina", v:15.1}, {k:"glucosa", v:120, bad:true}, {k:"colesterol", v:271, bad:true},
+    {k:"vitamina_d", v:12.33, bad:true}, {k:"vsg", v:25, bad:true}
+  ]},
+  { date: "2025-03-10", type: "laboratorio", title: "Vithas Laboratorio — Analítica más reciente", text: "VCM 98.1 ⚠️ (macrocitosis leve). Función renal estable FG 70.8. TSH 1.45 normal. Serología: Treponema negativo.", pdf: "VITHAS_Analisis_2025-03-10.pdf", vals: [
+    {k:"hemoglobina", v:14.5}, {k:"vcm", v:98.1, bad:true}, {k:"creatinina", v:0.76}, {k:"tsh", v:1.45}
+  ]},
+];
+
+function buildTimeline() {
+  const tl = document.getElementById('timeline');
+  tl.innerHTML = '';
+  [...EVENTS].reverse().forEach(ev => {
+    const item = document.createElement('div');
+    item.className = 'timeline-item';
+    const vals = ev.vals ? ev.vals.map(v =>
+      `<span class="tval ${v.bad?'bad':''}">${PARAMS[v.k]?.label ?? v.k}: ${v.v}</span>`
+    ).join('') : '';
+    const pdfBtn = ev.pdf
+      ? `<button class="btn-pdf" onclick="openPdfModal('${ev.pdf}','${ev.title}')">📄 Ver PDF</button>`
+      : '';
+    item.innerHTML = `
+      <div class="timeline-dot ${ev.type}"></div>
+      <div class="timeline-date">${ev.date}</div>
+      <div class="timeline-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap">
+          <div class="timeline-service ${ev.type}">${ev.type.toUpperCase()}</div>
+          ${pdfBtn}
+        </div>
+        <strong style="font-size:15px">${ev.title}</strong>
+        <div class="timeline-text">${ev.text}</div>
+        ${vals ? `<div class="timeline-values">${vals}</div>` : ''}
+      </div>
+    `;
+    tl.appendChild(item);
+  });
+}
+
+/* ================================================================
+   IMPORT (placeholder — nécessite pdf.js pour extraction réelle)
+================================================================ */
+function handleFiles(files) {
+  const log = document.getElementById('import-log');
+  log.innerHTML = '';
+  Array.from(files).forEach(f => {
+    const p = document.createElement('div');
+    p.style.padding = '8px 0';
+    p.innerHTML = `📄 ${f.name} — <em style="color:var(--warn)">Extraction automatique disponible dans la version complète. Veuillez saisir les valeurs manuellement.</em>`;
+    log.appendChild(p);
+  });
+}
+
+// Drag & drop
+const dz = document.getElementById('drop-zone');
+if (dz) {
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.style.background='#fdf0f0'; });
+  dz.addEventListener('dragleave', () => { dz.style.background=''; });
+  dz.addEventListener('drop', e => { e.preventDefault(); dz.style.background=''; handleFiles(e.dataTransfer.files); });
+}
+
+/* ================================================================
+   PDF VIEWER
+================================================================ */
+let currentPdfName = '';
+
+function openPdfModal(filename, title) {
+  currentPdfName = filename;
+  document.getElementById('pdf-modal-title').textContent = title || filename;
+  document.getElementById('pdf-drop-hint').textContent =
+    currentLang === 'fr'
+      ? `Fichier attendu : ${filename}`
+      : `Archivo esperado : ${filename}`;
+  // Reset to drop zone
+  const body = document.getElementById('pdf-modal-body');
+  body.innerHTML = `
+    <div class="pdf-drop-zone" id="pdf-drop-zone"
+         onclick="document.getElementById('pdf-file-input').click()"
+         ondragover="event.preventDefault();this.style.background='var(--surface2)'"
+         ondragleave="this.style.background=''"
+         ondrop="handlePdfDrop(event)">
+      <div class="pdf-drop-zone-icon">📄</div>
+      <div class="pdf-drop-zone-title">${currentLang==='fr'?'Sélectionnez le PDF correspondant':'Selecciona el PDF correspondiente'}</div>
+      <div class="pdf-drop-zone-sub">${currentLang==='fr'?'Cliquez ici ou glissez le fichier PDF':'Haz clic aquí o arrastra el archivo PDF'}</div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-family:var(--mono);font-size:11px;color:var(--accent);margin-top:12px">
+        ${currentLang==='fr'?'Fichier attendu':'Archivo esperado'} : <strong>${filename}</strong>
+      </div>
+    </div>`;
+  document.getElementById('pdf-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePdfModal() {
+  document.getElementById('pdf-modal').classList.remove('open');
+  document.body.style.overflow = '';
+  // Revoke any object URL
+  const iframe = document.querySelector('#pdf-modal-body iframe');
+  if (iframe) URL.revokeObjectURL(iframe.src);
+}
+
+function loadPdfFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  showPdfInModal(file);
+  input.value = '';
+}
+
+function handlePdfDrop(event) {
+  event.preventDefault();
+  const file = event.dataTransfer.files[0];
+  if (file && file.type === 'application/pdf') showPdfInModal(file);
+}
+
+function showPdfInModal(file) {
+  const url = URL.createObjectURL(file);
+  const body = document.getElementById('pdf-modal-body');
+  body.innerHTML = `<iframe src="${url}" style="width:100%;height:100%;border:none"></iframe>`;
+  document.getElementById('pdf-modal-title').textContent = file.name;
+}
+
+// Close modal on backdrop click
+document.getElementById('pdf-modal').addEventListener('click', function(e) {
+  if (e.target === this) closePdfModal();
+});
+
+// ESC key closes modal
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePdfModal(); });
+
+/* ================================================================
+   CORRELACIONES
+================================================================ */
+
+/* Données médicaments avec observance */
+const MEDS = [
+  { label: "Rivaroxaban",    start: "2022-01", end: "2024-07", obs: [
+    { from:"2022-01", to:"2022-07", status:"green",  note:"Confirmado" },
+    { from:"2022-07", to:"2024-07", status:"yellow", note:"Incierto / rechazado varias veces" },
+  ]},
+  { label: "Dabigatrán",     start: "2024-07", end: "2025-03", obs: [
+    { from:"2024-07", to:"2025-01", status:"yellow", note:"Prescrito, observancia dudosa" },
+    { from:"2025-01", to:"2025-03", status:"red",    note:"Abandonado por familia (02/2025)" },
+  ]},
+  { label: "Donepezilo",     start: "2022-01", end: "2025-03", obs: [
+    { from:"2022-01", to:"2022-04", status:"green",  note:"Confirmado" },
+    { from:"2022-04", to:"2022-10", status:"red",    note:"Suspendido por médico (anorexia)" },
+    { from:"2022-10", to:"2025-03", status:"yellow", note:"Reiniciado, observancia incierta" },
+  ]},
+  { label: "Memantina",      start: "2022-04", end: "2025-03", obs: [
+    { from:"2022-04", to:"2022-10", status:"green",  note:"Confirmado" },
+    { from:"2022-10", to:"2025-03", status:"red",    note:"Empeoró conducta — probablemente suspendida" },
+  ]},
+  { label: "Atorvastatina",  start: "2022-01", end: "2025-03", obs: [
+    { from:"2022-01", to:"2025-03", status:"yellow", note:"Prescrita, observancia desconocida" },
+  ]},
+  { label: "Haloperidol",    start: "2024-10", end: "2025-03", obs: [
+    { from:"2024-10", to:"2025-03", status:"yellow", note:"Solo en crisis, irregular por definición" },
+  ]},
+  { label: "Tiotropio/Adiro/Pantoprazol", start: "2022-01", end: "2025-03", obs: [
+    { from:"2022-01", to:"2025-03", status:"yellow", note:"Observancia desconocida" },
+  ]},
+];
+
+const OBS_COLORS = { green: '#2e7d32', yellow: '#e65100', red: '#c0392b' };
+const OBS_BG    = { green: 'rgba(46,125,50,0.15)', yellow: 'rgba(230,81,0,0.15)', red: 'rgba(192,57,43,0.15)' };
+
+/* Convertit "YYYY-MM" en position 0-1 sur l'axe temporel 2022-01 → 2025-06 */
+const T_START = new Date('2022-01-01').getTime();
+const T_END   = new Date('2025-06-01').getTime();
+function tPos(ym) {
+  const d = new Date(ym + '-01').getTime();
+  return (d - T_START) / (T_END - T_START);
+}
+
+window.corrBuilt = false;
+function buildCorrelaciones() {
+
+  /* --- TIMELINE MÉDICAMENTS (canvas custom) --- */
+  const cvs = document.getElementById('chart-meds');
+  const ctx = cvs.getContext('2d');
+  const W = cvs.offsetWidth || 800;
+  cvs.width  = W;
+  cvs.height = 220;
+  const PL = 160, PR = 20, PT = 30, PB = 30;
+  const graphW = W - PL - PR;
+  const rowH   = (cvs.height - PT - PB) / MEDS.length;
+
+  ctx.clearRect(0,0,W,cvs.height);
+
+  /* Axe temps */
+  const years = ['2022','2023','2024','2025'];
+  ctx.fillStyle = '#8a8278';
+  ctx.font = '10px JetBrains Mono, monospace';
+  years.forEach(y => {
+    const x = PL + tPos(y + '-01') * graphW;
+    ctx.fillText(y, x - 12, PT - 8);
+    ctx.strokeStyle = '#ddd8ce';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x, PT); ctx.lineTo(x, cvs.height - PB); ctx.stroke();
+  });
+
+  /* Lignes médicaments */
+  MEDS.forEach((med, i) => {
+    const y = PT + i * rowH + rowH / 2;
+    /* Label */
+    ctx.fillStyle = '#1a1714';
+    ctx.font = '10px JetBrains Mono, monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText(med.label, PL - 6, y + 4);
+    /* Bandes observance */
+    med.obs.forEach(o => {
+      const x1 = PL + tPos(o.from) * graphW;
+      const x2 = PL + tPos(o.to)   * graphW;
+      ctx.fillStyle = OBS_BG[o.status];
+      ctx.fillRect(x1, y - rowH*0.3, x2-x1, rowH*0.6);
+      ctx.strokeStyle = OBS_COLORS[o.status];
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x1, y - rowH*0.3, x2-x1, rowH*0.6);
+    });
+  });
+
+  /* Légende */
+  ctx.textAlign = 'left';
+  const leg = [['✓ Confirmado','green'],['? Incierto','yellow'],['✗ Abandonado','red']];
+  leg.forEach(([txt,col], i) => {
+    const lx = PL + i * 160;
+    ctx.fillStyle = OBS_COLORS[col];
+    ctx.fillRect(lx, cvs.height - PB + 8, 12, 10);
+    ctx.fillStyle = '#8a8278';
+    ctx.font = '10px JetBrains Mono, monospace';
+    ctx.fillText(txt, lx + 16, cvs.height - PB + 18);
+  });
+
+  /* --- GRAPHIQUES CORRÉLATIONS --- */
+
+  /* Dates communes extraites des mesures */
+  const dates = [...MESURES].sort((a,b)=>a.date.localeCompare(b.date)).map(m => fmtDate(m.date));
+
+  function corrChart(id, datasets, annotations) {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+    new Chart(canvas, {
+      type: 'line',
+      data: { labels: dates, datasets },
+      options: {
+        responsive: true,
+        interaction: { mode:'index', intersect:false },
+        plugins: {
+          legend: { display:true, position:'bottom', labels:{ boxWidth:10, padding:8, font:{size:9} } },
+          tooltip: { bodyFont:{size:10} }
+        },
+        scales: {
+          x: { grid:{color:'#f0ece4'}, ticks:{font:{size:8}} },
+          y:  { grid:{color:'#f0ece4'}, position:'left',  ticks:{font:{size:9}, maxTicksLimit:5} },
+          y2: { grid:{drawOnChartArea:false}, position:'right', ticks:{font:{size:9}, maxTicksLimit:5} },
+        }
+      }
+    });
+  }
+
+  function pts(key, scale) {
+    const map = {};
+    MESURES.forEach(m => { if (m.vals[key]!==undefined) map[fmtDate(m.date)] = m.vals[key] * (scale||1); });
+    return dates.map(d => map[d] ?? null);
+  }
+
+  /* 1. VitD + MMSE */
+  const mmseData = { "13/01/2022":null,"16/01/2022":null,"16/01/2022":null,"25/02/2022":null,
+    "28/09/2022":null,"28/10/2022":null,"25/04/2024":null,"12/02/2025":null,"10/03/2025":null };
+  const mmseMap = {"28/09/2022":22,"25/04/2024":16,"12/02/2025":16};
+  corrChart('corr-vitd-mmse', [
+    { label:'Vitamina D (ng/mL)', data:pts('vitamina_d'), borderColor:'#c8a000', backgroundColor:'#c8a00020',
+      pointRadius:5, tension:0.3, fill:false, yAxisID:'y' },
+    { label:'MMSE /30', data:dates.map(d=>mmseMap[d]??null), borderColor:'#3a6b8b', backgroundColor:'#3a6b8b20',
+      pointRadius:6, tension:0, fill:false, yAxisID:'y2', borderDash:[5,3] },
+  ]);
+
+  /* 2. Colesterol + LDL */
+  corrChart('corr-col-statin', [
+    { label:'Colesterol total (mg/dL)', data:pts('colesterol'), borderColor:'#7a3a8b', backgroundColor:'#7a3a8b20',
+      pointRadius:5, tension:0.3, fill:false, yAxisID:'y' },
+    { label:'LDL (mg/dL)', data:pts('ldl'), borderColor:'#c0392b', backgroundColor:'#c0392b20',
+      pointRadius:5, tension:0.3, fill:false, yAxisID:'y', borderDash:[4,2] },
+  ]);
+
+  /* 3. VCM + B12 + Folatos */
+  corrChart('corr-vcm-b12', [
+    { label:'VCM (fL)', data:pts('vcm'), borderColor:'#a06000', backgroundColor:'#a0600020',
+      pointRadius:5, tension:0.3, fill:false, yAxisID:'y' },
+    { label:'Vitamina B12 (pg/mL÷10)', data:pts('vitamina_b12', 0.1), borderColor:'#3a8b7a', backgroundColor:'#3a8b7a20',
+      pointRadius:5, tension:0.3, fill:false, yAxisID:'y2', borderDash:[4,2] },
+    { label:'Ácido Fólico (ng/mL)', data:pts('folico'), borderColor:'#5b8b3a', backgroundColor:'#5b8b3a20',
+      pointRadius:5, tension:0.3, fill:false, yAxisID:'y2' },
+  ]);
+
+  /* 4. PCR + Fibrinogeno */
+  corrChart('corr-inflam', [
+    { label:'PCR (mg/L)', data:pts('pcr'), borderColor:'#8b3a3a', backgroundColor:'#8b3a3a20',
+      pointRadius:5, tension:0.3, fill:false, yAxisID:'y' },
+    { label:'Fibrinógeno (mg/dL÷10)', data:pts('fibrinogeno', 0.1), borderColor:'#6a3a8b', backgroundColor:'#6a3a8b20',
+      pointRadius:5, tension:0.3, fill:false, yAxisID:'y2', borderDash:[4,2] },
+  ]);
+
+  /* 5. Glucosa + HbA1c */
+  corrChart('corr-gluc-hba1c', [
+    { label:'Glucosa (mg/dL)', data:pts('glucosa'), borderColor:'#8b6a3a', backgroundColor:'#8b6a3a20',
+      pointRadius:5, tension:0.3, fill:false, yAxisID:'y' },
+    { label:'HbA1c (%×10)', data:pts('hba1c', 10), borderColor:'#3a6b8b', backgroundColor:'#3a6b8b20',
+      pointRadius:5, tension:0.3, fill:false, yAxisID:'y2', borderDash:[4,2] },
+  ]);
+
+  /* 6. Renal */
+  corrChart('corr-renal', [
+    { label:'Creatinina (mg/dL)', data:pts('creatinina'), borderColor:'#3a8b7a', backgroundColor:'#3a8b7a20',
+      pointRadius:5, tension:0.3, fill:false, yAxisID:'y' },
+    { label:'Filtrado CKD-EPI (ml/min÷10)', data:pts('filtrado', 0.1), borderColor:'#2a7a8b', backgroundColor:'#2a7a8b20',
+      pointRadius:5, tension:0.3, fill:false, yAxisID:'y2', borderDash:[4,2] },
+  ]);
+
+  window.corrBuilt = true;
+}
+
+/* ================================================================
+   INIT
+================================================================ */
+buildKPIs();
+buildMainCharts();
+</script>
+</body>
+</html>
