@@ -441,6 +441,7 @@ canvas { width: 100% !important; }
   <div class="nav-tab" onclick="showPanel('tabla')" data-i18n="tab_tabla">Tabla</div>
   <div class="nav-tab" onclick="showPanel('timeline')" data-i18n="tab_timeline">Cronología</div>
   <div class="nav-tab" onclick="showPanel('antecedentes')" data-i18n="tab_antec">Antecedentes</div>
+  <div class="nav-tab" onclick="showPanel('correlaciones')" data-i18n="tab_corr">Correlaciones</div>
   <div class="nav-tab" onclick="showPanel('importar')" data-i18n="tab_import">+ Añadir PDF</div>
 </div>
 
@@ -559,6 +560,104 @@ canvas { width: 100% !important; }
       <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">04/2024</span> · Pfeiffer 8/10 · Barthel 80/100</div>
       <div class="antec-item"><span style="color:var(--accent);font-family:var(--mono);font-size:10px">09/10/2024</span> · MMSE 16/30 → Deterioro moderado</div>
     </div>
+  </div>
+</div>
+
+<!-- ===== PANEL CORRELACIONES ===== -->
+<div id="panel-correlaciones" class="panel">
+  <div class="section-title" data-i18n="tab_corr">Correlaciones clínicas</div>
+
+  <!-- AVISO -->
+  <div style="background:var(--surface);border:1px solid var(--warn);border-radius:var(--radius);padding:14px 18px;margin-bottom:24px;font-size:14px;color:var(--muted)">
+    ⚠️ <strong style="color:var(--warn)">Nota metodológica</strong> —
+    Las correlaciones mostradas son observacionales. La observancia terapéutica es parcial o incierta para varios medicamentos.
+    Las zonas <span style="color:#e06c00">🟡 amarillas</span> indican periodos de observancia incierta o abandono documentado.
+    Este análisis no sustituye el criterio médico.
+  </div>
+
+  <!-- TIMELINE MEDICAMENTOS -->
+  <div class="section-title">Observancia terapéutica</div>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:28px;overflow-x:auto">
+    <canvas id="chart-meds" height="220"></canvas>
+  </div>
+
+  <!-- CORRELACIONES -->
+  <div class="section-title">Análisis de correlaciones</div>
+  <div class="chart-grid">
+
+    <!-- 1. Vitamina D vs Cognitivo -->
+    <div class="chart-card" style="border-left:3px solid #c8a000">
+      <div class="chart-card-title">🧠 Vitamina D → Deterioro cognitivo</div>
+      <div class="chart-card-sub">Vitamina D (ng/mL) · MMSE (/30) · Ref VitD: 30–100</div>
+      <canvas id="corr-vitd-mmse" height="200"></canvas>
+      <div style="margin-top:10px;font-size:12px;color:var(--muted);font-family:var(--mono)">
+        💡 La VitD está crónicamente baja (12–27 ng/mL, ref &gt;30) durante todo el período documentado.
+        La deficiencia de VitD se asocia con aceleración del deterioro cognitivo.
+        <strong style="color:var(--danger)">No consta tratamiento sustitutivo prescrito.</strong>
+      </div>
+    </div>
+
+    <!-- 2. Colesterol vs Atorvastatina -->
+    <div class="chart-card" style="border-left:3px solid #7a3a8b">
+      <div class="chart-card-title">💊 Colesterol total → Atorvastatina</div>
+      <div class="chart-card-sub">Colesterol total (mg/dL) · LDL (mg/dL)</div>
+      <canvas id="corr-col-statin" height="200"></canvas>
+      <div style="margin-top:10px;font-size:12px;color:var(--muted);font-family:var(--mono)">
+        💡 A pesar de Atorvastatina 20mg desde ant. 2022, el colesterol sube de 230 → 281 mg/dL.
+        El LDL supera ampliamente el objetivo (&lt;116 mg/dL). Posible dosis insuficiente o
+        <strong style="color:var(--warn)">observancia irregular.</strong>
+      </div>
+    </div>
+
+    <!-- 3. VCM vs B12 y Folatos -->
+    <div class="chart-card" style="border-left:3px solid #a06000">
+      <div class="chart-card-title">🔬 Macrocitosis → Vitamina B12 & Folatos</div>
+      <div class="chart-card-sub">VCM (fL) · B12 (pg/mL/10) · Ácido fólico (ng/mL)</div>
+      <canvas id="corr-vcm-b12" height="200"></canvas>
+      <div style="margin-top:10px;font-size:12px;color:var(--muted);font-family:var(--mono)">
+        💡 VCM en progresiva elevación (90 → 98.1 fL ⚠️). Los folatos caen de 10.24 → 7.9 ng/mL.
+        B12 estuvo baja en 2022 (152 ⚠️) luego se normalizó. La macrocitosis con folatos bajos
+        puede indicar <strong style="color:var(--warn)">déficit nutricional o interacción medicamentosa.</strong>
+      </div>
+    </div>
+
+    <!-- 4. PCR/Fibrinógeno vs Eventos -->
+    <div class="chart-card" style="border-left:3px solid #8b3a3a">
+      <div class="chart-card-title">🔥 Inflamación → PCR & Fibrinógeno</div>
+      <div class="chart-card-sub">PCR (mg/L) · Fibrinógeno (mg/dL/10)</div>
+      <canvas id="corr-inflam" height="200"></canvas>
+      <div style="margin-top:10px;font-size:12px;color:var(--muted);font-family:var(--mono)">
+        💡 PCR muy elevada en contexto TEP (66.44 ⚠️) y bronquitis (22.9 ⚠️).
+        Fibrinógeno elevado de forma persistente (503–701 mg/dL ⚠️).
+        El fibrinógeno alto es un <strong style="color:var(--danger)">factor de riesgo trombótico independiente,</strong>
+        relevante dado el historial de TEP recurrente.
+      </div>
+    </div>
+
+    <!-- 5. Glucosa vs Eventos agudos -->
+    <div class="chart-card" style="border-left:3px solid #8b6a3a">
+      <div class="chart-card-title">📈 Glucosa → Picos en episodios agudos</div>
+      <div class="chart-card-sub">Glucosa (mg/dL) · HbA1c (%) · Ref: 70–110</div>
+      <canvas id="corr-gluc-hba1c" height="200"></canvas>
+      <div style="margin-top:10px;font-size:12px;color:var(--muted);font-family:var(--mono)">
+        💡 Glucosa basal normal (91–102 mg/dL). Picos marcados en episodios agudos: 264 ⚠️ (TEP 01/2022),
+        156 ⚠️ (bronquitis 10/2022). HbA1c siempre normal (5.66–6.01%).
+        Los picos son probablemente <strong style="color:var(--ok)">hiperglucemia de estrés,</strong> no diabéticos.
+      </div>
+    </div>
+
+    <!-- 6. Función renal -->
+    <div class="chart-card" style="border-left:3px solid #3a8b7a">
+      <div class="chart-card-title">🫘 Función renal → Creatinina & Filtrado</div>
+      <div class="chart-card-sub">Creatinina (mg/dL) · Filtrado CKD-EPI (ml/min)</div>
+      <canvas id="corr-renal" height="200"></canvas>
+      <div style="margin-top:10px;font-size:12px;color:var(--muted);font-family:var(--mono)">
+        💡 Función renal estable pero con tendencia a la baja: FG 83 (01/2022) → 62.45 (04/2024) → 70.8 (03/2025).
+        Importante porque <strong style="color:var(--warn)">el Dabigatrán requiere ajuste de dosis según FG.</strong>
+        Con FG &lt;60: contraindicado. Vigilar evolución.
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -737,7 +836,7 @@ const PARAMS = {
 ================================================================ */
 const T = {
   es: {
-    tab_resumen:"Resumen", tab_curvas:"Curvas", tab_tabla:"Tabla",
+    tab_corr:"Correlaciones", tab_resumen:"Resumen", tab_curvas:"Curvas", tab_tabla:"Tabla",
     tab_timeline:"Cronología", tab_antec:"Antecedentes", tab_import:"+ Añadir PDF",
     last_values:"Últimos valores conocidos", key_charts:"Evolución de parámetros clave",
     all_charts:"Todos los parámetros — curvas de evolución",
@@ -799,6 +898,7 @@ function showPanel(name) {
   if (name === 'curvas' && !window.allChartsBuilt) buildAllCharts();
   if (name === 'tabla') buildTable();
   if (name === 'timeline') buildTimeline();
+  if (name === 'correlaciones' && !window.corrBuilt) buildCorrelaciones();
 }
 
 /* ================================================================
@@ -1230,6 +1330,199 @@ document.getElementById('pdf-modal').addEventListener('click', function(e) {
 
 // ESC key closes modal
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closePdfModal(); });
+
+/* ================================================================
+   CORRELACIONES
+================================================================ */
+
+/* Données médicaments avec observance */
+const MEDS = [
+  { label: "Rivaroxaban",    start: "2022-01", end: "2024-07", obs: [
+    { from:"2022-01", to:"2022-07", status:"green",  note:"Confirmado" },
+    { from:"2022-07", to:"2024-07", status:"yellow", note:"Incierto / rechazado varias veces" },
+  ]},
+  { label: "Dabigatrán",     start: "2024-07", end: "2025-03", obs: [
+    { from:"2024-07", to:"2025-01", status:"yellow", note:"Prescrito, observancia dudosa" },
+    { from:"2025-01", to:"2025-03", status:"red",    note:"Abandonado por familia (02/2025)" },
+  ]},
+  { label: "Donepezilo",     start: "2022-01", end: "2025-03", obs: [
+    { from:"2022-01", to:"2022-04", status:"green",  note:"Confirmado" },
+    { from:"2022-04", to:"2022-10", status:"red",    note:"Suspendido por médico (anorexia)" },
+    { from:"2022-10", to:"2025-03", status:"yellow", note:"Reiniciado, observancia incierta" },
+  ]},
+  { label: "Memantina",      start: "2022-04", end: "2025-03", obs: [
+    { from:"2022-04", to:"2022-10", status:"green",  note:"Confirmado" },
+    { from:"2022-10", to:"2025-03", status:"red",    note:"Empeoró conducta — probablemente suspendida" },
+  ]},
+  { label: "Atorvastatina",  start: "2022-01", end: "2025-03", obs: [
+    { from:"2022-01", to:"2025-03", status:"yellow", note:"Prescrita, observancia desconocida" },
+  ]},
+  { label: "Haloperidol",    start: "2024-10", end: "2025-03", obs: [
+    { from:"2024-10", to:"2025-03", status:"yellow", note:"Solo en crisis, irregular por definición" },
+  ]},
+  { label: "Tiotropio/Adiro/Pantoprazol", start: "2022-01", end: "2025-03", obs: [
+    { from:"2022-01", to:"2025-03", status:"yellow", note:"Observancia desconocida" },
+  ]},
+];
+
+const OBS_COLORS = { green: '#2e7d32', yellow: '#e65100', red: '#c0392b' };
+const OBS_BG    = { green: 'rgba(46,125,50,0.15)', yellow: 'rgba(230,81,0,0.15)', red: 'rgba(192,57,43,0.15)' };
+
+/* Convertit "YYYY-MM" en position 0-1 sur l'axe temporel 2022-01 → 2025-06 */
+const T_START = new Date('2022-01-01').getTime();
+const T_END   = new Date('2025-06-01').getTime();
+function tPos(ym) {
+  const d = new Date(ym + '-01').getTime();
+  return (d - T_START) / (T_END - T_START);
+}
+
+window.corrBuilt = false;
+function buildCorrelaciones() {
+
+  /* --- TIMELINE MÉDICAMENTS (canvas custom) --- */
+  const cvs = document.getElementById('chart-meds');
+  const ctx = cvs.getContext('2d');
+  const W = cvs.offsetWidth || 800;
+  cvs.width  = W;
+  cvs.height = 220;
+  const PL = 160, PR = 20, PT = 30, PB = 30;
+  const graphW = W - PL - PR;
+  const rowH   = (cvs.height - PT - PB) / MEDS.length;
+
+  ctx.clearRect(0,0,W,cvs.height);
+
+  /* Axe temps */
+  const years = ['2022','2023','2024','2025'];
+  ctx.fillStyle = '#8a8278';
+  ctx.font = '10px JetBrains Mono, monospace';
+  years.forEach(y => {
+    const x = PL + tPos(y + '-01') * graphW;
+    ctx.fillText(y, x - 12, PT - 8);
+    ctx.strokeStyle = '#ddd8ce';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x, PT); ctx.lineTo(x, cvs.height - PB); ctx.stroke();
+  });
+
+  /* Lignes médicaments */
+  MEDS.forEach((med, i) => {
+    const y = PT + i * rowH + rowH / 2;
+    /* Label */
+    ctx.fillStyle = '#1a1714';
+    ctx.font = '10px JetBrains Mono, monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText(med.label, PL - 6, y + 4);
+    /* Bandes observance */
+    med.obs.forEach(o => {
+      const x1 = PL + tPos(o.from) * graphW;
+      const x2 = PL + tPos(o.to)   * graphW;
+      ctx.fillStyle = OBS_BG[o.status];
+      ctx.fillRect(x1, y - rowH*0.3, x2-x1, rowH*0.6);
+      ctx.strokeStyle = OBS_COLORS[o.status];
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x1, y - rowH*0.3, x2-x1, rowH*0.6);
+    });
+  });
+
+  /* Légende */
+  ctx.textAlign = 'left';
+  const leg = [['✓ Confirmado','green'],['? Incierto','yellow'],['✗ Abandonado','red']];
+  leg.forEach(([txt,col], i) => {
+    const lx = PL + i * 160;
+    ctx.fillStyle = OBS_COLORS[col];
+    ctx.fillRect(lx, cvs.height - PB + 8, 12, 10);
+    ctx.fillStyle = '#8a8278';
+    ctx.font = '10px JetBrains Mono, monospace';
+    ctx.fillText(txt, lx + 16, cvs.height - PB + 18);
+  });
+
+  /* --- GRAPHIQUES CORRÉLATIONS --- */
+
+  /* Dates communes extraites des mesures */
+  const dates = [...MESURES].sort((a,b)=>a.date.localeCompare(b.date)).map(m => fmtDate(m.date));
+
+  function corrChart(id, datasets, annotations) {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+    new Chart(canvas, {
+      type: 'line',
+      data: { labels: dates, datasets },
+      options: {
+        responsive: true,
+        interaction: { mode:'index', intersect:false },
+        plugins: {
+          legend: { display:true, position:'bottom', labels:{ boxWidth:10, padding:8, font:{size:9} } },
+          tooltip: { bodyFont:{size:10} }
+        },
+        scales: {
+          x: { grid:{color:'#f0ece4'}, ticks:{font:{size:8}} },
+          y:  { grid:{color:'#f0ece4'}, position:'left',  ticks:{font:{size:9}, maxTicksLimit:5} },
+          y2: { grid:{drawOnChartArea:false}, position:'right', ticks:{font:{size:9}, maxTicksLimit:5} },
+        }
+      }
+    });
+  }
+
+  function pts(key, scale) {
+    const map = {};
+    MESURES.forEach(m => { if (m.vals[key]!==undefined) map[fmtDate(m.date)] = m.vals[key] * (scale||1); });
+    return dates.map(d => map[d] ?? null);
+  }
+
+  /* 1. VitD + MMSE */
+  const mmseData = { "13/01/2022":null,"16/01/2022":null,"16/01/2022":null,"25/02/2022":null,
+    "28/09/2022":null,"28/10/2022":null,"25/04/2024":null,"12/02/2025":null,"10/03/2025":null };
+  const mmseMap = {"28/09/2022":22,"25/04/2024":16,"12/02/2025":16};
+  corrChart('corr-vitd-mmse', [
+    { label:'Vitamina D (ng/mL)', data:pts('vitamina_d'), borderColor:'#c8a000', backgroundColor:'#c8a00020',
+      pointRadius:5, tension:0.3, fill:false, yAxisID:'y' },
+    { label:'MMSE /30', data:dates.map(d=>mmseMap[d]??null), borderColor:'#3a6b8b', backgroundColor:'#3a6b8b20',
+      pointRadius:6, tension:0, fill:false, yAxisID:'y2', borderDash:[5,3] },
+  ]);
+
+  /* 2. Colesterol + LDL */
+  corrChart('corr-col-statin', [
+    { label:'Colesterol total (mg/dL)', data:pts('colesterol'), borderColor:'#7a3a8b', backgroundColor:'#7a3a8b20',
+      pointRadius:5, tension:0.3, fill:false, yAxisID:'y' },
+    { label:'LDL (mg/dL)', data:pts('ldl'), borderColor:'#c0392b', backgroundColor:'#c0392b20',
+      pointRadius:5, tension:0.3, fill:false, yAxisID:'y', borderDash:[4,2] },
+  ]);
+
+  /* 3. VCM + B12 + Folatos */
+  corrChart('corr-vcm-b12', [
+    { label:'VCM (fL)', data:pts('vcm'), borderColor:'#a06000', backgroundColor:'#a0600020',
+      pointRadius:5, tension:0.3, fill:false, yAxisID:'y' },
+    { label:'Vitamina B12 (pg/mL÷10)', data:pts('vitamina_b12', 0.1), borderColor:'#3a8b7a', backgroundColor:'#3a8b7a20',
+      pointRadius:5, tension:0.3, fill:false, yAxisID:'y2', borderDash:[4,2] },
+    { label:'Ácido Fólico (ng/mL)', data:pts('folico'), borderColor:'#5b8b3a', backgroundColor:'#5b8b3a20',
+      pointRadius:5, tension:0.3, fill:false, yAxisID:'y2' },
+  ]);
+
+  /* 4. PCR + Fibrinogeno */
+  corrChart('corr-inflam', [
+    { label:'PCR (mg/L)', data:pts('pcr'), borderColor:'#8b3a3a', backgroundColor:'#8b3a3a20',
+      pointRadius:5, tension:0.3, fill:false, yAxisID:'y' },
+    { label:'Fibrinógeno (mg/dL÷10)', data:pts('fibrinogeno', 0.1), borderColor:'#6a3a8b', backgroundColor:'#6a3a8b20',
+      pointRadius:5, tension:0.3, fill:false, yAxisID:'y2', borderDash:[4,2] },
+  ]);
+
+  /* 5. Glucosa + HbA1c */
+  corrChart('corr-gluc-hba1c', [
+    { label:'Glucosa (mg/dL)', data:pts('glucosa'), borderColor:'#8b6a3a', backgroundColor:'#8b6a3a20',
+      pointRadius:5, tension:0.3, fill:false, yAxisID:'y' },
+    { label:'HbA1c (%×10)', data:pts('hba1c', 10), borderColor:'#3a6b8b', backgroundColor:'#3a6b8b20',
+      pointRadius:5, tension:0.3, fill:false, yAxisID:'y2', borderDash:[4,2] },
+  ]);
+
+  /* 6. Renal */
+  corrChart('corr-renal', [
+    { label:'Creatinina (mg/dL)', data:pts('creatinina'), borderColor:'#3a8b7a', backgroundColor:'#3a8b7a20',
+      pointRadius:5, tension:0.3, fill:false, yAxisID:'y' },
+    { label:'Filtrado CKD-EPI (ml/min÷10)', data:pts('filtrado', 0.1), borderColor:'#2a7a8b', backgroundColor:'#2a7a8b20',
+      pointRadius:5, tension:0.3, fill:false, yAxisID:'y2', borderDash:[4,2] },
+  ]);
+
+  window.corrBuilt = true;
+}
 
 /* ================================================================
    INIT
