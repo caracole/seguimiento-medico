@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MediTrace — Seguimiento Médico Longitudinal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Source+Sans+3:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:       #0e1117;
+  --surface:  #161b27;
+  --surface2: #1e2535;
+  --border:   #2a3348;
+  --accent:   #4a8fe8;
+  --accent2:  #e8a44a;
+  --accent3:  #4ae8a4;
+  --text:     #e8eaf0;
+  --muted:    #7a8499;
+  --danger:   #e84a4a;
+  --serif:    'Playfair Display', Georgia, serif;
+  --sans:     'Source Sans 3', sans-serif;
+  --mono:     'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.7;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── LANG SELECTOR ── */
+.lang-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 12px 24px;
+  background: linear-gradient(to bottom, rgba(14,17,23,0.95), transparent);
+}
+.lang-btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all .2s;
+  letter-spacing: 1px;
+}
+.lang-btn:hover { border-color: var(--accent); color: var(--accent); }
+.lang-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 80px 24px 60px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Grille décorative en fond */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(74,143,232,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(74,143,232,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+}
+
+/* Halo central */
+.hero::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(74,143,232,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 20px;
+  padding: 5px 16px;
+  margin-bottom: 32px;
+  display: inline-block;
+  animation: fadeIn .8s ease forwards;
+}
+
+.hero-title {
+  font-family: var(--serif);
+  font-size: clamp(42px, 7vw, 84px);
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 12px;
+  animation: fadeUp .8s .1s ease both;
+}
+
+.hero-title span { color: var(--accent); font-style: italic; }
+
+.hero-subtitle {
+  font-family: var(--serif);
+  font-size: clamp(16px, 2vw, 22px);
+  font-weight: 400;
+  font-style: italic;
+  color: var(--muted);
+  max-width: 600px;
+  margin: 0 auto 48px;
+  animation: fadeUp .8s .2s ease both;
+}
+
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 16px;
+  padding: 14px 36px;
+  border-radius: 40px;
+  text-decoration: none;
+  transition: all .25s;
+  animation: fadeUp .8s .3s ease both;
+  box-shadow: 0 0 40px rgba(74,143,232,0.3);
+}
+.hero-cta:hover {
+  background: #6aa8f0;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 50px rgba(74,143,232,0.4);
+}
+
+.hero-version {
+  margin-top: 20px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  animation: fadeUp .8s .4s ease both;
+}
+
+/* ── STATS BAR ── */
+.stats-bar {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  flex-wrap: wrap;
+  padding: 32px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.stat { text-align: center; }
+.stat-num {
+  font-family: var(--serif);
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--accent2);
+  display: block;
+}
+.stat-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ── SECTIONS ── */
+section {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 80px 24px;
+}
+
+.section-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+  display: block;
+}
+
+.section-title {
+  font-family: var(--serif);
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 600;
+  margin-bottom: 24px;
+  line-height: 1.2;
+}
+
+.section-text {
+  color: var(--muted);
+  font-size: 17px;
+  margin-bottom: 20px;
+  max-width: 700px;
+}
+
+/* ── OBJECTIF ── */
+.objectif-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent3);
+  border-radius: 12px;
+  padding: 28px 32px;
+  margin: 32px 0;
+  font-size: 18px;
+  font-style: italic;
+  color: var(--text);
+  line-height: 1.8;
+}
+
+/* ── FEATURES GRID ── */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+  margin-top: 40px;
+}
+
+.feature-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  transition: all .2s;
+}
+.feature-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+.feature-icon { font-size: 28px; margin-bottom: 12px; display: block; }
+.feature-title {
+  font-family: var(--serif);
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.feature-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+/* ── AVERTISSEMENT ── */
+.warning-box {
+  background: rgba(232,74,74,0.08);
+  border: 1px solid rgba(232,74,74,0.3);
+  border-radius: 12px;
+  padding: 24px 28px;
+  margin: 32px 0;
+}
+.warning-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--danger);
+  margin-bottom: 10px;
+}
+.warning-text { font-size: 15px; color: var(--muted); line-height: 1.7; }
+
+/* ── MANUEL ── */
+.manuel-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 32px;
+}
+.step-row {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 24px;
+  transition: border-color .2s;
+}
+.step-row:hover { border-color: var(--accent); }
+.step-num {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--accent);
+  opacity: 0.4;
+  min-width: 40px;
+  line-height: 1;
+}
+.step-content h4 {
+  font-family: var(--serif);
+  font-size: 18px;
+  margin-bottom: 6px;
+}
+.step-content p { font-size: 14px; color: var(--muted); }
+
+/* ── CREDITS ── */
+.credits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin-top: 32px;
+}
+.credit-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px;
+  text-align: center;
+}
+.credit-role {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent2);
+  margin-bottom: 12px;
+}
+.credit-name {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.credit-detail { font-size: 13px; color: var(--muted); }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 32px 24px;
+  text-align: center;
+}
+.footer-title {
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.footer-meta {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  margin-top: 16px;
+}
+.footer-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  padding: 12px 32px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-size: 15px;
+  transition: all .2s;
+}
+.footer-cta:hover { background: #6aa8f0; transform: translateY(-1px); }
+
+/* ── DIVIDER ── */
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 0;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeIn  { from{opacity:0} to{opacity:1} }
+@keyframes fadeUp  { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px) {
+  .stats-bar { gap: 24px; }
+  .step-row { flex-direction: column; gap: 8px; }
+  .step-num { font-size: 22px; }
+}
+</style>
+</head>
+<body>
+
+<!-- LANG BAR -->
+<div class="lang-bar">
+  <button class="lang-btn active" onclick="setLang('es')">ES</button>
+  <button class="lang-btn" onclick="setLang('fr')">FR</button>
+  <button class="lang-btn" onclick="setLang('en')">EN</button>
+</div>
+
+<!-- ══════════════════════════════════════════
+     HERO
+══════════════════════════════════════════ -->
+<div class="hero">
+  <div class="hero-badge" data-i18n="badge">Herramienta de seguimiento médico</div>
+  <h1 class="hero-title">Medi<span>Trace</span></h1>
+  <p class="hero-subtitle" data-i18n="hero_sub">
+    Un dossier médical longitudinal, interactif et visuel — pour mieux comprendre, mieux dialoguer, mieux soigner.
+  </p>
+  <a href="dossier.html" class="hero-cta">
+    <span data-i18n="cta">→ Acceder al dossier</span>
+  </a>
+  <div class="hero-version">v2026.2 · <span data-i18n="updated">Actualizado</span> Mayo 2026</div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     STATS
+══════════════════════════════════════════ -->
+<div class="stats-bar">
+  <div class="stat">
+    <span class="stat-num">9</span>
+    <span class="stat-label" data-i18n="stat_dates">Fechas de análisis</span>
+  </div>
+  <div class="stat">
+    <span class="stat-num">29</span>
+    <span class="stat-label" data-i18n="stat_docs">Documentos procesados</span>
+  </div>
+  <div class="stat">
+    <span class="stat-num">25+</span>
+    <span class="stat-label" data-i18n="stat_params">Parámetros seguidos</span>
+  </div>
+  <div class="stat">
+    <span class="stat-num">6</span>
+    <span class="stat-label" data-i18n="stat_corr">Correlaciones clínicas</span>
+  </div>
+  <div class="stat">
+    <span class="stat-num">2022→2025</span>
+    <span class="stat-label" data-i18n="stat_period">Período cubierto</span>
+  </div>
+</div>
+
+<hr class="divider"/>
+
+<!-- ══════════════════════════════════════════
+     OBJECTIF
+══════════════════════════════════════════ -->
+<section id="about">
+  <span class="section-tag" data-i18n="tag_about">À propos</span>
+  <h2 class="section-title" data-i18n="about_title">Un outil né d'une nécessité</h2>
+
+  <div class="objectif-box" data-i18n="objectif">
+    "Cet outil a été conçu pour donner au patient et à ses proches une vision claire et longitudinale
+    de l'histoire médicale, afin de faciliter le dialogue avec les professionnels de santé,
+    améliorer la continuité des soins et prévenir les erreurs médicales."
+  </div>
+
+  <p class="section-text" data-i18n="about_p1">
+    Face à des dossiers médicaux dispersés entre plusieurs hôpitaux, cliniques privées et centres de santé,
+    et face à des épisodes aigus mal diagnostiqués au départ, l'idée s'est imposée :
+    construire un outil qui centralise, visualise et analyse l'histoire médicale dans sa continuité.
+  </p>
+  <p class="section-text" data-i18n="about_p2">
+    MediTrace n'est pas un outil de diagnostic. C'est un outil de mémoire médicale structurée,
+    conçu pour le patient, sa famille et son médecin — afin que personne ne reparte de zéro
+    à chaque consultation.
+  </p>
+
+  <div class="warning-box">
+    <div class="warning-title">⚠️ <span data-i18n="warn_title">Avertissement médical</span></div>
+    <div class="warning-text" data-i18n="warn_text">
+      MediTrace est un outil d'aide à la compréhension et ne se substitue en aucun cas
+      au jugement d'un professionnel de santé. Les corrélations présentées sont observationnelles.
+      Toute décision thérapeutique doit être prise par un médecin qualifié.
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- ══════════════════════════════════════════
+     FONCTIONNALITÉS
+══════════════════════════════════════════ -->
+<section>
+  <span class="section-tag" data-i18n="tag_features">Fonctionnalités</span>
+  <h2 class="section-title" data-i18n="features_title">Ce que fait MediTrace</h2>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <span class="feature-icon">📊</span>
+      <div class="feature-title" data-i18n="f1_t">Résumé & KPIs</div>
+      <div class="feature-desc" data-i18n="f1_d">Dernières valeurs connues avec tendance (↑↓) et comparaison à la mesure précédente.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">📈</span>
+      <div class="feature-title" data-i18n="f2_t">Courbes d'évolution</div>
+      <div class="feature-desc" data-i18n="f2_d">25+ paramètres biologiques tracés dans le temps avec zones de référence. Points hors norme en rouge.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">📋</span>
+      <div class="feature-title" data-i18n="f3_t">Tableau de synthèse</div>
+      <div class="feature-desc" data-i18n="f3_d">Tableau chronologique complet, trié par colonnes. Vert = normal, rouge = hors norme.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🕐</span>
+      <div class="feature-title" data-i18n="f4_t">Chronologie clinique</div>
+      <div class="feature-desc" data-i18n="f4_d">Timeline de tous les événements médicaux avec accès direct au PDF source correspondant.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🔗</span>
+      <div class="feature-title" data-i18n="f5_t">Corrélations cliniques</div>
+      <div class="feature-desc" data-i18n="f5_d">Graphiques superposés pour identifier les relations entre paramètres et médicaments, avec observance thérapeutique.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">📄</span>
+      <div class="feature-title" data-i18n="f6_t">Viewer PDF intégré</div>
+      <div class="feature-desc" data-i18n="f6_d">Chaque événement de la chronologie permet d'ouvrir le PDF source correspondant directement dans l'application.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🏥</span>
+      <div class="feature-title" data-i18n="f7_t">Antécédents structurés</div>
+      <div class="feature-desc" data-i18n="f7_d">Respiratoire, neurologique, cardiovasculaire, traitements — avec dates de première prescription et observance.</div>
+    </div>
+    <div class="feature-card">
+      <span class="feature-icon">🔒</span>
+      <div class="feature-title" data-i18n="f8_t">100% local & privé</div>
+      <div class="feature-desc" data-i18n="f8_d">Aucune donnée envoyée sur un serveur. Les PDFs restent sur votre appareil. Fonctionne hors ligne.</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- ══════════════════════════════════════════
+     MANUEL
+══════════════════════════════════════════ -->
+<section id="manual">
+  <span class="section-tag" data-i18n="tag_manual">Manuel d'utilisation</span>
+  <h2 class="section-title" data-i18n="manual_title">Comment utiliser MediTrace</h2>
+  <p class="section-text" data-i18n="manual_intro">
+    L'application s'ouvre directement dans votre navigateur. Aucune installation requise.
+    Naviguez entre les onglets selon vos besoins.
+  </p>
+
+  <div class="manuel-steps">
+    <div class="step-row">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h4 data-i18n="s1_t">Résumé — Vue d'ensemble rapide</h4>
+        <p data-i18n="s1_d">Les cartes KPI affichent les dernières valeurs connues avec leur tendance. Les 4 graphiques clés donnent une vue immédiate de l'hémoglobine, la glycémie, le cholestérol et la fonction rénale.</p>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h4 data-i18n="s2_t">Curvas — Tous les paramètres en détail</h4>
+        <p data-i18n="s2_d">Chaque paramètre biologique est tracé dans le temps. La zone verte indique la plage de référence. Les points rouges signalent les valeurs hors norme.</p>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h4 data-i18n="s3_t">Tabla — Trier et comparer</h4>
+        <p data-i18n="s3_d">Cliquez sur l'entête de n'importe quelle colonne pour trier (↑↓). Idéal pour identifier les dates où un paramètre était le plus élevé ou le plus bas.</p>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <h4 data-i18n="s4_t">Cronología — L'histoire dans le temps</h4>
+        <p data-i18n="s4_d">Tous les événements médicaux classés chronologiquement. Cliquez sur 📄 Ver PDF pour ouvrir le document source correspondant — sélectionnez-le depuis votre ordinateur.</p>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <h4 data-i18n="s5_t">Correlaciones — Les liens entre les données</h4>
+        <p data-i18n="s5_d">La timeline d'observance montre quand chaque médicament a été réellement pris. Les 6 graphiques superposent paramètres et traitements pour identifier des corrélations.</p>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">6</div>
+      <div class="step-content">
+        <h4 data-i18n="s6_t">Antecedentes — La fiche patient complète</h4>
+        <p data-i18n="s6_d">Tous les antécédents organisés par catégorie et en ordre chronologique, avec les dates de première apparition ou prescription.</p>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">7</div>
+      <div class="step-content">
+        <h4 data-i18n="s7_t">Ajouter de nouveaux documents</h4>
+        <p data-i18n="s7_d">Pour intégrer de nouveaux bilans, envoyez les PDFs à Claude (claude.ai) avec l'indication "à intégrer dans MediTrace". Les nouvelles données seront ajoutées et le fichier mis à jour.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- ══════════════════════════════════════════
+     CRÉDITS
+══════════════════════════════════════════ -->
+<section id="credits">
+  <span class="section-tag" data-i18n="tag_credits">Crédits</span>
+  <h2 class="section-title" data-i18n="credits_title">Auteur & Concepteur</h2>
+  <p class="section-text" data-i18n="credits_intro">
+    MediTrace est né d'une initiative personnelle, conçu entièrement dans une série de sessions
+    de travail collaboratif entre un ingénieur informaticien et une intelligence artificielle.
+  </p>
+
+  <div class="credits-grid">
+    <div class="credit-card">
+      <div class="credit-role" data-i18n="role_author">Auteur & Concepteur</div>
+      <div class="credit-name">Pierre-Henri Giraud</div>
+      <div class="credit-detail" data-i18n="author_detail">
+        Ingénieur informaticien · 83 ans<br>
+        Castellón de la Plana, España<br>
+        <a href="mailto:ph.giraud@proton.me" style="color:var(--accent);text-decoration:none">ph.giraud@proton.me</a>
+      </div>
+    </div>
+    <div class="credit-card">
+      <div class="credit-role" data-i18n="role_ai">Assistant IA & Co-développeur</div>
+      <div class="credit-name">Claude</div>
+      <div class="credit-detail" data-i18n="ai_detail">
+        Par Anthropic<br>
+        Analyse, code, extraction de données<br>
+        <a href="https://claude.ai" target="_blank" style="color:var(--accent);text-decoration:none">claude.ai</a>
+      </div>
+    </div>
+    <div class="credit-card">
+      <div class="credit-role" data-i18n="role_tech">Technologies</div>
+      <div class="credit-name" style="font-size:16px;margin-top:8px">HTML · JS · Chart.js</div>
+      <div class="credit-detail" data-i18n="tech_detail">
+        Application web pure · Sans serveur<br>
+        Fonctionne 100% localement<br>
+        Open source · GitHub Pages
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider"/>
+
+<!-- ══════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════ -->
+<footer>
+  <div class="footer-title">Medi<span style="color:var(--accent);font-style:italic">Trace</span></div>
+  <p style="color:var(--muted);font-size:14px;margin-top:8px" data-i18n="footer_sub">
+    Seguimiento médico longitudinal · Pierre-Henri Giraud × Claude (Anthropic)
+  </p>
+  <a href="dossier.html" class="footer-cta" data-i18n="cta">→ Acceder al dossier</a>
+  <div class="footer-meta">
+    v2026.2 · Mayo 2026 · <span data-i18n="footer_private">Datos anonimizados · 100% local</span>
+  </div>
+  <div style="margin-top:20px;font-family:var(--mono);font-size:10px;color:var(--border);letter-spacing:1px">
+    © 2026 <strong style="color:var(--muted)">MediTrace</strong> · Pierre-Henri Giraud ·
+    <span data-i18n="footer_rights">Tous droits réservés · Concept & Design original</span><br>
+    Développé en collaboration avec Claude (Anthropic) · GNU GPL v3
+  </div>
+</footer>
+
+<script>
+/* ================================================================
+   TRADUCTIONS
+================================================================ */
+const T = {
+  es: {
+    badge:"Herramienta de seguimiento médico longitudinal",
+    hero_sub:"Un dossier médico longitudinal, interactivo y visual — para comprender mejor, dialogar mejor, cuidar mejor.",
+    cta:"→ Acceder al dossier médico",
+    updated:"Actualizado",
+    stat_dates:"Fechas de análisis", stat_docs:"Documentos procesados",
+    stat_params:"Parámetros seguidos", stat_corr:"Correlaciones clínicas", stat_period:"Período cubierto",
+    tag_about:"Acerca de", about_title:"Una herramienta nacida de una necesidad",
+    objectif:'"Esta herramienta fue diseñada para dar al paciente y a sus familiares una visión clara y longitudinal de la historia médica, con el fin de facilitar el diálogo con los profesionales de la salud, mejorar la continuidad de la atención y prevenir errores médicos."',
+    about_p1:"Ante expedientes médicos dispersos entre varios hospitales, clínicas privadas y centros de salud, y ante episodios agudos inicialmente mal diagnosticados, surgió la idea: construir una herramienta que centralice, visualice y analice la historia médica en su continuidad.",
+    about_p2:"MediTrace no es una herramienta de diagnóstico. Es una herramienta de memoria médica estructurada, diseñada para el paciente, su familia y su médico — para que nadie tenga que empezar de cero en cada consulta.",
+    warn_title:"Aviso médico",
+    warn_text:"MediTrace es una herramienta de apoyo a la comprensión y no sustituye en ningún caso el criterio de un profesional de la salud. Las correlaciones presentadas son observacionales. Toda decisión terapéutica debe ser tomada por un médico cualificado.",
+    tag_features:"Funcionalidades", features_title:"Lo que hace MediTrace",
+    f1_t:"Resumen & KPIs", f1_d:"Últimos valores conocidos con tendencia (↑↓) y comparación con la medición anterior.",
+    f2_t:"Curvas de evolución", f2_d:"25+ parámetros biológicos trazados en el tiempo con zonas de referencia. Puntos fuera de rango en rojo.",
+    f3_t:"Tabla de síntesis", f3_d:"Tabla cronológica completa, ordenable por columnas. Verde = normal, rojo = fuera de rango.",
+    f4_t:"Cronología clínica", f4_d:"Timeline de todos los eventos médicos con acceso directo al PDF fuente correspondiente.",
+    f5_t:"Correlaciones clínicas", f5_d:"Gráficos superpuestos para identificar relaciones entre parámetros y medicamentos, con observancia terapéutica.",
+    f6_t:"Visor PDF integrado", f6_d:"Cada evento de la cronología permite abrir el PDF fuente directamente en la aplicación.",
+    f7_t:"Antecedentes estructurados", f7_d:"Respiratorio, neurológico, cardiovascular, tratamientos — con fechas de primera prescripción y observancia.",
+    f8_t:"100% local y privado", f8_d:"Ningún dato enviado a un servidor. Los PDFs permanecen en su dispositivo. Funciona sin conexión.",
+    tag_manual:"Manual de uso", manual_title:"Cómo usar MediTrace",
+    manual_intro:"La aplicación se abre directamente en su navegador. Sin instalación. Navegue entre las pestañas según sus necesidades.",
+    s1_t:"Resumen — Vista general rápida", s1_d:"Las tarjetas KPI muestran los últimos valores conocidos con su tendencia. Los 4 gráficos clave dan una visión inmediata de la hemoglobina, glucosa, colesterol y función renal.",
+    s2_t:"Curvas — Todos los parámetros en detalle", s2_d:"Cada parámetro biológico está trazado en el tiempo. La zona verde indica el rango de referencia. Los puntos rojos señalan valores fuera de rango.",
+    s3_t:"Tabla — Ordenar y comparar", s3_d:"Haga clic en el encabezado de cualquier columna para ordenar (↑↓). Ideal para identificar las fechas en que un parámetro fue más alto o más bajo.",
+    s4_t:"Cronología — La historia en el tiempo", s4_d:"Todos los eventos médicos en orden cronológico. Haga clic en 📄 Ver PDF para abrir el documento fuente — selecciónelo desde su ordenador.",
+    s5_t:"Correlaciones — Los vínculos entre los datos", s5_d:"La línea de tiempo de observancia muestra cuándo se tomó realmente cada medicamento. Los 6 gráficos superponen parámetros y tratamientos para identificar correlaciones.",
+    s6_t:"Antecedentes — La ficha completa del paciente", s6_d:"Todos los antecedentes organizados por categoría y en orden cronológico, con las fechas de primera aparición o prescripción.",
+    s7_t:"Añadir nuevos documentos", s7_d:"Para integrar nuevos análisis, envíe los PDFs a Claude (claude.ai) indicando 'integrar en MediTrace'. Los nuevos datos se añadirán y el archivo se actualizará.",
+    tag_credits:"Créditos", credits_title:"Autor y Conceptor",
+    credits_intro:"MediTrace nació de una iniciativa personal, concebido íntegramente en una serie de sesiones de trabajo colaborativo entre un ingeniero informático y una inteligencia artificial.",
+    role_author:"Autor y Conceptor", author_detail:"Ingeniero informático · 83 años<br>Castellón de la Plana, España<br><a href='mailto:ph.giraud@proton.me' style='color:var(--accent);text-decoration:none'>ph.giraud@proton.me</a>",
+    role_ai:"Asistente IA y Co-desarrollador", ai_detail:"Por Anthropic<br>Análisis, código, extracción de datos<br><a href='https://claude.ai' target='_blank' style='color:var(--accent);text-decoration:none'>claude.ai</a>",
+    role_tech:"Tecnologías", tech_detail:"Aplicación web pura · Sin servidor<br>Funciona 100% localmente<br>Open source · GitHub Pages",
+    footer_sub:"Seguimiento médico longitudinal · Pierre-Henri Giraud × Claude (Anthropic)",
+    footer_private:"Datos anonimizados · 100% local",
+    footer_rights:"Todos los derechos reservados · Concepto y Diseño original",
+  },
+  fr: {
+    badge:"Outil de suivi médical longitudinal",
+    hero_sub:"Un dossier médical longitudinal, interactif et visuel — pour mieux comprendre, mieux dialoguer, mieux soigner.",
+    cta:"→ Accéder au dossier médical",
+    updated:"Mis à jour",
+    stat_dates:"Dates d'analyse", stat_docs:"Documents traités",
+    stat_params:"Paramètres suivis", stat_corr:"Corrélations cliniques", stat_period:"Période couverte",
+    tag_about:"À propos", about_title:"Un outil né d'une nécessité",
+    objectif:'"Cet outil a été conçu pour donner au patient et à ses proches une vision claire et longitudinale de l\'histoire médicale, afin de faciliter le dialogue avec les professionnels de santé, améliorer la continuité des soins et prévenir les erreurs médicales."',
+    about_p1:"Face à des dossiers médicaux dispersés entre plusieurs hôpitaux, cliniques privées et centres de santé, et face à des épisodes aigus mal diagnostiqués au départ, l'idée s'est imposée : construire un outil qui centralise, visualise et analyse l'histoire médicale dans sa continuité.",
+    about_p2:"MediTrace n'est pas un outil de diagnostic. C'est un outil de mémoire médicale structurée, conçu pour le patient, sa famille et son médecin — afin que personne ne reparte de zéro à chaque consultation.",
+    warn_title:"Avertissement médical",
+    warn_text:"MediTrace est un outil d'aide à la compréhension et ne se substitue en aucun cas au jugement d'un professionnel de santé. Les corrélations présentées sont observationnelles. Toute décision thérapeutique doit être prise par un médecin qualifié.",
+    tag_features:"Fonctionnalités", features_title:"Ce que fait MediTrace",
+    f1_t:"Résumé & KPIs", f1_d:"Dernières valeurs connues avec tendance (↑↓) et comparaison à la mesure précédente.",
+    f2_t:"Courbes d'évolution", f2_d:"25+ paramètres biologiques tracés dans le temps avec zones de référence. Points hors norme en rouge.",
+    f3_t:"Tableau de synthèse", f3_d:"Tableau chronologique complet, trié par colonnes. Vert = normal, rouge = hors norme.",
+    f4_t:"Chronologie clinique", f4_d:"Timeline de tous les événements médicaux avec accès direct au PDF source correspondant.",
+    f5_t:"Corrélations cliniques", f5_d:"Graphiques superposés pour identifier les relations entre paramètres et médicaments, avec observance thérapeutique.",
+    f6_t:"Viewer PDF intégré", f6_d:"Chaque événement de la chronologie permet d'ouvrir le PDF source directement dans l'application.",
+    f7_t:"Antécédents structurés", f7_d:"Respiratoire, neurologique, cardiovasculaire, traitements — avec dates de première prescription et observance.",
+    f8_t:"100% local & privé", f8_d:"Aucune donnée envoyée sur un serveur. Les PDFs restent sur votre appareil. Fonctionne hors ligne.",
+    tag_manual:"Manuel d'utilisation", manual_title:"Comment utiliser MediTrace",
+    manual_intro:"L'application s'ouvre directement dans votre navigateur. Aucune installation requise. Naviguez entre les onglets selon vos besoins.",
+    s1_t:"Résumé — Vue d'ensemble rapide", s1_d:"Les cartes KPI affichent les dernières valeurs connues avec leur tendance. Les 4 graphiques clés donnent une vue immédiate.",
+    s2_t:"Courbes — Tous les paramètres en détail", s2_d:"Chaque paramètre biologique est tracé dans le temps. La zone verte indique la plage de référence. Les points rouges signalent les valeurs hors norme.",
+    s3_t:"Tableau — Trier et comparer", s3_d:"Cliquez sur l'entête de n'importe quelle colonne pour trier (↑↓). Idéal pour identifier les dates où un paramètre était le plus élevé ou bas.",
+    s4_t:"Chronologie — L'histoire dans le temps", s4_d:"Tous les événements médicaux classés chronologiquement. Cliquez sur 📄 Ver PDF pour ouvrir le document source.",
+    s5_t:"Corrélations — Les liens entre les données", s5_d:"La timeline d'observance montre quand chaque médicament a été réellement pris. Les 6 graphiques superposent paramètres et traitements.",
+    s6_t:"Antécédents — La fiche patient complète", s6_d:"Tous les antécédents organisés par catégorie et en ordre chronologique, avec les dates de première apparition ou prescription.",
+    s7_t:"Ajouter de nouveaux documents", s7_d:"Pour intégrer de nouveaux bilans, envoyez les PDFs à Claude (claude.ai) avec l'indication 'à intégrer dans MediTrace'.",
+    tag_credits:"Crédits", credits_title:"Auteur & Concepteur",
+    credits_intro:"MediTrace est né d'une initiative personnelle, conçu entièrement dans une série de sessions de travail collaboratif entre un ingénieur informaticien et une intelligence artificielle.",
+    role_author:"Auteur & Concepteur", author_detail:"Ingénieur informaticien · 83 ans<br>Castellón de la Plana, España<br><a href='mailto:ph.giraud@proton.me' style='color:var(--accent);text-decoration:none'>ph.giraud@proton.me</a>",
+    role_ai:"Assistant IA & Co-développeur", ai_detail:"Par Anthropic<br>Analyse, code, extraction de données<br><a href='https://claude.ai' target='_blank' style='color:var(--accent);text-decoration:none'>claude.ai</a>",
+    role_tech:"Technologies", tech_detail:"Application web pure · Sans serveur<br>Fonctionne 100% localement<br>Open source · GitHub Pages",
+    footer_sub:"Suivi médical longitudinal · Pierre-Henri Giraud × Claude (Anthropic)",
+    footer_private:"Données anonymisées · 100% local",
+    footer_rights:"Tous droits réservés · Concept & Design original",
+  },
+  en: {
+    badge:"Longitudinal medical tracking tool",
+    hero_sub:"A longitudinal, interactive and visual medical record — to understand better, communicate better, care better.",
+    cta:"→ Open the medical record",
+    updated:"Updated",
+    stat_dates:"Analysis dates", stat_docs:"Documents processed",
+    stat_params:"Parameters tracked", stat_corr:"Clinical correlations", stat_period:"Period covered",
+    tag_about:"About", about_title:"A tool born from necessity",
+    objectif:'"This tool was designed to give patients and their families a clear, longitudinal view of the medical history, in order to facilitate dialogue with healthcare professionals, improve continuity of care and prevent medical errors."',
+    about_p1:"Faced with medical records scattered across several hospitals, private clinics and health centres, and with acute episodes that were initially misdiagnosed, the idea emerged: build a tool that centralises, visualises and analyses medical history in its continuity.",
+    about_p2:"MediTrace is not a diagnostic tool. It is a structured medical memory tool, designed for the patient, their family and their doctor — so that no one has to start from scratch at each appointment.",
+    warn_title:"Medical disclaimer",
+    warn_text:"MediTrace is a comprehension aid and in no way replaces the judgement of a healthcare professional. The correlations presented are observational. All therapeutic decisions must be made by a qualified physician.",
+    tag_features:"Features", features_title:"What MediTrace does",
+    f1_t:"Summary & KPIs", f1_d:"Latest known values with trend (↑↓) and comparison to the previous measurement.",
+    f2_t:"Evolution charts", f2_d:"25+ biological parameters plotted over time with reference zones. Out-of-range points in red.",
+    f3_t:"Synthesis table", f3_d:"Complete chronological table, sortable by columns. Green = normal, red = out of range.",
+    f4_t:"Clinical timeline", f4_d:"Timeline of all medical events with direct access to the corresponding source PDF.",
+    f5_t:"Clinical correlations", f5_d:"Overlaid charts to identify relationships between parameters and medications, with therapeutic adherence.",
+    f6_t:"Integrated PDF viewer", f6_d:"Each timeline event allows the source PDF to be opened directly within the application.",
+    f7_t:"Structured medical history", f7_d:"Respiratory, neurological, cardiovascular, treatments — with first prescription dates and adherence.",
+    f8_t:"100% local & private", f8_d:"No data sent to a server. PDFs remain on your device. Works offline.",
+    tag_manual:"User manual", manual_title:"How to use MediTrace",
+    manual_intro:"The application opens directly in your browser. No installation required. Navigate between tabs as needed.",
+    s1_t:"Summary — Quick overview", s1_d:"KPI cards show the latest known values with their trend. The 4 key charts give an immediate view of haemoglobin, blood sugar, cholesterol and kidney function.",
+    s2_t:"Charts — All parameters in detail", s2_d:"Each biological parameter is plotted over time. The green zone indicates the reference range. Red points flag out-of-range values.",
+    s3_t:"Table — Sort and compare", s3_d:"Click any column header to sort (↑↓). Ideal for identifying the dates when a parameter was highest or lowest.",
+    s4_t:"Timeline — History over time", s4_d:"All medical events in chronological order. Click 📄 Ver PDF to open the source document — select it from your computer.",
+    s5_t:"Correlations — Links between data", s5_d:"The adherence timeline shows when each medication was actually taken. The 6 charts overlay parameters and treatments to identify correlations.",
+    s6_t:"Medical history — Complete patient record", s6_d:"All medical history organised by category and in chronological order, with dates of first occurrence or prescription.",
+    s7_t:"Adding new documents", s7_d:"To integrate new test results, send the PDFs to Claude (claude.ai) with the note 'integrate into MediTrace'. New data will be added and the file updated.",
+    tag_credits:"Credits", credits_title:"Author & Designer",
+    credits_intro:"MediTrace was born from a personal initiative, conceived entirely in a series of collaborative work sessions between a computer engineer and an artificial intelligence.",
+    role_author:"Author & Designer", author_detail:"Computer engineer · 83 years old<br>Castellón de la Plana, Spain<br><a href='mailto:ph.giraud@proton.me' style='color:var(--accent);text-decoration:none'>ph.giraud@proton.me</a>",
+    role_ai:"AI Assistant & Co-developer", ai_detail:"By Anthropic<br>Analysis, code, data extraction<br><a href='https://claude.ai' target='_blank' style='color:var(--accent);text-decoration:none'>claude.ai</a>",
+    role_tech:"Technologies", tech_detail:"Pure web application · No server<br>Works 100% locally<br>Open source · GitHub Pages",
+    footer_sub:"Longitudinal medical tracking · Pierre-Henri Giraud × Claude (Anthropic)",
+    footer_private:"Anonymised data · 100% local",
+    footer_rights:"All rights reserved · Original concept & design",
+  }
+};
+
+let lang = 'es';
+function setLang(l) {
+  lang = l;
+  const t = T[l];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.dataset.i18n;
+    if (t[k] !== undefined) el.innerHTML = t[k];
+  });
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`).classList.add('active');
+  document.documentElement.lang = l;
+  localStorage.setItem('meditrace_lang', l);
+}
+
+/* Restaurer la langue */
+const saved = localStorage.getItem('meditrace_lang');
+if (saved && T[saved]) setLang(saved);
+else setLang('es');
+</script>
+</body>
+</html>
