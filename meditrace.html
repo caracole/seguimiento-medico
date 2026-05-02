@@ -281,6 +281,9 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
     <button class="lang-btn active" onclick="setLang('es')">ES</button>
     <button class="lang-btn" onclick="setLang('fr')">FR</button>
     <button class="lang-btn" onclick="setLang('en')">EN</button>
+    <button class="btn-topbar" onclick="exportData()" title="Guardar datos en archivo JSON">💾 Exportar</button>
+    <button class="btn-topbar" onclick="document.getElementById('import-json').click()" title="Restaurar datos desde archivo JSON">📂 Importar</button>
+    <input type="file" id="import-json" accept=".json,.js" style="display:none" onchange="importData(this)"/>
     <button class="btn-topbar" onclick="showPanel('importar',this)" data-i18n="nav_import">+ Añadir datos</button>
     <button class="btn-topbar danger" onclick="confirmReset()" data-i18n="nav_reset">⟳ Reiniciar</button>
   </div>
@@ -819,6 +822,75 @@ function updateDataSummary(data) {
   const paramCount = new Set(data.flatMap(d => Object.keys(d.vals))).size;
   el.innerHTML = `📊 ${data.length} fechas · ${paramCount} parámetros distintos · ` +
     `${data[0].date} → ${data[data.length-1].date}`;
+}
+
+/* ================================================================
+   EXPORT / IMPORT JSON
+================================================================ */
+function exportData() {
+  const data   = loadData();
+  const events = loadEvents();
+  if (!data.length && !events.length) {
+    alert('No hay datos que exportar.');
+    return;
+  }
+  const payload = {
+    version: "MediTrace-2026",
+    exported: new Date().toISOString(),
+    mesures: data,
+    events:  events
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'meditrace_backup_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const text = e.target.result;
+      // Supporte JSON pur ou fichier .js avec const data = [...]
+      let parsed;
+      if (text.trim().startsWith('{')) {
+        // Format JSON natif MediTrace
+        parsed = JSON.parse(text);
+        if (parsed.mesures) {
+          saveData(parsed.mesures);
+          if (parsed.events) saveEvents(parsed.events);
+          alert('✓ ' + parsed.mesures.length + ' entrées + ' + (parsed.events?.length||0) + ' événements restaurés !');
+        } else {
+          alert('Format non reconnu.');
+          return;
+        }
+      } else {
+        // Format .js ancien style : extrait le tableau data = [...]
+        const match = text.match(/(?:const|let|var)\s+data\s*=\s*(\[[\s\S]*?\])\s*;/);
+        const matchEv = text.match(/(?:const|let|var)\s+events\s*=\s*(\[[\s\S]*?\])\s*;/);
+        if (match) {
+          const data = JSON.parse(match[1]);
+          saveData(data);
+          if (matchEv) saveEvents(JSON.parse(matchEv[1]));
+          alert('✓ ' + data.length + ' entrées restaurées !');
+        } else {
+          alert('Format non reconnu. Utilisez un fichier JSON exporté par MediTrace.');
+          return;
+        }
+      }
+      showMainNav();
+      location.reload();
+    } catch(err) {
+      alert('Erreur de lecture : ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  input.value = '';
 }
 
 /* ================================================================
