@@ -34,31 +34,133 @@ body {
   overflow-x: hidden;
 }
 
-/* ── LANG SELECTOR ── */
-.lang-bar {
+/* ── NAVBAR ── */
+.navbar {
   position: fixed;
   top: 0; left: 0; right: 0;
-  z-index: 100;
+  z-index: 200;
+  background: rgba(14,17,23,0.96);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
   display: flex;
-  justify-content: flex-end;
-  gap: 6px;
-  padding: 12px 24px;
-  background: linear-gradient(to bottom, rgba(14,17,23,0.95), transparent);
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  height: 56px;
 }
-.lang-btn {
+.navbar-logo {
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.navbar-logo span { font-style: italic; color: var(--accent); }
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.nav-link {
   font-family: var(--mono);
   font-size: 11px;
-  padding: 4px 12px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid transparent;
+  transition: all .2s;
+  white-space: nowrap;
+}
+.nav-link:hover { color: var(--accent); border-color: var(--border); }
+.nav-link.cta {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+  margin-left: 8px;
+}
+.nav-link.cta:hover { background: #6aa8f0; }
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.lang-btn-nav {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 3px 10px;
   border-radius: 20px;
   border: 1px solid var(--border);
   background: transparent;
   color: var(--muted);
   cursor: pointer;
   transition: all .2s;
-  letter-spacing: 1px;
 }
-.lang-btn:hover { border-color: var(--accent); color: var(--accent); }
-.lang-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.lang-btn-nav:hover { color: var(--accent); border-color: var(--accent); }
+.lang-btn-nav.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+/* Hamburger mobile */
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  padding: 4px;
+  background: none;
+  border: none;
+}
+.nav-hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--muted);
+  border-radius: 2px;
+  transition: all .2s;
+}
+.nav-mobile {
+  display: none;
+  position: fixed;
+  top: 56px; left: 0; right: 0;
+  background: rgba(14,17,23,0.98);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 24px;
+  z-index: 199;
+  flex-direction: column;
+  gap: 4px;
+}
+.nav-mobile.open { display: flex; }
+.nav-mobile a {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  transition: color .2s;
+}
+.nav-mobile a:hover { color: var(--accent); }
+.nav-mobile a.cta {
+  color: var(--accent);
+  font-weight: 600;
+  border-bottom: none;
+  margin-top: 8px;
+}
+
+@media(max-width:768px) {
+  .navbar-links { display: none; }
+  .nav-hamburger { display: flex; }
+  .navbar { padding: 0 16px; }
+}
+
+/* Ajuster le hero pour la navbar */
+.hero { padding-top: 100px; }
+.stats-bar { scroll-margin-top: 60px; }
+section { scroll-margin-top: 60px; }
+
 
 /* ── HERO ── */
 .hero {
@@ -403,17 +505,43 @@ footer {
 </head>
 <body>
 
-<!-- LANG BAR -->
-<div class="lang-bar">
-  <button class="lang-btn active" onclick="setLang('es')">ES</button>
-  <button class="lang-btn" onclick="setLang('fr')">FR</button>
-  <button class="lang-btn" onclick="setLang('en')">EN</button>
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="#hero" class="navbar-logo">Medi<span>Trace</span></a>
+
+  <!-- Links desktop -->
+  <div class="navbar-links">
+    <a href="#about"    class="nav-link" data-i18n="nav_about">À propos</a>
+    <a href="#features" class="nav-link" data-i18n="nav_features">Fonctionnalités</a>
+    <a href="#manual"   class="nav-link" data-i18n="nav_manual">Utilisation</a>
+    <a href="#credits"  class="nav-link" data-i18n="nav_credits">Crédits</a>
+    <a href="meditrace.html" class="nav-link cta" data-i18n="nav_open">→ Ouvrir MediTrace</a>
+  </div>
+
+  <!-- Right: lang + hamburger -->
+  <div class="navbar-right">
+    <button class="lang-btn-nav active" onclick="setLang('es')">ES</button>
+    <button class="lang-btn-nav" onclick="setLang('fr')">FR</button>
+    <button class="lang-btn-nav" onclick="setLang('en')">EN</button>
+    <button class="nav-hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- MENU MOBILE -->
+<div class="nav-mobile" id="nav-mobile">
+  <a href="#about"    onclick="closeMobileMenu()" data-i18n="nav_about">À propos</a>
+  <a href="#features" onclick="closeMobileMenu()" data-i18n="nav_features">Fonctionnalités</a>
+  <a href="#manual"   onclick="closeMobileMenu()" data-i18n="nav_manual">Utilisation</a>
+  <a href="#credits"  onclick="closeMobileMenu()" data-i18n="nav_credits">Crédits</a>
+  <a href="meditrace.html" class="cta" data-i18n="nav_open">→ Ouvrir MediTrace</a>
 </div>
 
 <!-- ══════════════════════════════════════════
      HERO
 ══════════════════════════════════════════ -->
-<div class="hero">
+<div class="hero" id="hero">
   <div class="hero-badge" data-i18n="badge">Herramienta de seguimiento médico</div>
   <h1 class="hero-title">Medi<span>Trace</span></h1>
   <p class="hero-subtitle" data-i18n="hero_sub">
@@ -492,7 +620,7 @@ footer {
 <!-- ══════════════════════════════════════════
      FONCTIONNALITÉS
 ══════════════════════════════════════════ -->
-<section>
+<section id="features">
   <span class="section-tag" data-i18n="tag_features">Fonctionnalités</span>
   <h2 class="section-title" data-i18n="features_title">Ce que fait Medi<span style="font-style:italic;color:var(--accent)">Trace</span></h2>
 
@@ -721,6 +849,7 @@ const T = {
     footer_sub:"Seguimiento médico longitudinal · Pierre-Henri Giraud × Claude (Anthropic)",
     footer_private:"Datos anonimizados · 100% local",
     footer_rights:"Todos los derechos reservados · Concepto y Diseño original",
+    nav_about:"Acerca de", nav_features:"Funcionalidades", nav_manual:"Uso", nav_credits:"Créditos", nav_open:"→ Abrir MediTrace",
   },
   fr: {
     badge:"Outil de suivi médical longitudinal",
@@ -761,6 +890,7 @@ const T = {
     footer_sub:"Suivi médical longitudinal · Pierre-Henri Giraud × Claude (Anthropic)",
     footer_private:"Données anonymisées · 100% local",
     footer_rights:"Tous droits réservés · Concept & Design original",
+    nav_about:"À propos", nav_features:"Fonctionnalités", nav_manual:"Utilisation", nav_credits:"Crédits", nav_open:"→ Ouvrir MediTrace",
   },
   en: {
     badge:"Longitudinal medical tracking tool",
@@ -801,6 +931,7 @@ const T = {
     footer_sub:"Longitudinal medical tracking · Pierre-Henri Giraud × Claude (Anthropic)",
     footer_private:"Anonymised data · 100% local",
     footer_rights:"All rights reserved · Original concept & design",
+    nav_about:"About", nav_features:"Features", nav_manual:"How to use", nav_credits:"Credits", nav_open:"→ Open MediTrace",
   }
 };
 
@@ -812,10 +943,38 @@ function setLang(l) {
     const k = el.dataset.i18n;
     if (t[k] !== undefined) el.innerHTML = t[k];
   });
-  document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`).classList.add('active');
+  /* Mettre à jour les boutons de langue */
+  document.querySelectorAll('.lang-btn-nav').forEach(b => b.classList.remove('active'));
+  const activeBtn = document.querySelector(`.lang-btn-nav[onclick="setLang('${l}')"]`);
+  if (activeBtn) activeBtn.classList.add('active');
   document.documentElement.lang = l;
   localStorage.setItem('meditrace_lang', l);
 }
+
+/* Menu mobile */
+function toggleMobileMenu() {
+  document.getElementById('nav-mobile').classList.toggle('open');
+}
+function closeMobileMenu() {
+  document.getElementById('nav-mobile').classList.remove('open');
+}
+/* Fermer le menu si on clique ailleurs */
+document.addEventListener('click', e => {
+  if (!e.target.closest('.navbar') && !e.target.closest('#nav-mobile')) {
+    closeMobileMenu();
+  }
+});
+
+/* Smooth scroll pour les ancres */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
 
 /* Restaurer la langue */
 const saved = localStorage.getItem('meditrace_lang');
