@@ -547,7 +547,14 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 
 <!-- ===== PANEL FARMA ===== -->
 <div id="panel-farma" class="panel">
-  <div class="section-label">⚠ Farmacovigilancia — CIMA/AEMPS</div>
+  <div class="section-label">⚠ Farmacovigilancia — Interacciones & Contraindicaciones · Fuente: CIMA/AEMPS</div>
+
+  <!-- AVISO -->
+  <div style="background:var(--surface);border:1px solid rgba(232,74,74,0.3);border-radius:var(--radius);padding:14px 18px;margin-bottom:20px;font-size:13px;color:var(--muted)">
+    <strong style="color:var(--danger)">Fuentes:</strong> CIMA/AEMPS — Fichas técnicas oficiales de cada medicamento.
+    Este análisis es informativo y no sustituye el criterio médico.
+  </div>
+
   <div id="farma-content"></div>
 </div>
 
@@ -1555,26 +1562,91 @@ function buildTimeline() {
 ================================================================ */
 function buildFarma() {
   document.getElementById('farma-content').innerHTML = `
-    <div class="alert-box critical">
-      <div class="alert-title critical">🚨 INTERACCIÓN CRÍTICA — Haloperidol + Donepezilo</div>
-      <div class="alert-text">Ambos medicamentos prolongan el intervalo QTc de forma independiente. Su combinación puede producir arritmias ventriculares graves (Torsade de pointes), síncope o muerte súbita. Fuente: CIMA/AEMPS — FT Haloperidol Esteve · FT Aricept/Donepezilo</div>
+    <div class="alert-box warn" style="margin-bottom:14px">
+      <div class="alert-title warn">&#x26A0; QTc RESUELTO PARCIALMENTE — Haloperidol suspendido definitivamente</div>
+      <div class="alert-text">
+        <strong>Riesgo QTc RESUELTO PARCIALMENTE.</strong> Haloperidol suspendido definitivamente por neurólogo privado. Persiste riesgo residual: Donepezilo + Melitraceno (antidepresivo tricíclico) siguen prolongando el QTc. Verificar ECG de control.
+        FT Haloperidol (CIMA): lista "otros antipsicóticos (derivados de fenotiazina)" y "antidepresivos tricíclicos" como contraindicados.
+        FT Donepezilo (CIMA): casos notificados de prolongacion del QTc y torsade de pointes.
+        Melitraceno es un antidepresivo tricíclico — sinergismo QTc con Haloperidol.
+        Riesgo elevado con insuficiencia tricuspídea moderada y bradicardia (FC 52 en 2017).
+        Recomendacion: ECG urgente. Suspender si QTc mayor de 500ms.
+      </div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:8px">FT Haloperidol Esteve · FT Donepezilo Stada · FT Deanxit — CIMA/AEMPS</div>
     </div>
-    <div class="alert-box warn">
-      <div class="alert-title warn">⚠ RIESGO ALTO — Dabigatrán + Adiro (AAS)</div>
-      <div class="alert-text">Según la FT de Pradaxa (CIMA): el uso concomitante de AAS "dobla aproximadamente los índices de episodios de sangrado mayor". Riesgo especialmente elevado en pacientes ≥75 años. Fuente: CIMA — FT Pradaxa 150mg</div>
+    <div class="alert-box critical" style="margin-bottom:14px">
+      <div class="alert-title critical">&#x1F6A8; CRITICO 2 — Dabigatran + Adiro (AAS)</div>
+      <div class="alert-text">FT Pradaxa (CIMA): uso concomitante de AAS dobla aproximadamente los indices de episodios de sangrado mayor. Riesgo especialmente elevado en mayores de 75 anos con 150mg/12h.</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:8px">FT Pradaxa 150mg · FT Adiro 100mg — CIMA/AEMPS</div>
     </div>
-    <div class="alert-box warn">
-      <div class="alert-title warn">⚠ VIGILANCIA — Dabigatrán + Función renal</div>
-      <div class="alert-text">Evaluar función renal al menos una vez al año en pacientes >75 años. Contraindicado si FG &lt;30 ml/min. Precaución si FG 30–80 ml/min. Fuente: AEMPS Nota MUH(FV) 21/2011</div>
+    <div class="alert-box warn" style="margin-bottom:14px">
+      <div class="alert-title warn">&#x26A0; IMPORTANTE 1 — Dabigatran + Funcion renal</div>
+      <div class="alert-text">FG en descenso: 83 a 75.97 a 70.8 a 62.45 ml/min. Control renal obligatorio al menos 1 vez/anio en mayores de 75 anos (AEMPS). Contraindicado si FG menor de 30. Con FG menor de 50: reducir dosis a 110mg/12h.</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:8px">AEMPS Nota MUH(FV) 21/2011 · FT Pradaxa 150mg</div>
     </div>
-    <div class="alert-box ok">
-      <div class="alert-title ok">✓ SEGURO — Donepezilo + Memantina</div>
-      <div class="alert-text">No se han observado interacciones relevantes entre memantina y donepezilo. Combinación reconocida y segura. Fuente: CIMA — FT Domex/TecniGen</div>
+    <div class="alert-box warn" style="margin-bottom:14px">
+      <div class="alert-title warn">&#x26A0; IMPORTANTE 2 — Tiotropio + Donepezilo — Antagonismo anticolinergico</div>
+      <div class="alert-text">Tiotropio (anticolinergico) antagoniza el mecanismo pro-colinergico del Donepezilo. FT Donepezilo (CIMA): puede interferir con farmacos que presenten actividad anticolinergica. Este antagonismo puede reducir la eficacia cognitiva del Donepezilo.</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:8px">FT Donepezilo Stada · FT Spiriva — CIMA/AEMPS</div>
     </div>
-    <div style="margin-top:16px;font-family:var(--mono);font-size:10px;color:var(--muted)">
-      Análisis basado en fichas técnicas CIMA/AEMPS · Este módulo será ampliado con datos del perfil del paciente.
-      <br>DOI: <a href="https://doi.org/10.5281/zenodo.19973451" target="_blank" style="color:var(--accent)">10.5281/zenodo.19973451</a>
-    </div>`;
+    <div class="alert-box warn" style="margin-bottom:14px">
+      <div class="alert-title warn">&#x26A0; IMPORTANTE 3 — Pantoprazol largo plazo — Deficit Vitamina B12</div>
+      <div class="alert-text">FT Pantoprazol (CIMA): tratamiento prolongado puede reducir la absorcion de vitamina B12 a causa de la aclorhidria. Paciente toma Pantoprazol desde antes de 2022. B12: 152 pg/mL (09/2022, ref mayor de 180). Contribuye a macrocitosis (VCM 98.1 en 03/2025).</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:8px">FT Pantoprazol Durban · Analitica HGC 09/2022 — CIMA/AEMPS</div>
+    </div>
+    <div class="alert-box warn" style="margin-bottom:14px">
+      <div class="alert-title warn">&#x26A0; IMPORTANTE 4 — Pantoprazol largo plazo — Hipomagnesemia — Arritmia</div>
+      <div class="alert-text">FT Pantoprazol (CIMA): casos graves de hipomagnesemia tras mas de 3 meses de tratamiento. Sintomas: fatiga, delirio, convulsiones, arritmia ventricular. La hipomagnesemia potencia ademas el riesgo de prolongacion del QTc. No consta medicion de magnesio en ningun documento disponible.</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:8px">FT Pantoprazol Anagastra — CIMA/AEMPS</div>
+    </div>
+    <div class="alert-box warn" style="margin-bottom:14px">
+      <div class="alert-title warn">&#x26A0; A VIGILAR — Atorvastatina — Hiperglucemia potencial</div>
+      <div class="alert-text">Las estatinas pueden aumentar la glucemia. Glucemias basales 102-120 mg/dL. LDL: 202 mg/dL (objetivo menor de 116). Colesterol sube a pesar del tratamiento.</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:8px">FT Atorvastatina Normon — CIMA/AEMPS</div>
+    </div>
+    <div class="alert-box ok" style="margin-bottom:14px">
+      <div class="alert-title ok">&#x2713; SEGURO — Donepezilo + Memantina</div>
+      <div class="alert-text">No se han observado interacciones relevantes. Combinacion reconocida y segura segun FT Domex (CIMA).</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:8px">FT Domex/TecniGen — CIMA/AEMPS</div>
+    </div>
+    <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--muted);margin:20px 0 10px">TABLA RESUMEN</div>
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Medicamento</th><th>Interaccion</th><th>Con</th><th>Nivel</th><th>Fuente CIMA</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Haloperidol</strong></td><td>QTc triple</td><td>Donepezilo + Melitraceno</td><td><span class="badge-bad">CRITICO</span></td><td>FT Haloperidol Esteve</td></tr>
+          <tr><td><strong>Donepezilo</strong></td><td>QTc</td><td>Haloperidol</td><td><span class="badge-bad">CRITICO</span></td><td>FT Donepezilo Stada</td></tr>
+          <tr><td><strong>Melitraceno</strong></td><td>QTc (tricíclico)</td><td>Haloperidol</td><td><span class="badge-bad">CRITICO</span></td><td>FT Deanxit</td></tr>
+          <tr><td><strong>Dabigatran</strong></td><td>Doble sangrado</td><td>AAS (Adiro)</td><td><span class="badge-bad">Alto</span></td><td>FT Pradaxa 150mg</td></tr>
+          <tr><td><strong>Dabigatran</strong></td><td>Acumulacion si FG baja</td><td>Funcion renal</td><td><span class="badge-bad">Vigilancia</span></td><td>AEMPS MUH 21/2011</td></tr>
+          <tr><td><strong>Tiotropio</strong></td><td>Antagonismo colinergico</td><td>Donepezilo</td><td><span class="badge-warn">Importante</span></td><td>FT Spiriva · Donepezilo</td></tr>
+          <tr><td><strong>Pantoprazol</strong></td><td>Deficit B12</td><td>Largo plazo</td><td><span class="badge-warn">Importante</span></td><td>FT Pantoprazol</td></tr>
+          <tr><td><strong>Pantoprazol</strong></td><td>Hipomagnesemia</td><td>Largo plazo</td><td><span class="badge-warn">Importante</span></td><td>FT Pantoprazol</td></tr>
+          <tr><td><strong>Atorvastatina</strong></td><td>Hiperglucemia</td><td>Perfil metabolico</td><td><span class="badge-warn">Vigilar</span></td><td>FT Atorvastatina</td></tr>
+          <tr><td><strong>Quetiapina</strong></td><td>QTc — sustituida por Haloperidol</td><td>NO simultanea</td><td><span class="badge-ok">Secuencial</span></td><td>FT Quetiapina STADA</td></tr>
+          <tr><td><strong>Hidroferol</strong></td><td>Sin interacciones</td><td>—</td><td><span class="badge-ok">Seguro</span></td><td>FT Hidroferol</td></tr>
+          <tr><td><strong>Donepezilo + Memantina</strong></td><td>Sin interaccion</td><td>—</td><td><span class="badge-ok">Seguro</span></td><td>FT Domex</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:18px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px">
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--accent2);margin-bottom:10px">RECOMENDACIONES PARA EL MEDICO</div>
+      <div style="font-size:13px;color:var(--muted);line-height:2.2">
+        <div>&#x1F534; <strong style="color:var(--text)">ECG urgente</strong> — Triple QTc: Haloperidol + Donepezilo + Melitraceno. Suspender si QTc mayor de 500ms</div>
+        <div>&#x1F534; <strong style="color:var(--text)">Revisar Adiro + Dabigatran</strong> — Dobla riesgo sangrado mayor en mayores de 75 anos</div>
+        <div>&#x1F7E1; <strong style="color:var(--text)">Control renal semestral</strong> — FG en descenso. Ajuste dosis si FG menor de 50</div>
+        <div>&#x1F7E1; <strong style="color:var(--text)">Medir Magnesio serico</strong> — Pantoprazol mas de 3 anos — hipomagnesemia — arritmia ventricular</div>
+        <div>&#x1F7E1; <strong style="color:var(--text)">Vitamina D</strong> — Hidroferol 0.266mg/mensual EN CURSO (stock 6 meses). Verificar eficacia en proxima analitica (objetivo &gt;30 ng/mL). Renovar receta en ~3 meses</div>
+        <div>&#x1F534; <strong style="color:var(--text)">ECG URGENTE — PRESCRITO Y NO REALIZADO</strong> — Neurólogo HGC prescribió ECG de control CONOCIENDO el informe del neurólogo privado (Haloperidol suspendido + Donepezilo re-prescrito). Buena coordinación entre ambos especialistas. ECG AÚN NO REALIZADO — único paso pendiente antes de iniciar Donepezilo con seguridad.</div>
+        <div>&#x1F7E1; <strong style="color:var(--text)">Revisar Tiotropio + Donepezilo</strong> — Antagonismo puede reducir eficacia cognitiva</div>
+        <div>&#x1F7E1; <strong style="color:var(--text)">Valorar reduccion Pantoprazol</strong> — Contribuye a deficit B12 y macrocitosis</div>
+      </div>
+      <div style="margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--muted)">
+        CIMA/AEMPS · Mayo 2026 · P.-H. Giraud x Claude (Anthropic) ·
+        DOI: <a href="https://doi.org/10.5281/zenodo.19973451" target="_blank" style="color:var(--accent)">10.5281/zenodo.19973451</a>
+      </div>
+    </div>
+  `;
 }
 
 /* ================================================================
@@ -1662,7 +1734,8 @@ const OBSERVANCIA = [
     periodos: [
       { de:"2022-02", a:"2022-04", estado:"verde",   razon:"Confirmado — prescrito e iniciado", fuente:"Anamnesis HGC 25/02/2022" },
       { de:"2022-04", a:"2022-10", estado:"rojo",    razon:"SUSPENDIDO por médico — anorexia e incontinencia", fuente:"Nota Neurología HGC 22/04/2022" },
-      { de:"2022-10", a:"2026-03", estado:"amarillo", razon:"Reiniciado — observancia incierta, deterioro progresivo", fuente:"Nota Neurología HGC 21/10/2022" },
+      { de:"2022-10", a:"2025-06", estado:"amarillo", razon:"Reiniciado — observancia muy incierta. Caja Lixben encontrada SIN ABRIR.", fuente:"Nota Neurología HGC 21/10/2022 · Caja Lixben sin abrir" },
+      { de:"2025-06", a:"2026-05", estado:"amarillo", razon:"RE-PRESCRITO por neurólogo privado (consulta fin marzo 2026) — AÚN NO INICIADO. Pendiente ECG de control prescrito por neurólogo HGC (no el privado) — aún no realizado. Iniciar Donepezilo solo tras ECG.", fuente:"Neurólogo privado consulta 03/2026" },
     ]
   },
   {
@@ -1690,7 +1763,8 @@ const OBSERVANCIA = [
     inicio: "2024-10",
     fin: "2026-03",
     periodos: [
-      { de:"2024-10", a:"2026-03", estado:"amarillo", razon:"Solo en crisis — irregular por definición. ⚠️ Interacción QTc con Donepezilo", fuente:"Nota Neurología HGC 10/2024" },
+      { de:"2024-10", a:"2025-06", estado:"amarillo", razon:"Solo en crisis — irregular por definición. Interacción QTc con Donepezilo + Melitraceno.", fuente:"Nota Neurología HGC 10/2024" },
+      { de:"2025-06", a:"2026-03", estado:"rojo", razon:"SUSPENDIDO DEFINITIVAMENTE por neurólogo privado. Riesgo QTc con Donepezilo + Melitraceno fue probablemente el motivo.", fuente:"Decisión neurólogo privado" },
     ]
   },
   {
@@ -1721,13 +1795,45 @@ const OBSERVANCIA = [
     ]
   },
   {
-    med: "Melitraceno / Flupentixol 10mg/0.5mg",
+    med: "Melitraceno / Flupentixol 10mg/0.5mg (Deanxit)",
     indicacion: "Antidepresivo / ansiolítico",
     inicio: "2022-01",
     fin: "2026-03",
     periodos: [
-      { de:"2022-01", a:"2026-03", estado:"amarillo", razon:"Prescrito — observancia desconocida", fuente:"Anamnesis HGC 25/02/2022" },
-    ]
+      { de:"2022-01", a:"2025-06", estado:"amarillo", razon:"Prescrito — observancia desconocida", fuente:"Anamnesis HGC 25/02/2022" },
+      { de:"2025-06", a:"2026-05", estado:"rojo", razon:"PROBABLE ABANDONO o SUSPENSIÓN — no encontrado en el stock domiciliario actual. Si confirmado suspendido: riesgo QTc residual muy reducido.", fuente:"Stock domiciliario — caja no encontrada" },
+    ],
+    nota: "ℹ️ Si Melitraceno realmente suspendido: el riesgo QTc con Donepezilo (aún no iniciado) es mucho menor. Confirmar con el neurólogo privado antes de iniciar Donepezilo."
+  },
+  {
+    med: "Lixben (Donepezilo) 5mg",
+    indicacion: "Deterioro cognitivo — marca alternativa",
+    inicio: "2022-01",
+    fin: "2026-03",
+    periodos: [
+      { de:"2022-01", a:"2025-06", estado:"rojo", razon:"NUNCA ADMINISTRADO — caja encontrada sin abrir. Lixben = misma molécula que Donepezilo. Confirma no observancia antigua. Desde 2025-2026 el neurólogo privado re-prescribe Donepezilo con seguimiento activo.", fuente:"Observación directa — caja sin abrir · Neurólogo privado" },
+    ],
+    nota: "⚕️ Lixben es un genérico de Donepezilo (misma molécula, mismo mecanismo). La caja sin abrir confirma períodos de no observancia del tratamiento cognitivo."
+  },
+  {
+    med: "Quetiapina STADA (antipsicótico atípico)",
+    indicacion: "Agitación / demencia — prescripción puntual",
+    inicio: "2024-10",
+    fin: "2025-03",
+    periodos: [
+      { de:"2024-10", a:"2024-12", estado:"rojo", razon:"SUSPENDIDA y reemplazada por Haloperidol — solo 8 pastillas tomadas. Quetiapina y Haloperidol NO se tomaron simultáneamente. Sustitución secuencial.", fuente:"Stock domiciliario — 8 pastillas tomadas · reemplazada por Haloperidol" },
+    ],
+    nota: "ℹ️ Quetiapina fue el primer antipsicótico prescrito — reemplazada por Haloperidol al no ser suficiente. Uso secuencial, NO simultáneo. El riesgo QTc crítico es con Haloperidol (que la reemplazó) + Donepezilo + Melitraceno — TRIPLE prolongación."
+  },
+  {
+    med: "Hidroferol 0.266mg/mensual (Calcifediol — Vitamina D3)",
+    indicacion: "Suplementación Vitamina D — déficit crónico",
+    inicio: "2024-01",
+    fin: "2026-09",
+    periodos: [
+      { de:"2024-01", a:"2026-03", estado:"verde", razon:"Confirmado tomado — ampolla mensual. Stock actual: 6 meses restantes (hasta ~09/2026). Prescrito probablemente por médico de familia — no documentado en informes hospitalarios.", fuente:"Stock domiciliario confirmado" },
+    ],
+    nota: "✅ Vitamina D en tratamiento sustitutivo. Valores previos al tratamiento: 27.10 (09/2022) → 15.96 (04/2024) → 12.33 ng/mL (02/2025). Próxima analítica debería mostrar mejoría. Verificar si dosis mensual es suficiente con déficit severo (ref >30 ng/mL). Renovar receta en ~3 meses."
   },
 ];
 
