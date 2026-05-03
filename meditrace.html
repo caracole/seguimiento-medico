@@ -873,7 +873,7 @@ function importData(input) {
         } else { alert('Format non reconnu.'); return; }
       }
       showMainNav();
-      location.reload();
+      window.location.href = window.location.href.split('?')[0];
     } catch(err) { alert('Erreur : ' + err.message); }
   };
   reader.readAsText(file);
