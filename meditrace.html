@@ -297,6 +297,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <div class="nav-tab" onclick="showPanel('tabla',this)"              data-i18n="tab_tabla">Tabla</div>
   <div class="nav-tab" onclick="showPanel('timeline',this)"           data-i18n="tab_timeline">Cronología</div>
   <div class="nav-tab" onclick="showPanel('vascular',this)"           data-i18n="tab_vasc">🧠 Análisis Vascular</div>
+  <div class="nav-tab" onclick="showPanel('correlaciones',this)"      data-i18n="tab_corr">📊 Correlaciones</div>
   <div class="nav-tab" onclick="showPanel('observancia',this)"        data-i18n="tab_obs">Observancia</div>
   <div class="nav-tab alert" onclick="showPanel('farma',this)"        data-i18n="tab_farma">⚠ Farmacovigilancia</div>
   <div class="nav-tab" onclick="showPanel('importar',this)"           data-i18n="tab_import">+ Datos</div>
@@ -518,6 +519,21 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
     DOI: <a href="https://doi.org/10.5281/zenodo.19973451" target="_blank" style="color:var(--accent)">10.5281/zenodo.19973451</a>
     · Este análisis es informativo y no sustituye el criterio médico profesional.
   </div>
+</div>
+
+<!-- ===== PANEL CORRELACIONES ===== -->
+<div id="panel-correlaciones" class="panel">
+  <div class="section-label">📊 Correlaciones clínicas — Parámetros biológicos vs Medicamentos</div>
+
+  <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent2);border-radius:var(--radius);padding:14px 18px;margin-bottom:24px;font-size:13px;color:var(--muted)">
+    💡 <strong style="color:var(--text)">Cómo leer estos gráficos</strong> —
+    Las zonas coloreadas de fondo indican los períodos de observancia de cada medicamento:
+    <span style="background:rgba(74,232,164,0.2);padding:1px 6px;border-radius:3px;font-family:var(--mono);font-size:11px">Verde = confirmado tomado</span>
+    <span style="background:rgba(232,164,74,0.2);padding:1px 6px;border-radius:3px;font-family:var(--mono);font-size:11px;margin:0 4px">Naranja = incierto</span>
+    <span style="background:rgba(232,74,74,0.2);padding:1px 6px;border-radius:3px;font-family:var(--mono);font-size:11px">Rojo = abandonado</span>
+  </div>
+
+  <div class="chart-grid" id="corr-grid"></div>
 </div>
 
 <!-- ===== PANEL OBSERVANCIA ===== -->
@@ -820,13 +836,14 @@ function showPanel(name, tabEl) {
   document.getElementById('panel-' + name).classList.add('active');
   if (tabEl) tabEl.classList.add('active');
   const data = loadData();
-  if (name === 'resumen')     buildResumen(data);
-  if (name === 'curvas')      buildAllCharts(data);
-  if (name === 'tabla')       buildTable(data);
-  if (name === 'timeline')    buildTimeline();
-  if (name === 'vascular')    buildVascular();
-  if (name === 'observancia') buildObservancia();
-  if (name === 'farma')       buildFarma();
+  if (name === 'resumen')      buildResumen(data);
+  if (name === 'curvas')       buildAllCharts(data);
+  if (name === 'tabla')        buildTable(data);
+  if (name === 'timeline')     buildTimeline();
+  if (name === 'vascular')     buildVascular();
+  if (name === 'correlaciones') buildCorrelaciones(data);
+  if (name === 'observancia')  buildObservancia();
+  if (name === 'farma')        buildFarma();
   if (name === 'importar') updateDataSummary(data);
 }
 
@@ -1720,6 +1737,210 @@ function loadPdfView(input) {
 }
 document.getElementById('pdf-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closePdf(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closePdf(); });
+
+/* ================================================================
+   CORRELACIONES — Paramètres biologiques vs Médicaments
+================================================================ */
+
+/* Périodes d'observance pour superposition sur graphiques */
+const MED_PERIODS = {
+  'Atorvastatina': [
+    { de:'2022-01', a:'2026-05', estado:'amarillo', label:'Atorvastatina (incierta)' }
+  ],
+  'Dabigatran/Xarelto': [
+    { de:'2016-11', a:'2017-11', estado:'verde',    label:'Xarelto confirmado' },
+    { de:'2022-01', a:'2022-07', estado:'verde',    label:'Xarelto post-TEP' },
+    { de:'2022-07', a:'2024-07', estado:'amarillo', label:'Xarelto/Dabigatrán incierto' },
+    { de:'2024-07', a:'2025-02', estado:'amarillo', label:'Dabigatrán incierto' },
+    { de:'2025-02', a:'2026-05', estado:'rojo',     label:'ABANDONADO' },
+  ],
+  'Donepezilo': [
+    { de:'2022-02', a:'2022-04', estado:'verde',    label:'Donepezilo confirmado' },
+    { de:'2022-04', a:'2022-10', estado:'rojo',     label:'Suspendido (médico)' },
+    { de:'2022-10', a:'2026-03', estado:'rojo',     label:'Caja sin abrir (Lixben)' },
+    { de:'2026-03', a:'2026-05', estado:'amarillo', label:'Re-prescrito — no iniciado' },
+  ],
+  'Hidroferol': [
+    { de:'2024-01', a:'2026-05', estado:'verde',    label:'Hidroferol confirmado' },
+  ],
+};
+
+const OBS_BG = {
+  verde:    'rgba(74,232,164,0.12)',
+  amarillo: 'rgba(232,164,74,0.12)',
+  rojo:     'rgba(232,74,74,0.12)',
+};
+const OBS_BORDER = {
+  verde:    'rgba(74,232,164,0.5)',
+  amarillo: 'rgba(232,164,74,0.5)',
+  rojo:     'rgba(232,74,74,0.5)',
+};
+
+let corrCharts = {};
+
+function buildCorrelaciones(data) {
+  const grid = document.getElementById('corr-grid');
+  grid.innerHTML = '';
+
+  /* Définition des corrélations à afficher */
+  const CORRS = [
+    {
+      title: 'Colesterol total + LDL — Atorvastatina',
+      sub: 'mg/dL · Zones = observancia Atorvastatina',
+      params: [
+        { key:'colesterol', label:'Colesterol total', color:'#7d3c98' },
+        { key:'ldl',        label:'LDL',              color:'#e84a4a', dash:true },
+      ],
+      med: 'Atorvastatina',
+      ref: 116, refLabel:'LDL objetivo <116'
+    },
+    {
+      title: 'Filtrado glomerular — Dabigatrán/Xarelto',
+      sub: 'ml/min · Zones = observancia anticoagulante',
+      params: [
+        { key:'filtrado', label:'FG CKD-EPI', color:'#117a65' },
+        { key:'creatinina', label:'Creatinina (×50)', color:'#4a8fe8', dash:true, scale:50 },
+      ],
+      med: 'Dabigatran/Xarelto',
+      ref: 60, refLabel:'Límite inferior FG'
+    },
+    {
+      title: 'Vitamina D — Hidroferol',
+      sub: 'ng/mL · Zones = observancia Hidroferol',
+      params: [
+        { key:'vitamina_d', label:'Vitamina D', color:'#c8a000' },
+      ],
+      med: 'Hidroferol',
+      ref: 30, refLabel:'Mínimo referencia (30)'
+    },
+    {
+      title: 'Vitamina B12 + VCM — Pantoprazol',
+      sub: 'B12 pg/mL · VCM fL · Pantoprazol long terme',
+      params: [
+        { key:'vitamina_b12', label:'B12 (pg/mL)', color:'#a06000' },
+        { key:'vcm', label:'VCM (fL × 2)', color:'#e84a4a', dash:true, scale:2 },
+      ],
+      med: null,
+      note:'Pantoprazol prescrit depuis 2022 — réduction absorption B12 (FT CIMA)',
+      ref: 180, refLabel:'B12 mínimo (180)'
+    },
+    {
+      title: 'PCR + Fibrinógeno — Inflamación',
+      sub: 'PCR mg/L · Fibrinógeno mg/dL÷10',
+      params: [
+        { key:'pcr',        label:'PCR (mg/L)',       color:'#e84a4a' },
+        { key:'fibrinogeno', label:'Fibrinógeno (÷10)', color:'#7d3c98', dash:true, scale:0.1 },
+      ],
+      med: null,
+      ref: 10, refLabel:'PCR máximo normal'
+    },
+    {
+      title: 'Glucosa + HbA1c — Atorvastatina',
+      sub: 'Glucosa mg/dL · HbA1c %×10 · Efecto hiperglucemiante estatinas',
+      params: [
+        { key:'glucosa', label:'Glucosa (mg/dL)', color:'#784212' },
+        { key:'hba1c',   label:'HbA1c (×10)',     color:'#e8a44a', dash:true, scale:10 },
+      ],
+      med: 'Atorvastatina',
+      ref: 110, refLabel:'Glucosa máximo normal'
+    },
+  ];
+
+  CORRS.forEach((corr, idx) => {
+    const div = document.createElement('div');
+    div.className = 'chart-card';
+    div.innerHTML = `
+      <div class="chart-title">${corr.title}</div>
+      <div class="chart-sub">${corr.sub}</div>
+      ${corr.note ? `<div style="font-family:var(--mono);font-size:9px;color:var(--warn);margin-bottom:8px">⚠ ${corr.note}</div>` : ''}
+      <canvas id="corr-${idx}" height="180"></canvas>`;
+    grid.appendChild(div);
+
+    setTimeout(() => {
+      const canvas = document.getElementById(`corr-${idx}`);
+      if (!canvas) return;
+
+      /* Dates et données */
+      const allDates = [...new Set(
+        data.flatMap(m => corr.params.some(p => m.vals[p.key] !== undefined) ? [m.date] : [])
+      )].sort();
+
+      if (allDates.length < 2) return;
+
+      const labels = allDates.map(d => fmtDate(d));
+
+      /* Datasets */
+      const datasets = corr.params.map(p => ({
+        label: p.label,
+        data: allDates.map(d => {
+          const m = data.find(x => x.date === d);
+          const v = m?.vals[p.key];
+          return v !== undefined ? v * (p.scale || 1) : null;
+        }),
+        borderColor: p.color,
+        backgroundColor: p.color + '20',
+        pointBackgroundColor: allDates.map(d => {
+          const m = data.find(x => x.date === d);
+          const v = m?.vals[p.key];
+          if (v === undefined) return p.color;
+          return getStatus(p.key, v / (p.scale || 1)) === 'bad' ? '#e84a4a' : p.color;
+        }),
+        pointRadius: 5,
+        tension: 0.3,
+        fill: false,
+        borderDash: p.dash ? [5, 3] : [],
+        spanGaps: true,
+      }));
+
+      /* Zones médicament */
+      const annotations = {};
+      if (corr.med && MED_PERIODS[corr.med]) {
+        MED_PERIODS[corr.med].forEach((period, pi) => {
+          annotations[`med${pi}`] = {
+            type: 'box',
+            xMin: period.de,
+            xMax: period.a,
+            backgroundColor: OBS_BG[period.estado],
+            borderColor: OBS_BORDER[period.estado],
+            borderWidth: 1,
+            label: { content: period.label, display: false }
+          };
+        });
+      }
+
+      /* Ligne de référence */
+      if (corr.ref) {
+        annotations['refLine'] = {
+          type: 'line',
+          yMin: corr.ref, yMax: corr.ref,
+          borderColor: 'rgba(74,232,164,0.5)',
+          borderWidth: 1,
+          borderDash: [4, 4],
+          label: { content: corr.refLabel, display: true, position: 'end',
+                   font: { size: 8 }, color: '#4ae8a4', backgroundColor: 'transparent' }
+        };
+      }
+
+      if (corrCharts[idx]) corrCharts[idx].destroy();
+      corrCharts[idx] = new Chart(canvas, {
+        type: 'line',
+        data: { labels, datasets },
+        options: {
+          responsive: true,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: true, position: 'bottom', labels: { boxWidth: 10, font: { size: 9 } } },
+            tooltip: { bodyFont: { size: 10 } },
+          },
+          scales: {
+            x: { grid: { color: '#2a3348' }, ticks: { font: { size: 8 } } },
+            y: { grid: { color: '#2a3348' }, ticks: { font: { size: 9 }, maxTicksLimit: 5 } }
+          }
+        }
+      });
+    }, idx * 100);
+  });
+}
 
 /* ================================================================
    ANÁLISIS VASCULAR — panel statique
