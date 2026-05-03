@@ -1238,23 +1238,64 @@ function exportPDF() {
   <!-- FARMACOVIGILANCIA -->
   <div class="section">
     <div class="section-title">⚠ Farmacovigilancia — Alertas CIMA/AEMPS</div>
+
+    <div class="alert warn">
+      <div class="alert-title">⚠ QTc RESUELTO PARCIALMENTE — Haloperidol suspendido definitivamente</div>
+      Haloperidol arrêté par le neurologue privé. Donepezilo re-prescrit mais AÚN NO INICIADO.
+      Melitraceno/Flupentixol probablemente también suspendido (no encontrado en stock domiciliario).
+      ECG prescrito por neurólogo HGC en 03/2026 — AÚN NO REALIZADO.
+      Realizar ECG ANTES de iniciar Donepezilo.
+    </div>
     <div class="alert critical">
-      <div class="alert-title">🚨 CRÍTICO — Haloperidol + Donepezilo</div>
-      Doble prolongación del intervalo QTc. Riesgo de arritmia ventricular grave (Torsade de pointes).
-      Contraindicación relativa con insuficiencia tricuspídea moderada. Fuente: CIMA/AEMPS.
+      <div class="alert-title">🚨 URGENTE — ECG PENDIENTE</div>
+      ECG prescrito por neurólogo HGC (conociendo informe neurólogo privado) — único paso pendiente
+      para iniciar Donepezilo con seguridad. Buena coordinación entre ambos especialistas confirmada.
     </div>
-    <div class="alert warn">
-      <div class="alert-title">⚠ RIESGO ALTO — Dabigatrán + Adiro (AAS)</div>
+    <div class="alert critical">
+      <div class="alert-title">🚨 CRÍTICO — Dabigatrán + Adiro (AAS)</div>
       Dobla el riesgo de sangrado mayor según FT Pradaxa (CIMA). Especialmente en ≥75 años.
+      Dabigatrán ABANDONADO por decisión familiar (02/2025) — riesgo trombótico elevado sin anticoagulación
+      con carotídea interna izquierda completamente ocluida.
     </div>
     <div class="alert warn">
-      <div class="alert-title">⚠ VIGILANCIA — Dabigatrán + Función renal</div>
-      FG en descenso (83→70 ml/min). Control semestral obligatorio. Contraindicado si FG &lt;30.
+      <div class="alert-title">⚠ Dabigatrán + Función renal</div>
+      FG en descenso (83→70 ml/min). Control semestral obligatorio (AEMPS). Contraindicado si FG &lt;30.
+    </div>
+    <div class="alert warn">
+      <div class="alert-title">⚠ Pantoprazol largo plazo → Déficit B12 + Hipomagnesemia</div>
+      FT Pantoprazol (CIMA): reduce absorción B12. B12=152 pg/mL (2022) ⚠️.
+      Riesgo hipomagnesemia → arritmia ventricular. Medir Magnesio sérico.
+    </div>
+    <div class="alert warn">
+      <div class="alert-title">⚠ Tiotropio + Donepezilo → Antagonismo anticolinérgico</div>
+      Tiotropio reduce eficacia del Donepezilo. Revisar necesidad de ambos simultáneamente.
+    </div>
+    <div class="alert warn">
+      <div class="alert-title">⚠ Vitamina D — Hidroferol EN CURSO</div>
+      Hidroferol 0.266mg/mensual confirmado. Stock 6 meses. Verificar eficacia en próxima analítica (objetivo &gt;30 ng/mL).
     </div>
     <div class="alert ok">
       <div class="alert-title">✓ SEGURO — Donepezilo + Memantina</div>
       Sin interacciones relevantes según FT Domex/TecniGen (CIMA).
     </div>
+  </div>
+
+  <!-- OBSERVANCIA -->
+  <div class="section">
+    <div class="section-title">Observancia terapéutica — Situación actual</div>
+    <table>
+      <thead><tr><th>Medicamento</th><th>Estado actual</th><th>Observación</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Dabigatrán 150mg</strong></td><td style="color:#c0392b">ABANDONADO</td><td>Decisión familiar 02/2025. Sin anticoagulación activa.</td></tr>
+        <tr><td><strong>Donepezilo</strong></td><td style="color:#d68910">PRESCRITO — no iniciado</td><td>Pendiente ECG. Caja Lixben sin abrir encontrada.</td></tr>
+        <tr><td><strong>Haloperidol</strong></td><td style="color:#1e8449">SUSPENDIDO definitivamente</td><td>Decisión neurólogo privado. Correcto (QTc).</td></tr>
+        <tr><td><strong>Hidroferol 0.266mg</strong></td><td style="color:#1e8449">EN CURSO ✓</td><td>Mensual. Stock 6 meses. Renovar en ~3 meses.</td></tr>
+        <tr><td><strong>Melitraceno/Flupentixol</strong></td><td style="color:#d68910">PROBABLE ABANDONO</td><td>No encontrado en stock domiciliario.</td></tr>
+        <tr><td><strong>Quetiapina</strong></td><td style="color:#1e8449">SUSTITUIDA por Haloperidol</td><td>8 pastillas tomadas. Uso secuencial no simultáneo.</td></tr>
+        <tr><td><strong>Atorvastatina</strong></td><td style="color:#d68910">INCIERTO</td><td>LDL 202 mg/dL ⚠️ a pesar del tratamiento.</td></tr>
+        <tr><td><strong>Adiro + Pantoprazol + Tiotropio</strong></td><td style="color:#d68910">INCIERTO</td><td>Prescritos — observancia desconocida.</td></tr>
+      </tbody>
+    </table>
   </div>
 
   <!-- KPIs -->
