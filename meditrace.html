@@ -281,9 +281,10 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
     <button class="lang-btn active" onclick="setLang('es')">ES</button>
     <button class="lang-btn" onclick="setLang('fr')">FR</button>
     <button class="lang-btn" onclick="setLang('en')">EN</button>
-    <button class="btn-topbar" onclick="exportData()" title="Guardar datos en archivo JSON">💾 Exportar</button>
-    <button class="btn-topbar" onclick="document.getElementById('import-json').click()" title="Restaurar datos desde archivo JSON">📂 Importar</button>
-    <input type="file" id="import-json" accept=".json,.js" style="display:none" onchange="importData(this)"/>
+    <button class="btn-topbar" onclick="exportData()" title="Guardar copia de seguridad">💾 Backup .mt</button>
+    <button class="btn-topbar" onclick="document.getElementById('import-json').click()" title="Restaurar desde backup">📂 Restaurar</button>
+    <button class="btn-topbar" onclick="exportPDF()" title="Generar informe PDF" style="color:#4ae8a4;border-color:#4ae8a4">📄 Informe PDF</button>
+    <input type="file" id="import-json" accept=".json,.js,.mt" style="display:none" onchange="importData(this)"/>
     <button class="btn-topbar" onclick="showPanel('importar',this)" data-i18n="nav_import">+ Añadir datos</button>
     <button class="btn-topbar danger" onclick="confirmReset()" data-i18n="nav_reset">⟳ Reiniciar</button>
   </div>
@@ -825,15 +826,12 @@ function updateDataSummary(data) {
 }
 
 /* ================================================================
-   EXPORT / IMPORT JSON
+   EXPORT / IMPORT
 ================================================================ */
 function exportData() {
   const data   = loadData();
   const events = loadEvents();
-  if (!data.length && !events.length) {
-    alert('No hay datos que exportar.');
-    return;
-  }
+  if (!data.length && !events.length) { alert('No hay datos que exportar.'); return; }
   const payload = {
     version: "MediTrace-2026",
     exported: new Date().toISOString(),
@@ -844,7 +842,7 @@ function exportData() {
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
   a.href     = url;
-  a.download = 'meditrace_backup_' + new Date().toISOString().slice(0,10) + '.json';
+  a.download = 'meditrace_backup_' + new Date().toISOString().slice(0,10) + '.mt';
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -856,41 +854,235 @@ function importData(input) {
   reader.onload = e => {
     try {
       const text = e.target.result;
-      // Supporte JSON pur ou fichier .js avec const data = [...]
       let parsed;
       if (text.trim().startsWith('{')) {
-        // Format JSON natif MediTrace
         parsed = JSON.parse(text);
         if (parsed.mesures) {
           saveData(parsed.mesures);
           if (parsed.events) saveEvents(parsed.events);
           alert('✓ ' + parsed.mesures.length + ' entrées + ' + (parsed.events?.length||0) + ' événements restaurés !');
-        } else {
-          alert('Format non reconnu.');
-          return;
-        }
+        } else { alert('Format non reconnu.'); return; }
       } else {
-        // Format .js ancien style : extrait le tableau data = [...]
-        const match = text.match(/(?:const|let|var)\s+data\s*=\s*(\[[\s\S]*?\])\s*;/);
+        const match   = text.match(/(?:const|let|var)\s+data\s*=\s*(\[[\s\S]*?\])\s*;/);
         const matchEv = text.match(/(?:const|let|var)\s+events\s*=\s*(\[[\s\S]*?\])\s*;/);
         if (match) {
           const data = JSON.parse(match[1]);
           saveData(data);
           if (matchEv) saveEvents(JSON.parse(matchEv[1]));
           alert('✓ ' + data.length + ' entrées restaurées !');
-        } else {
-          alert('Format non reconnu. Utilisez un fichier JSON exporté par MediTrace.');
-          return;
-        }
+        } else { alert('Format non reconnu.'); return; }
       }
       showMainNav();
       location.reload();
-    } catch(err) {
-      alert('Erreur de lecture : ' + err.message);
-    }
+    } catch(err) { alert('Erreur : ' + err.message); }
   };
   reader.readAsText(file);
   input.value = '';
+}
+
+/* ================================================================
+   EXPORT PDF — Rapport médical
+================================================================ */
+function exportPDF() {
+  const data   = loadData();
+  const events = loadEvents();
+  if (!data.length) { alert('No hay datos que exportar.'); return; }
+
+  /* Dernières valeurs connues */
+  const lastVals = {};
+  data.forEach(m => Object.entries(m.vals).forEach(([k,v]) => {
+    if (!lastVals[k] || m.date > lastVals[k].date) lastVals[k] = { v, date: m.date, src: m.src };
+  }));
+
+  const now = new Date().toLocaleDateString('es-ES');
+  const dateRange = data[0].date + ' → ' + data[data.length-1].date;
+
+  /* Construction HTML du rapport */
+  const html = `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<title>MediTrace — Informe Médico</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; font-size: 11px; color: #1a1a2e; background: white; }
+  .page { max-width: 210mm; margin: 0 auto; padding: 15mm; }
+
+  /* HEADER */
+  .header { display: flex; justify-content: space-between; align-items: flex-start;
+    border-bottom: 3px solid #1a5276; padding-bottom: 12px; margin-bottom: 20px; }
+  .header-logo { font-family: Georgia, serif; font-size: 28px; font-weight: 700; color: #1a5276; }
+  .header-logo span { font-style: italic; color: #4a8fe8; }
+  .header-meta { text-align: right; font-size: 10px; color: #555; line-height: 1.8; }
+
+  /* SECTIONS */
+  .section { margin-bottom: 20px; }
+  .section-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    color: #1a5276; border-bottom: 1px solid #cce; padding-bottom: 4px; margin-bottom: 10px;
+  }
+
+  /* ALERTES */
+  .alert { border-radius: 4px; padding: 8px 12px; margin-bottom: 8px; font-size: 10px; }
+  .alert.critical { background: #fde8e8; border-left: 4px solid #c0392b; color: #7b241c; }
+  .alert.warn     { background: #fef9e7; border-left: 4px solid #d68910; color: #7d6608; }
+  .alert.ok       { background: #e8f8f5; border-left: 4px solid #1e8449; color: #1a5c35; }
+  .alert-title    { font-weight: 700; margin-bottom: 2px; }
+
+  /* KPI GRID */
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
+  .kpi-card { border: 1px solid #ddd; border-radius: 4px; padding: 8px; }
+  .kpi-card.bad  { border-top: 3px solid #c0392b; }
+  .kpi-card.ok   { border-top: 3px solid #1e8449; }
+  .kpi-label { font-size: 8px; text-transform: uppercase; letter-spacing: 1px; color: #888; }
+  .kpi-value { font-size: 18px; font-weight: 700; color: #1a1a2e; }
+  .kpi-unit  { font-size: 8px; color: #888; }
+  .kpi-date  { font-size: 8px; color: #aaa; margin-top: 2px; }
+  .kpi-bad   { color: #c0392b; font-size: 8px; font-weight: 700; }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; font-size: 9px; }
+  th { background: #1a5276; color: white; padding: 5px 6px; text-align: left; font-size: 8px; letter-spacing: 1px; }
+  td { padding: 4px 6px; border-bottom: 1px solid #eee; }
+  tr:nth-child(even) td { background: #f5f8ff; }
+  .val-bad  { color: #c0392b; font-weight: 700; }
+  .val-ok   { color: #1e8449; }
+
+  /* TIMELINE */
+  .tl-item { display: flex; gap: 10px; margin-bottom: 8px; }
+  .tl-dot  { width: 10px; height: 10px; border-radius: 50%; margin-top: 3px; flex-shrink: 0; }
+  .tl-dot.urgencias   { background: #c0392b; }
+  .tl-dot.hematologia { background: #1a5276; }
+  .tl-dot.neurologia  { background: #7d3c98; }
+  .tl-dot.laboratorio { background: #1e8449; }
+  .tl-content { flex: 1; }
+  .tl-date  { font-size: 8px; color: #888; }
+  .tl-title { font-size: 10px; font-weight: 700; margin: 1px 0; }
+  .tl-text  { font-size: 9px; color: #555; }
+
+  /* FOOTER */
+  .footer { border-top: 1px solid #ccc; margin-top: 20px; padding-top: 8px;
+    font-size: 8px; color: #aaa; display: flex; justify-content: space-between; }
+
+  @media print {
+    body { font-size: 10px; }
+    .page { padding: 10mm; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div>
+      <div class="header-logo">Medi<span>Trace</span></div>
+      <div style="font-size:10px;color:#555;margin-top:4px">Informe de Seguimiento Médico Longitudinal</div>
+    </div>
+    <div class="header-meta">
+      Generado: ${now}<br>
+      Período: ${dateRange}<br>
+      Documentos: ${data.length} fechas de análisis<br>
+      DOI: 10.5281/zenodo.19973451<br>
+      <strong>⚠ Documento de uso médico — No diagnóstico</strong>
+    </div>
+  </div>
+
+  <!-- FARMACOVIGILANCIA -->
+  <div class="section">
+    <div class="section-title">⚠ Farmacovigilancia — Alertas CIMA/AEMPS</div>
+    <div class="alert critical">
+      <div class="alert-title">🚨 CRÍTICO — Haloperidol + Donepezilo</div>
+      Doble prolongación del intervalo QTc. Riesgo de arritmia ventricular grave (Torsade de pointes).
+      Contraindicación relativa con insuficiencia tricuspídea moderada. Fuente: CIMA/AEMPS.
+    </div>
+    <div class="alert warn">
+      <div class="alert-title">⚠ RIESGO ALTO — Dabigatrán + Adiro (AAS)</div>
+      Dobla el riesgo de sangrado mayor según FT Pradaxa (CIMA). Especialmente en ≥75 años.
+    </div>
+    <div class="alert warn">
+      <div class="alert-title">⚠ VIGILANCIA — Dabigatrán + Función renal</div>
+      FG en descenso (83→70 ml/min). Control semestral obligatorio. Contraindicado si FG &lt;30.
+    </div>
+    <div class="alert ok">
+      <div class="alert-title">✓ SEGURO — Donepezilo + Memantina</div>
+      Sin interacciones relevantes según FT Domex/TecniGen (CIMA).
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="section">
+    <div class="section-title">Últimos valores conocidos</div>
+    <div class="kpi-grid">
+      ${Object.entries(lastVals).filter(([k]) => PARAMS[k]).slice(0,16).map(([k, info]) => {
+        const p  = PARAMS[k];
+        const st = getStatus(k, info.v);
+        return `<div class="kpi-card ${st}">
+          <div class="kpi-label">${p.label}</div>
+          <div class="kpi-value">${info.v} <span class="kpi-unit">${p.unit}</span></div>
+          <div class="kpi-date">${fmtDate(info.date)}</div>
+          ${st==='bad' ? '<div class="kpi-bad">⚠ Fuera de rango</div>' : ''}
+        </div>`;
+      }).join('')}
+    </div>
+  </div>
+
+  <!-- TABLEAU SYNTHÈSE -->
+  <div class="section">
+    <div class="section-title">Tabla de síntesis cronológica</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th><th>Fuente</th>
+          <th>Hb</th><th>Leuc.</th><th>Gluc.</th><th>Creat.</th><th>FG</th>
+          <th>Colest.</th><th>PCR</th><th>Fibr.</th><th>TSH</th><th>VitD</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${data.map(m => `<tr>
+          <td>${fmtDate(m.date)}</td>
+          <td>${m.src}</td>
+          ${['hemoglobina','leucocitos','glucosa','creatinina','filtrado','colesterol','pcr','fibrinogeno','tsh','vitamina_d'].map(k => {
+            const v = m.vals[k];
+            if (v===undefined) return '<td style="color:#ccc">—</td>';
+            const st = getStatus(k, v);
+            return `<td class="${st==='bad'?'val-bad':'val-ok'}">${v}</td>`;
+          }).join('')}
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- TIMELINE -->
+  ${events.length ? `<div class="section">
+    <div class="section-title">Cronología clínica (${events.length} eventos)</div>
+    ${[...events].reverse().map(ev => `
+      <div class="tl-item">
+        <div class="tl-dot ${ev.type||'laboratorio'}"></div>
+        <div class="tl-content">
+          <div class="tl-date">${ev.date} · ${(ev.type||'').toUpperCase()}</div>
+          <div class="tl-title">${ev.title||''}</div>
+          <div class="tl-text">${ev.text||''}</div>
+        </div>
+      </div>`).join('')}
+  </div>` : ''}
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span>MediTrace © 2026 Pierre-Henri Giraud × Claude (Anthropic) · GNU GPL v3 · DOI: 10.5281/zenodo.19973451</span>
+    <span>Este informe es informativo y no sustituye el criterio médico profesional.</span>
+  </div>
+
+</div>
+</body>
+</html>`;
+
+  /* Ouvrir dans une nouvelle fenêtre et imprimer */
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(() => win.print(), 800);
 }
 
 /* ================================================================
