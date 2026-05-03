@@ -284,7 +284,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
     <button class="btn-topbar" onclick="exportData()" title="Guardar copia de seguridad">💾 Backup .mt</button>
     <button class="btn-topbar" onclick="document.getElementById('import-json').click()" title="Restaurar desde backup">📂 Restaurar</button>
     <button class="btn-topbar" onclick="exportPDF()" title="Generar informe PDF" style="color:#4ae8a4;border-color:#4ae8a4">📄 Informe PDF</button>
-    <input type="file" id="import-json" accept=".json,.js,.mt" style="display:none" onchange="importData(this)"/>
+    <input type="file" id="import-json" accept=".json,.js,.mt,application/json,text/plain" style="display:none" onchange="importData(this)"/>
     <button class="btn-topbar" onclick="showPanel('importar',this)" data-i18n="nav_import">+ Añadir datos</button>
     <button class="btn-topbar danger" onclick="confirmReset()" data-i18n="nav_reset">⟳ Reiniciar</button>
   </div>
@@ -1676,13 +1676,71 @@ function buildTimeline() {
   const el = document.getElementById('timeline-el');
   const evts = loadEvents();
   el.innerHTML = '';
-  if (!evts.length) { el.innerHTML = `<div style="color:var(--muted);font-family:var(--mono);font-size:12px">${LANG[currentLang].no_data}</div>`; return; }
+  if (!evts.length) {
+    el.innerHTML = `<div style="color:var(--muted);font-family:var(--mono);font-size:12px">${LANG[currentLang].no_data}</div>`;
+    return;
+  }
+
+  /* ── ÉVÉNEMENTS ÉPINGLÉS — Actions urgentes ── */
+  const pinned = [
+    { icon:'🚨', color:'#e84a4a', title:'ECG PENDIENTE — Prescrito por neurólogo HGC (03/2026)',
+      text:'No realizado. OBLIGATORIO antes de iniciar Donepezilo. Contactar con HGC Neurología.' },
+    { icon:'💊', color:'#e8a44a', title:'Donepezilo (Lixben) — Prescrito pero no iniciado',
+      text:'Caja sin abrir. Iniciar solo DESPUÉS del ECG. Neurólogo privado 03/2026.' },
+    { icon:'🔴', color:'#e84a4a', title:'Sin anticoagulación desde 02/2025',
+      text:'ACI izquierda completamente ocluida (IRM 03/2026). Riesgo trombótico elevado.' },
+    { icon:'✅', color:'#4ae8a4', title:'Haloperidol — Suspendido definitivamente',
+      text:'Decisión neurólogo privado (03/2026). Correcto por riesgo QTc.' },
+    { icon:'💊', color:'#4ae8a4', title:'Hidroferol 0.266mg/mensual — En curso',
+      text:'Stock 6 meses. Renovar en ~3 meses. Verificar VitD en próxima analítica.' },
+  ];
+
+  /* Encadré actions urgentes */
+  const pinnedBox = document.createElement('div');
+  pinnedBox.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:24px';
+  pinnedBox.innerHTML = `<div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--accent);margin-bottom:12px">📌 SITUACIÓN ACTUAL — MAYO 2026</div>`;
+  pinned.forEach(p => {
+    const row = document.createElement('div');
+    row.style.cssText = `display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border)`;
+    row.innerHTML = `
+      <div style="font-size:18px;flex-shrink:0">${p.icon}</div>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:${p.color};margin-bottom:2px">${p.title}</div>
+        <div style="font-size:12px;color:var(--muted)">${p.text}</div>
+      </div>`;
+    pinnedBox.appendChild(row);
+  });
+  el.appendChild(pinnedBox);
+
+  /* ── LÉGENDE ── */
+  const legend = document.createElement('div');
+  legend.style.cssText = 'display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px;font-family:var(--mono);font-size:10px;color:var(--muted)';
+  legend.innerHTML = `
+    <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#e84a4a;vertical-align:middle;margin-right:4px"></span>Urgencias / crítico</span>
+    <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#1a5276;vertical-align:middle;margin-right:4px"></span>Hematología</span>
+    <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#7d3c98;vertical-align:middle;margin-right:4px"></span>Neurología</span>
+    <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#1e8449;vertical-align:middle;margin-right:4px"></span>Laboratorio</span>`;
+  el.appendChild(legend);
+
+  /* ── LABEL SECTION ── */
+  const secLabel = document.createElement('div');
+  secLabel.className = 'section-label';
+  secLabel.textContent = 'Cronología completa — ' + evts.length + ' eventos documentados';
+  el.appendChild(secLabel);
+
+  /* ── TIMELINE ── */
+  const tlWrap = document.createElement('div');
+  tlWrap.className = 'timeline';
   [...evts].reverse().forEach(ev => {
     const item = document.createElement('div');
     item.className = 'tl-item';
     const pdfBtn = ev.pdf ? `<button class="btn" style="font-size:9px;padding:2px 8px" onclick="openPdf('${ev.pdf}')">📄 PDF</button>` : '';
+
+    /* Badge couleur selon type */
+    const dotClass = ev.type || 'laboratorio';
+
     item.innerHTML = `
-      <div class="tl-dot ${ev.type||'laboratorio'}"></div>
+      <div class="tl-dot ${dotClass}"></div>
       <div class="tl-date">${ev.date}</div>
       <div class="tl-card">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
@@ -1692,8 +1750,9 @@ function buildTimeline() {
         <div class="tl-title">${ev.title||''}</div>
         <div class="tl-text">${ev.text||''}</div>
       </div>`;
-    el.appendChild(item);
+    tlWrap.appendChild(item);
   });
+  el.appendChild(tlWrap);
 }
 
 /* ================================================================
