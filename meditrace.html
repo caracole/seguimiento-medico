@@ -929,7 +929,7 @@ function exportPDF() {
 <html lang="es">
 <head>
 <meta charset="UTF-8"/>
-<title>MediTrace — Informe Médico</title>
+<title>MediTrace — Informe Médico — M.E.J. — ${new Date().toISOString().slice(0,10)}</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: Arial, sans-serif; font-size: 11px; color: #1a1a2e; background: white; }
@@ -1007,11 +1007,15 @@ function exportPDF() {
       <div style="font-size:10px;color:#555;margin-top:4px">Informe de Seguimiento Médico Longitudinal</div>
     </div>
     <div class="header-meta">
+      <strong>Paciente:</strong> M.E.J. (datos anonimizados)<br>
+      <strong>Generado por:</strong> MediTrace v2026.2<br>
+      <strong>Aplicación:</strong> <a href="https://caracole.github.io/seguimiento-medico/" style="color:#1a5276">caracole.github.io/seguimiento-medico</a><br>
+      <strong>Autor:</strong> Pierre-Henri Giraud × Claude (Anthropic)<br>
       Generado: ${now}<br>
       Período: ${dateRange}<br>
       Documentos: ${data.length} fechas de análisis<br>
       DOI: 10.5281/zenodo.19973451<br>
-      <strong>⚠ Documento de uso médico — No diagnóstico</strong>
+      <strong>⚠ Documento informativo — No diagnóstico</strong>
     </div>
   </div>
 
@@ -1109,6 +1113,7 @@ function exportPDF() {
   win.document.write(html);
   win.document.close();
   win.focus();
+  win.document.title = 'MediTrace_Informe_Medico_MEJ_' + new Date().toISOString().slice(0,10);
   setTimeout(() => win.print(), 800);
 }
 
