@@ -292,12 +292,13 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 
 <!-- NAV -->
 <div class="nav" id="main-nav" style="display:none">
-  <div class="nav-tab active" onclick="showPanel('resumen',this)"   data-i18n="tab_resumen">Resumen</div>
-  <div class="nav-tab" onclick="showPanel('curvas',this)"           data-i18n="tab_curvas">Curvas</div>
-  <div class="nav-tab" onclick="showPanel('tabla',this)"            data-i18n="tab_tabla">Tabla</div>
-  <div class="nav-tab" onclick="showPanel('timeline',this)"         data-i18n="tab_timeline">Cronología</div>
-  <div class="nav-tab alert" onclick="showPanel('farma',this)"      data-i18n="tab_farma">⚠ Farmacovigilancia</div>
-  <div class="nav-tab" onclick="showPanel('importar',this)"         data-i18n="tab_import">+ Datos</div>
+  <div class="nav-tab active" onclick="showPanel('resumen',this)"     data-i18n="tab_resumen">Resumen</div>
+  <div class="nav-tab" onclick="showPanel('curvas',this)"             data-i18n="tab_curvas">Curvas</div>
+  <div class="nav-tab" onclick="showPanel('tabla',this)"              data-i18n="tab_tabla">Tabla</div>
+  <div class="nav-tab" onclick="showPanel('timeline',this)"           data-i18n="tab_timeline">Cronología</div>
+  <div class="nav-tab" onclick="showPanel('observancia',this)"        data-i18n="tab_obs">Observancia</div>
+  <div class="nav-tab alert" onclick="showPanel('farma',this)"        data-i18n="tab_farma">⚠ Farmacovigilancia</div>
+  <div class="nav-tab" onclick="showPanel('importar',this)"           data-i18n="tab_import">+ Datos</div>
 </div>
 
 <div class="main">
@@ -341,6 +342,31 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 <div id="panel-timeline" class="panel">
   <div class="section-label" data-i18n="clinical_timeline">Cronología clínica</div>
   <div class="timeline" id="timeline-el"></div>
+</div>
+
+<!-- ===== PANEL OBSERVANCIA ===== -->
+<div id="panel-observancia" class="panel">
+  <div class="section-label">Observancia terapéutica — Registro de toma real de medicamentos</div>
+
+  <!-- NOTA METODOLÓGICA -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent2);border-radius:var(--radius);padding:14px 18px;margin-bottom:24px;font-size:13px;color:var(--muted)">
+    💡 <strong style="color:var(--text)">Nota metodológica</strong> —
+    Este módulo documenta la observancia <em>real</em> de cada medicamento, distinguiendo entre
+    lo prescrito y lo efectivamente tomado. Las fuentes son las notas médicas, declaraciones
+    del paciente/familia y cambios de prescripción documentados.
+    La transparencia sobre la observancia es esencial para interpretar correctamente
+    la evolución de los parámetros biológicos.
+  </div>
+
+  <!-- LEYENDA -->
+  <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;font-family:var(--mono);font-size:11px">
+    <span>🟢 <span style="color:var(--accent2)">Confirmado tomado</span></span>
+    <span>🟡 <span style="color:var(--warn)">Incierto / irregular</span></span>
+    <span>🔴 <span style="color:var(--danger)">Abandonado / suspendido</span></span>
+    <span>⚪ <span style="color:var(--muted)">No prescrito en ese período</span></span>
+  </div>
+
+  <div id="obs-content"></div>
 </div>
 
 <!-- ===== PANEL FARMA ===== -->
@@ -611,11 +637,12 @@ function showPanel(name, tabEl) {
   document.getElementById('panel-' + name).classList.add('active');
   if (tabEl) tabEl.classList.add('active');
   const data = loadData();
-  if (name === 'resumen')  buildResumen(data);
-  if (name === 'curvas')   buildAllCharts(data);
-  if (name === 'tabla')    buildTable(data);
-  if (name === 'timeline') buildTimeline();
-  if (name === 'farma')    buildFarma();
+  if (name === 'resumen')     buildResumen(data);
+  if (name === 'curvas')      buildAllCharts(data);
+  if (name === 'tabla')       buildTable(data);
+  if (name === 'timeline')    buildTimeline();
+  if (name === 'observancia') buildObservancia();
+  if (name === 'farma')       buildFarma();
   if (name === 'importar') updateDataSummary(data);
 }
 
@@ -1360,6 +1387,183 @@ function loadPdfView(input) {
 }
 document.getElementById('pdf-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closePdf(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closePdf(); });
+
+/* ================================================================
+   OBSERVANCIA TERAPÉUTICA
+================================================================ */
+
+/* Données d'observance — basées sur les documents médicaux */
+const OBSERVANCIA = [
+  {
+    med: "Xarelto (Rivaroxaban) 20mg/día",
+    indicacion: "Anticoagulación TEP",
+    inicio: "2016-11",
+    fin: "2024-07",
+    periodos: [
+      { de:"2016-11", a:"2017-11", estado:"verde",  razon:"Confirmado — 1er año post-TEP", fuente:"CUN Navarra 10/2017" },
+      { de:"2017-11", a:"2022-01", estado:"rojo",   razon:"Suspendido — CUN recomienda parar si no hipercoagulabilidad", fuente:"Informe CUN 04/10/2017" },
+      { de:"2022-01", a:"2022-07", estado:"verde",  razon:"Reiniciado post 2º TEP — Xarelto 20mg/día", fuente:"Alta HGC 14/01/2022" },
+      { de:"2022-07", a:"2024-07", estado:"amarillo", razon:"Incierto — Paciente refiere no querer pagarlo, presión familiar", fuente:"Nota Hematología HGC" },
+    ]
+  },
+  {
+    med: "Dabigatrán (Pradaxa) 150mg/12h",
+    indicacion: "Anticoagulación TEP — alternativa financiada",
+    inicio: "2024-07",
+    fin: "2026-03",
+    periodos: [
+      { de:"2024-07", a:"2025-01", estado:"amarillo", razon:"Prescrito — observancia dudosa, familia reticente", fuente:"Nota Hematología HGC 07/2024" },
+      { de:"2025-01", a:"2026-03", estado:"rojo",     razon:"ABANDONADO — 'no desean tomar anticoagulante' (marido)", fuente:"Nota Hematología HGC 02/2025" },
+    ]
+  },
+  {
+    med: "Enoxaparina (HBPM) 60mg/12h",
+    indicacion: "Anticoagulación puente post-TEP",
+    inicio: "2022-01",
+    fin: "2022-02",
+    periodos: [
+      { de:"2022-01", a:"2022-01", estado:"verde",   razon:"Iniciado en hospitalización HGC", fuente:"Alta HGC 14/01/2022" },
+      { de:"2022-01", a:"2022-02", estado:"rojo",    razon:"ABANDONADO por paciente — hematomas e incomodidad", fuente:"Nota Hematología HGC 25/02/2022" },
+    ]
+  },
+  {
+    med: "Donepezilo 5mg",
+    indicacion: "Deterioro cognitivo post-ictus",
+    inicio: "2022-02",
+    fin: "2026-03",
+    periodos: [
+      { de:"2022-02", a:"2022-04", estado:"verde",   razon:"Confirmado — prescrito e iniciado", fuente:"Anamnesis HGC 25/02/2022" },
+      { de:"2022-04", a:"2022-10", estado:"rojo",    razon:"SUSPENDIDO por médico — anorexia e incontinencia", fuente:"Nota Neurología HGC 22/04/2022" },
+      { de:"2022-10", a:"2026-03", estado:"amarillo", razon:"Reiniciado — observancia incierta, deterioro progresivo", fuente:"Nota Neurología HGC 21/10/2022" },
+    ]
+  },
+  {
+    med: "Memantina",
+    indicacion: "Deterioro cognitivo — complemento Donepezilo",
+    inicio: "2022-04",
+    fin: "2026-03",
+    periodos: [
+      { de:"2022-04", a:"2022-10", estado:"verde",   razon:"Confirmado — añadida por Neurología", fuente:"Nota Neurología HGC 22/04/2022" },
+      { de:"2022-10", a:"2026-03", estado:"rojo",    razon:"PROBABLE ABANDONO — 'empeoró conducta con memantina'", fuente:"Nota Neurología HGC 21/10/2022" },
+    ]
+  },
+  {
+    med: "Atorvastatina 20mg",
+    indicacion: "Dislipemia",
+    inicio: "2022-01",
+    fin: "2026-03",
+    periodos: [
+      { de:"2022-01", a:"2026-03", estado:"amarillo", razon:"Prescrita — observancia desconocida. Colesterol sube 230→281 mg/dL a pesar del tratamiento", fuente:"Analíticas HGC 2022-2025" },
+    ]
+  },
+  {
+    med: "Haloperidol gotas",
+    indicacion: "Agitación / demencia",
+    inicio: "2024-10",
+    fin: "2026-03",
+    periodos: [
+      { de:"2024-10", a:"2026-03", estado:"amarillo", razon:"Solo en crisis — irregular por definición. ⚠️ Interacción QTc con Donepezilo", fuente:"Nota Neurología HGC 10/2024" },
+    ]
+  },
+  {
+    med: "Adiro (AAS) 100mg",
+    indicacion: "Antiagregante plaquetario",
+    inicio: "2022-01",
+    fin: "2026-03",
+    periodos: [
+      { de:"2022-01", a:"2026-03", estado:"amarillo", razon:"Prescrito — observancia desconocida. ⚠️ Riesgo sangrado con Dabigatrán", fuente:"Anamnesis HGC 25/02/2022" },
+    ]
+  },
+  {
+    med: "Bromuro de Tiotropio 18mcg",
+    indicacion: "EPOC / patrón restrictivo",
+    inicio: "2022-01",
+    fin: "2026-03",
+    periodos: [
+      { de:"2022-01", a:"2026-03", estado:"amarillo", razon:"Prescrito — observancia desconocida", fuente:"Anamnesis HGC 25/02/2022" },
+    ]
+  },
+  {
+    med: "Pantoprazol 20mg",
+    indicacion: "Gastroprotector",
+    inicio: "2022-01",
+    fin: "2026-03",
+    periodos: [
+      { de:"2022-01", a:"2026-03", estado:"amarillo", razon:"Prescrito — observancia desconocida", fuente:"Anamnesis HGC 25/02/2022" },
+    ]
+  },
+  {
+    med: "Melitraceno / Flupentixol 10mg/0.5mg",
+    indicacion: "Antidepresivo / ansiolítico",
+    inicio: "2022-01",
+    fin: "2026-03",
+    periodos: [
+      { de:"2022-01", a:"2026-03", estado:"amarillo", razon:"Prescrito — observancia desconocida", fuente:"Anamnesis HGC 25/02/2022" },
+    ]
+  },
+];
+
+const OBS_COLORS = {
+  verde:    { bg: 'rgba(74,232,164,0.15)', border: '#4ae8a4', dot: '#4ae8a4', emoji: '🟢' },
+  amarillo: { bg: 'rgba(232,164,74,0.15)', border: '#e8a44a', dot: '#e8a44a', emoji: '🟡' },
+  rojo:     { bg: 'rgba(232,74,74,0.15)',  border: '#e84a4a', dot: '#e84a4a', emoji: '🔴' },
+};
+
+function buildObservancia() {
+  const el = document.getElementById('obs-content');
+  el.innerHTML = '';
+
+  OBSERVANCIA.forEach(med => {
+    const card = document.createElement('div');
+    card.style.cssText = `background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:16px`;
+
+    /* Header */
+    const header = document.createElement('div');
+    header.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:12px';
+    header.innerHTML = `
+      <div>
+        <div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--text)">${med.med}</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px">${med.indicacion}</div>
+      </div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted)">${med.inicio} → ${med.fin}</div>`;
+    card.appendChild(header);
+
+    /* Périodes */
+    med.periodos.forEach(p => {
+      const c = OBS_COLORS[p.estado] || OBS_COLORS.amarillo;
+      const row = document.createElement('div');
+      row.style.cssText = `background:${c.bg};border:1px solid ${c.border};border-left:4px solid ${c.border};border-radius:6px;padding:10px 14px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start`;
+      row.innerHTML = `
+        <div style="font-size:16px;flex-shrink:0">${c.emoji}</div>
+        <div style="flex:1">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px;margin-bottom:4px">
+            <div style="font-family:var(--mono);font-size:10px;color:var(--muted)">${p.de} → ${p.a}</div>
+            <div style="font-family:var(--mono);font-size:9px;color:var(--muted);font-style:italic">📄 ${p.fuente}</div>
+          </div>
+          <div style="font-size:13px;color:var(--text)">${p.razon}</div>
+        </div>`;
+      card.appendChild(row);
+    });
+
+    el.appendChild(card);
+  });
+
+  /* Résumé statistique */
+  const total = OBSERVANCIA.reduce((s, m) => s + m.periodos.length, 0);
+  const confirmed = OBSERVANCIA.reduce((s, m) => s + m.periodos.filter(p => p.estado === 'verde').length, 0);
+  const abandoned = OBSERVANCIA.reduce((s, m) => s + m.periodos.filter(p => p.estado === 'rojo').length, 0);
+  const uncertain = OBSERVANCIA.reduce((s, m) => s + m.periodos.filter(p => p.estado === 'amarillo').length, 0);
+
+  const summary = document.createElement('div');
+  summary.style.cssText = 'background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-top:8px;display:flex;gap:24px;flex-wrap:wrap;font-family:var(--mono);font-size:11px';
+  summary.innerHTML = `
+    <div>📊 <strong>${OBSERVANCIA.length}</strong> medicamentos documentados</div>
+    <div>🟢 <strong style="color:#4ae8a4">${confirmed}</strong> períodos confirmados</div>
+    <div>🟡 <strong style="color:#e8a44a">${uncertain}</strong> períodos inciertos</div>
+    <div>🔴 <strong style="color:#e84a4a">${abandoned}</strong> períodos de abandono documentado</div>
+    <div style="color:var(--muted);font-size:10px">Fuentes: notas médicas HGC · Vithas · CUN Navarra · declaraciones familia</div>`;
+  el.appendChild(summary);
+}
 
 /* ================================================================
    INIT
