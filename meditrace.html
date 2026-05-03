@@ -296,6 +296,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <div class="nav-tab" onclick="showPanel('curvas',this)"             data-i18n="tab_curvas">Curvas</div>
   <div class="nav-tab" onclick="showPanel('tabla',this)"              data-i18n="tab_tabla">Tabla</div>
   <div class="nav-tab" onclick="showPanel('timeline',this)"           data-i18n="tab_timeline">Cronología</div>
+  <div class="nav-tab" onclick="showPanel('antecedentes',this)"      data-i18n="tab_ant">Antecedentes</div>
   <div class="nav-tab" onclick="showPanel('vascular',this)"           data-i18n="tab_vasc">🧠 Análisis Vascular</div>
   <div class="nav-tab" onclick="showPanel('correlaciones',this)"      data-i18n="tab_corr">📊 Correlaciones</div>
   <div class="nav-tab" onclick="showPanel('observancia',this)"        data-i18n="tab_obs">Observancia</div>
@@ -331,7 +332,12 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 
 <!-- ===== PANEL TABLA ===== -->
 <div id="panel-tabla" class="panel">
-  <div class="section-label" data-i18n="synth_table">Tabla de síntesis cronológica</div>
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+    <div class="section-label" style="margin-bottom:0" data-i18n="synth_table">Tabla de síntesis cronológica</div>
+    <button class="btn" onclick="openGlosario()" style="font-size:11px;padding:6px 14px">
+      ❓ Glosario de parámetros
+    </button>
+  </div>
   <div class="data-table-wrap">
     <table class="data-table">
       <thead id="tbl-head"></thead>
@@ -344,6 +350,116 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 <div id="panel-timeline" class="panel">
   <div class="section-label" data-i18n="clinical_timeline">Cronología clínica</div>
   <div class="timeline" id="timeline-el"></div>
+</div>
+
+<!-- ===== PANEL ANTECEDENTES ===== -->
+<div id="panel-antecedentes" class="panel">
+  <div class="section-label">📋 Antecedentes médicos estructurados — M.E.J. · F · 87 años</div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;margin-bottom:24px">
+
+    <!-- RESPIRATORIO -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+      <div style="background:rgba(74,143,232,0.15);padding:10px 16px;border-bottom:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--accent)">🫁 NEUMOLOGÍA / RESPIRATORIO</div>
+      </div>
+      <div style="padding:14px 16px;font-size:13px;line-height:1.9;color:var(--muted)">
+        <div>• <strong style="color:var(--text)">TBC infancia</strong> — TAC 2017: hallazgos compatibles con cambios post-TBC</div>
+        <div>• <strong style="color:var(--text)">Pleuritis + parálisis hemidiafragma derecho</strong> post-TBC. Tratada con estreptomicina</div>
+        <div>• <strong style="color:var(--text)">Patrón restrictivo severo</strong> — FVC 64% · FEV1 69% (CUN Navarra 10/2017)</div>
+        <div>• <strong style="color:var(--text)">SAOS — BIPAP/VMNI</strong> domiciliaria desde hace años (puesta en Navarra)</div>
+        <div>• <strong style="color:var(--text)">SpO2 96%</strong> en reposo · FC 52 (bradicardia) · TA 155/79 (10/2017)</div>
+        <div>• <strong style="color:var(--text)">Elevación hemidiafragma derecho</strong> — visible en RX y TAC</div>
+        <div>• <strong style="color:var(--text)">Atelectasia basal derecha</strong> secundaria + engrosamiento cisural</div>
+        <div style="margin-top:8px;font-family:var(--mono);font-size:9px;color:var(--accent)">Fuentes: CUN Navarra 10/2017 · Alta HGC 01/2022</div>
+      </div>
+    </div>
+
+    <!-- CARDIOVASCULAR / TROMBÓTICO -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+      <div style="background:rgba(232,74,74,0.12);padding:10px 16px;border-bottom:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:#e84a4a">🫀 CARDIOVASCULAR / TROMBÓTICO</div>
+      </div>
+      <div style="padding:14px 16px;font-size:13px;line-height:1.9;color:var(--muted)">
+        <div>• <strong style="color:var(--text)">TEP bilateral (11/2016)</strong> — durante viaje Alemania. TVP. HTPulmonar PAPs 55-60mmHg. Disfunción VD</div>
+        <div>• <strong style="color:var(--text)">TEP crónico</strong> confirmado en angio-TAC junio 2017</div>
+        <div>• <strong style="color:var(--text)">2º TEP bilateral agudo (01/2022)</strong> — Troponina 76.68 ⚠ · NT-ProBNP 11.924 ⚠</div>
+        <div>• <strong style="color:var(--text)">Insuficiencia tricuspídea moderada</strong></div>
+        <div>• <strong style="color:var(--text)">Dislipemia</strong> — LDL 202 mg/dL ⚠ · Colesterol 281.7 ⚠</div>
+        <div>• <strong style="color:var(--text)">ACI izquierda ocluida</strong> — IRM Ascires 03/2026 🚨</div>
+        <div style="margin-top:8px;font-family:var(--mono);font-size:9px;color:#e84a4a">Fuentes: CUN 10/2017 · Alta HGC 01/2022 · IRM Ascires 03/2026</div>
+      </div>
+    </div>
+
+    <!-- NEUROLÓGICO -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+      <div style="background:rgba(125,60,152,0.12);padding:10px 16px;border-bottom:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:#7d3c98">🧠 NEUROLÓGICO</div>
+      </div>
+      <div style="padding:14px 16px;font-size:13px;line-height:1.9;color:var(--muted)">
+        <div>• <strong style="color:var(--text)">Ictus isquémico vertebrobasilar (09/2021)</strong> — diagnóstico tardío 27h. Diagnóstico inicial erróneo: enolismo</div>
+        <div>• <strong style="color:var(--text)">Deterioro cognitivo</strong> desde el ictus. MMSE: 25 (11/2021) → 22 (04/2022) → 16 (10/2024)</div>
+        <div>• <strong style="color:var(--text)">PET/CT FDG (12/2021)</strong> — hipometabolismo frontal izquierdo dominante → señal precoz oclusión carotídea</div>
+        <div>• <strong style="color:var(--text)">Disfagia a líquidos</strong> como secuela del ictus vertebrobasilar</div>
+        <div>• <strong style="color:var(--text)">Alucinaciones</strong> documentadas (Neurología HGC 10/2024)</div>
+        <div>• <strong style="color:var(--text)">Leucoaraiosis Fazekas II-III</strong> — IRM Ascires 03/2026</div>
+        <div style="margin-top:8px;font-family:var(--mono);font-size:9px;color:#7d3c98">Fuentes: Neurología HGC 11/2021→10/2024 · CUN PET 12/2021 · IRM Ascires 03/2026</div>
+      </div>
+    </div>
+
+    <!-- METABÓLICO / ENDOCRINO -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+      <div style="background:rgba(232,164,74,0.12);padding:10px 16px;border-bottom:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:#e8a44a">🌡️ METABÓLICO / ENDOCRINO</div>
+      </div>
+      <div style="padding:14px 16px;font-size:13px;line-height:1.9;color:var(--muted)">
+        <div>• <strong style="color:var(--text)">Déficit Vitamina D crónico</strong> — 27.10 (09/2022) → 15.96 (04/2024) → 12.33 ng/mL (02/2025) ⚠</div>
+        <div>• <strong style="color:var(--text)">Hidroferol 0.266mg/mensual</strong> — iniciado ~2024. En curso. Stock 6 meses</div>
+        <div>• <strong style="color:var(--text)">Vitamina B12 baja</strong> — 152 pg/mL (09/2022) ⚠ — probable deficiencia por Pantoprazol</div>
+        <div>• <strong style="color:var(--text)">TSH normal</strong> — 0.60→0.88→1.45 mUI/L (evolución estable)</div>
+        <div>• <strong style="color:var(--text)">HbA1c límite</strong> — 5.66→5.88→6.01% (prediabetes)</div>
+        <div>• <strong style="color:var(--text)">Macrocitosis</strong> — VCM 98.1 fL ⚠ (03/2025)</div>
+        <div style="margin-top:8px;font-family:var(--mono);font-size:9px;color:#e8a44a">Fuentes: Analíticas HGC · Vithas · Centro Salud 2022–2025</div>
+      </div>
+    </div>
+
+    <!-- ANTECEDENTES PERSONALES -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+      <div style="background:rgba(74,232,164,0.1);padding:10px 16px;border-bottom:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:#4ae8a4">📋 ANTECEDENTES PERSONALES</div>
+      </div>
+      <div style="padding:14px 16px;font-size:13px;line-height:1.9;color:var(--muted)">
+        <div>• <strong style="color:var(--text)">Fecha nacimiento</strong> — 09/11/1938 · 87 años · Femenino</div>
+        <div>• <strong style="color:var(--text)">Peso</strong> 59kg · Talla 1.51m (CUN 10/2017)</div>
+        <div>• <strong style="color:var(--text)">Ex fumadora</strong> ocasional (más de 40 años, 4 cig/día)</div>
+        <div>• <strong style="color:var(--text)">Amigdalectomía</strong> — antecedente quirúrgico</div>
+        <div>• <strong style="color:var(--text)">RAM conocidas</strong> — ninguna documentada</div>
+        <div>• <strong style="color:var(--text)">Alergias</strong> — ninguna</div>
+        <div>• <strong style="color:var(--text)">Barthel 100</strong> (01/2022) — independiente ABVD. Rankin 0</div>
+        <div>• <strong style="color:var(--text)">Vacunas</strong> — gripe y neumococo · SARS-2 (2 dosis, no constan en abucasis)</div>
+        <div>• <strong style="color:var(--text)">Padre</strong> fallecido de cáncer de pulmón</div>
+        <div style="margin-top:8px;font-family:var(--mono);font-size:9px;color:#4ae8a4">Fuentes: CUN 10/2017 · Alta HGC 01/2022 · Vithas Urgencias 01/2022</div>
+      </div>
+    </div>
+
+    <!-- SEGUIMIENTO ACTUAL -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+      <div style="background:rgba(26,82,118,0.2);padding:10px 16px;border-bottom:1px solid var(--border)">
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--accent)">🏥 SEGUIMIENTO MÉDICO ACTUAL</div>
+      </div>
+      <div style="padding:14px 16px;font-size:13px;line-height:1.9;color:var(--muted)">
+        <div>• <strong style="color:var(--text)">Hematología HGC</strong> — seguimiento TEP y anticoagulación</div>
+        <div>• <strong style="color:var(--text)">Neurología HGC</strong> — deterioro cognitivo · ECG prescrito 03/2026 ⚠ no realizado</div>
+        <div>• <strong style="color:var(--text)">Neurólogo privado</strong> — consulta 03/2026 · Haloperidol suspendido · Donepezilo re-prescrito</div>
+        <div>• <strong style="color:var(--text)">Centro Salud Atzeneta</strong> — analítica general · Hidroferol prescrito</div>
+        <div>• <strong style="color:var(--text)">Vithas Castellón</strong> — urgencias y laboratorio</div>
+        <div>• <strong style="color:var(--text)">Ascires Castellón</strong> — IRM vascular 03/2026</div>
+        <div>• <strong style="color:var(--text)">Vive con el marido</strong> — Pierre-Henri Giraud · telf 667493227</div>
+        <div style="margin-top:8px;font-family:var(--mono);font-size:9px;color:var(--accent)">Actualizado: Mayo 2026</div>
+      </div>
+    </div>
+
+  </div>
 </div>
 
 <!-- ===== PANEL ANÁLISIS VASCULAR ===== -->
@@ -651,6 +767,27 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 
 </div><!-- /main -->
 
+<!-- GLOSARIO MODAL -->
+<div class="pdf-modal" id="glosario-modal">
+  <div class="pdf-modal-box" style="max-width:780px;height:85vh">
+    <div class="pdf-modal-hdr">
+      <div class="pdf-modal-title">❓ Glosario de parámetros biológicos</div>
+      <button class="pdf-modal-close" onclick="closeGlosario()">✕</button>
+    </div>
+    <div style="padding:20px;overflow-y:auto;height:calc(100% - 48px)">
+
+      <!-- Selector de idioma del glosario -->
+      <div style="display:flex;gap:8px;margin-bottom:16px;font-family:var(--mono);font-size:11px">
+        <button class="btn primary" id="g-es" onclick="setGlosarioLang('es')">ES</button>
+        <button class="btn" id="g-fr" onclick="setGlosarioLang('fr')">FR</button>
+        <button class="btn" id="g-en" onclick="setGlosarioLang('en')">EN</button>
+      </div>
+
+      <div id="glosario-content"></div>
+    </div>
+  </div>
+</div>
+
 <!-- PDF MODAL -->
 <div class="pdf-modal" id="pdf-modal">
   <div class="pdf-modal-box">
@@ -836,14 +973,15 @@ function showPanel(name, tabEl) {
   document.getElementById('panel-' + name).classList.add('active');
   if (tabEl) tabEl.classList.add('active');
   const data = loadData();
-  if (name === 'resumen')      buildResumen(data);
-  if (name === 'curvas')       buildAllCharts(data);
-  if (name === 'tabla')        buildTable(data);
-  if (name === 'timeline')     buildTimeline();
-  if (name === 'vascular')     buildVascular();
+  if (name === 'resumen')       buildResumen(data);
+  if (name === 'curvas')        buildAllCharts(data);
+  if (name === 'tabla')         buildTable(data);
+  if (name === 'timeline')      buildTimeline();
+  if (name === 'antecedentes')  buildAntecedentes();
+  if (name === 'vascular')      buildVascular();
   if (name === 'correlaciones') buildCorrelaciones(data);
-  if (name === 'observancia')  buildObservancia();
-  if (name === 'farma')        buildFarma();
+  if (name === 'observancia')   buildObservancia();
+  if (name === 'farma')         buildFarma();
   if (name === 'importar') updateDataSummary(data);
 }
 
@@ -2080,6 +2218,286 @@ function buildCorrelaciones(data) {
       });
     }, idx * 100);
   });
+}
+
+/* ================================================================
+   GLOSARIO DE PARÁMETROS BIOLÓGICOS
+================================================================ */
+const GLOSARIO = {
+  es: {
+    categorias: [
+      {
+        nombre: "🩸 Hematología — Sangre",
+        params: [
+          { nombre:"Hemoglobina", sigla:"Hb", que:"Proteína de los glóbulos rojos que transporta el oxígeno por el cuerpo.", bajo:"Anemia: cansancio, palidez, falta de aliento.", alto:"Puede indicar deshidratación o enfermedad pulmonar.", unidad:"g/dL", ref:"12–18" },
+          { nombre:"Hematocrito", sigla:"Hct", que:"Porcentaje del volumen de sangre ocupado por los glóbulos rojos.", bajo:"Anemia.", alto:"Deshidratación o enfermedad pulmonar.", unidad:"%", ref:"37–52" },
+          { nombre:"Leucocitos", sigla:"WBC", que:"Glóbulos blancos: células de defensa del sistema inmunitario.", bajo:"Mayor riesgo de infecciones.", alto:"Infección activa o inflamación.", unidad:"x10³/µL", ref:"4.8–10.8" },
+          { nombre:"Plaquetas", sigla:"PLT", que:"Células pequeñas que detienen el sangrado formando coágulos.", bajo:"Riesgo de hemorragia.", alto:"Riesgo de trombosis.", unidad:"x10³/µL", ref:"130–400" },
+          { nombre:"VSG", sigla:"VSG", que:"Velocidad de sedimentación globular: mide la inflamación general del cuerpo.", bajo:"Normal.", alto:"Infección, inflamación o enfermedad autoinmune.", unidad:"mm/h", ref:"0–20" },
+          { nombre:"VCM", sigla:"MCV", que:"Volumen corpuscular medio: tamaño de los glóbulos rojos.", bajo:"Anemia ferropénica.", alto:"Déficit de vitamina B12 o ácido fólico (macrocitosis).", unidad:"fL", ref:"80–96" },
+        ]
+      },
+      {
+        nombre: "🍬 Glucosa y Diabetes",
+        params: [
+          { nombre:"Glucosa", sigla:"GLU", que:"Nivel de azúcar en sangre en ayunas.", bajo:"Hipoglucemia: mareos, temblores.", alto:"Diabetes o prediabetes.", unidad:"mg/dL", ref:"70–110" },
+          { nombre:"Hemoglobina A1c", sigla:"HbA1c", que:"Refleja el nivel medio de azúcar en sangre durante los últimos 2–3 meses.", bajo:"Normal.", alto:"≥6.5%: diabetes · 5.7–6.4%: prediabetes.", unidad:"%", ref:"<6.5" },
+        ]
+      },
+      {
+        nombre: "🫀 Corazón y Riñones",
+        params: [
+          { nombre:"Creatinina", sigla:"Crea", que:"Residuo muscular eliminado por los riñones. Indica cómo funcionan los riñones.", bajo:"Normal.", alto:"Los riñones no filtran bien.", unidad:"mg/dL", ref:"0.51–0.95" },
+          { nombre:"Filtrado Glomerular", sigla:"FG", que:"Cantidad de sangre que filtran los riñones por minuto. Es la medida más importante de la función renal.", bajo:"<60: enfermedad renal crónica · <30: grave.", alto:"Normal.", unidad:"ml/min", ref:">60" },
+          { nombre:"Urea", sigla:"BUN", que:"Residuo proteico eliminado por los riñones.", bajo:"Normal.", alto:"Problema renal o deshidratación.", unidad:"mg/dL", ref:"10–50" },
+          { nombre:"Troponina", sigla:"TnI", que:"Proteína liberada cuando el músculo cardíaco sufre daño. Marcador de infarto.", bajo:"Normal.", alto:"Posible infarto o daño cardíaco — urgencia médica.", unidad:"ng/L", ref:"<14" },
+          { nombre:"NT-ProBNP / BNP", sigla:"BNP", que:"Hormona producida cuando el corazón trabaja en exceso. Indica insuficiencia cardíaca.", bajo:"Normal.", alto:"El corazón está sobrecargado.", unidad:"pg/mL", ref:"<125" },
+          { nombre:"Sodio", sigla:"Na", que:"Mineral que regula el agua en el cuerpo y la presión arterial.", bajo:"Confusión, convulsiones.", alto:"Deshidratación.", unidad:"mmol/L", ref:"134–145" },
+          { nombre:"Potasio", sigla:"K", que:"Mineral esencial para el corazón y los músculos.", bajo:"Debilidad muscular, arritmias.", alto:"Arritmias cardíacas.", unidad:"mmol/L", ref:"3.5–5" },
+        ]
+      },
+      {
+        nombre: "🧈 Colesterol y Grasas",
+        params: [
+          { nombre:"Colesterol total", sigla:"CHOL", que:"Grasa total en sangre. Incluye el 'bueno' (HDL) y el 'malo' (LDL).", bajo:"Normal.", alto:"Mayor riesgo cardiovascular.", unidad:"mg/dL", ref:"<200 ideal" },
+          { nombre:"LDL (colesterol malo)", sigla:"LDL", que:"Colesterol que se deposita en las arterias y las obstruye.", bajo:"Normal.", alto:"Riesgo de infarto e ictus. Objetivo: <116 mg/dL.", unidad:"mg/dL", ref:"<116" },
+          { nombre:"HDL (colesterol bueno)", sigla:"HDL", que:"Colesterol protector que limpia las arterias.", bajo:"Mayor riesgo cardiovascular.", alto:"Protector.", unidad:"mg/dL", ref:"40–65" },
+          { nombre:"Triglicéridos", sigla:"TG", que:"Grasas de reserva en sangre. Suben con la alimentación, el alcohol y la diabetes.", bajo:"Normal.", alto:"Riesgo cardiovascular y pancreático.", unidad:"mg/dL", ref:"50–165" },
+        ]
+      },
+      {
+        nombre: "🔥 Inflamación",
+        params: [
+          { nombre:"PCR (Proteína C Reactiva)", sigla:"CRP", que:"Marcador de inflamación o infección activa en el cuerpo.", bajo:"Normal.", alto:"Infección, inflamación o enfermedad autoinmune.", unidad:"mg/L", ref:"<10" },
+          { nombre:"Fibrinógeno", sigla:"Fib", que:"Proteína de la coagulación que también sube con la inflamación.", bajo:"Riesgo de sangrado.", alto:"Inflamación o trombosis.", unidad:"mg/dL", ref:"200–400" },
+        ]
+      },
+      {
+        nombre: "🌡️ Vitaminas y Hormonas",
+        params: [
+          { nombre:"Vitamina D (Calcidiol)", sigla:"VitD", que:"Vitamina esencial para los huesos, el sistema inmunitario y el cerebro. Se obtiene del sol.", bajo:"<30: déficit · <20: déficit severo. Riesgo de caídas, deterioro cognitivo, depresión.", alto:"Raro. Muy altas dosis suplementarias.", unidad:"ng/mL", ref:"30–100" },
+          { nombre:"Vitamina B12", sigla:"B12", que:"Vitamina esencial para el sistema nervioso y la formación de glóbulos rojos.", bajo:"Anemia, hormigueos, problemas neurológicos.", alto:"Generalmente sin consecuencias.", unidad:"pg/mL", ref:"180–914" },
+          { nombre:"Ácido Fólico", sigla:"Fol", que:"Vitamina B9: esencial para la formación de células y el sistema nervioso.", bajo:"Anemia, problemas neurológicos.", alto:"Sin consecuencias.", unidad:"ng/mL", ref:"4–16" },
+          { nombre:"TSH (Tirotropina)", sigla:"TSH", que:"Hormona que controla la tiroides. Indica si la tiroides funciona bien.", bajo:"Hipertiroidismo: palpitaciones, pérdida de peso.", alto:"Hipotiroidismo: cansancio, frío, aumento de peso.", unidad:"mUI/L", ref:"0.38–5.33" },
+          { nombre:"Ferritina", sigla:"Fer", que:"Reserva de hierro en el cuerpo.", bajo:"Déficit de hierro — anemia.", alto:"Inflamación o sobrecarga de hierro.", unidad:"ng/mL", ref:"20–300" },
+        ]
+      },
+      {
+        nombre: "🫀 Hígado",
+        params: [
+          { nombre:"GPT / ALT", sigla:"GPT", que:"Enzima hepática. Indica daño en las células del hígado.", bajo:"Normal.", alto:"Inflamación del hígado (hepatitis, medicamentos, alcohol).", unidad:"UI/L", ref:"10–37" },
+          { nombre:"GGT", sigla:"GGT", que:"Enzima que sube con el alcohol, algunos medicamentos o enfermedad hepática.", bajo:"Normal.", alto:"Consumo de alcohol, medicamentos hepatotóxicos.", unidad:"UI/L", ref:"7–50" },
+          { nombre:"Fosfatasa alcalina", sigla:"ALP", que:"Enzima del hígado y los huesos.", bajo:"Normal.", alto:"Enfermedad hepática o ósea.", unidad:"UI/L", ref:"40–145" },
+          { nombre:"Albúmina", sigla:"Alb", que:"Proteína principal de la sangre, fabricada por el hígado. Indica el estado nutricional.", bajo:"Desnutrición o enfermedad hepática grave.", alto:"Normal.", unidad:"g/dL", ref:"3.5–5.2" },
+          { nombre:"INR", sigla:"INR", que:"Mide la coagulación de la sangre. Importante en pacientes con anticoagulantes.", bajo:"La sangre coagula demasiado rápido.", alto:"Riesgo de hemorragia — sangre demasiado líquida.", unidad:"", ref:"0.85–1.25" },
+        ]
+      },
+    ]
+  },
+  fr: {
+    categorias: [
+      {
+        nombre: "🩸 Hématologie — Sang",
+        params: [
+          { nombre:"Hémoglobine", sigla:"Hb", que:"Protéine des globules rouges qui transporte l'oxygène dans le corps.", bajo:"Anémie : fatigue, pâleur, essoufflement.", alto:"Déshydratation ou maladie pulmonaire.", unidad:"g/dL", ref:"12–18" },
+          { nombre:"Hématocrite", sigla:"Hct", que:"Pourcentage du volume sanguin occupé par les globules rouges.", bajo:"Anémie.", alto:"Déshydratation ou maladie pulmonaire.", unidad:"%", ref:"37–52" },
+          { nombre:"Leucocytes", sigla:"GB", que:"Globules blancs : cellules de défense du système immunitaire.", bajo:"Risque accru d'infections.", alto:"Infection active ou inflammation.", unidad:"x10³/µL", ref:"4.8–10.8" },
+          { nombre:"Plaquettes", sigla:"PLT", que:"Petites cellules qui arrêtent les saignements en formant des caillots.", bajo:"Risque hémorragique.", alto:"Risque de thrombose.", unidad:"x10³/µL", ref:"130–400" },
+          { nombre:"VS (Vitesse de sédimentation)", sigla:"VS", que:"Mesure l'inflammation générale du corps.", bajo:"Normal.", alto:"Infection, inflammation ou maladie auto-immune.", unidad:"mm/h", ref:"0–20" },
+          { nombre:"VGM (Volume Globulaire Moyen)", sigla:"VGM", que:"Taille des globules rouges.", bajo:"Anémie ferriprive.", alto:"Déficit en B12 ou acide folique (macrocytose).", unidad:"fL", ref:"80–96" },
+        ]
+      },
+      {
+        nombre: "🍬 Glycémie et Diabète",
+        params: [
+          { nombre:"Glycémie", sigla:"GLU", que:"Taux de sucre dans le sang à jeun.", bajo:"Hypoglycémie : vertiges, tremblements.", alto:"Diabète ou prédiabète.", unidad:"mg/dL", ref:"70–110" },
+          { nombre:"Hémoglobine A1c", sigla:"HbA1c", que:"Reflète le taux moyen de sucre sur les 2–3 derniers mois.", bajo:"Normal.", alto:"≥6.5% : diabète · 5.7–6.4% : prédiabète.", unidad:"%", ref:"<6.5" },
+        ]
+      },
+      {
+        nombre: "🫀 Cœur et Reins",
+        params: [
+          { nombre:"Créatinine", sigla:"Crea", que:"Déchet musculaire éliminé par les reins. Indique leur fonctionnement.", bajo:"Normal.", alto:"Les reins ne filtrent pas bien.", unidad:"mg/dL", ref:"0.51–0.95" },
+          { nombre:"Filtration Glomérulaire", sigla:"DFG", que:"Quantité de sang filtrée par les reins par minute. Mesure principale de la fonction rénale.", bajo:"<60 : maladie rénale chronique · <30 : grave.", alto:"Normal.", unidad:"ml/min", ref:">60" },
+          { nombre:"Urée", sigla:"BUN", que:"Déchet protéique éliminé par les reins.", bajo:"Normal.", alto:"Problème rénal ou déshydratation.", unidad:"mg/dL", ref:"10–50" },
+          { nombre:"Troponine", sigla:"TnI", que:"Protéine libérée lors d'une lésion du muscle cardiaque. Marqueur d'infarctus.", bajo:"Normal.", alto:"Possible infarctus ou lésion cardiaque — urgence médicale.", unidad:"ng/L", ref:"<14" },
+          { nombre:"NT-ProBNP / BNP", sigla:"BNP", que:"Hormone produite quand le cœur travaille trop fort. Indique une insuffisance cardiaque.", bajo:"Normal.", alto:"Le cœur est en surcharge.", unidad:"pg/mL", ref:"<125" },
+          { nombre:"Sodium", sigla:"Na", que:"Minéral qui régule l'eau dans le corps et la tension artérielle.", bajo:"Confusion, convulsions.", alto:"Déshydratation.", unidad:"mmol/L", ref:"134–145" },
+          { nombre:"Potassium", sigla:"K", que:"Minéral essentiel pour le cœur et les muscles.", bajo:"Faiblesse musculaire, arythmies.", alto:"Arythmies cardiaques.", unidad:"mmol/L", ref:"3.5–5" },
+        ]
+      },
+      {
+        nombre: "🧈 Cholestérol et Graisses",
+        params: [
+          { nombre:"Cholestérol total", sigla:"CHOL", que:"Graisse totale dans le sang. Inclut le 'bon' (HDL) et le 'mauvais' (LDL).", bajo:"Normal.", alto:"Risque cardiovasculaire accru.", unidad:"mg/dL", ref:"<200 idéal" },
+          { nombre:"LDL (mauvais cholestérol)", sigla:"LDL", que:"Cholestérol qui se dépose dans les artères et les obstrue.", bajo:"Normal.", alto:"Risque d'infarctus et d'AVC. Objectif : <116 mg/dL.", unidad:"mg/dL", ref:"<116" },
+          { nombre:"HDL (bon cholestérol)", sigla:"HDL", que:"Cholestérol protecteur qui nettoie les artères.", bajo:"Risque cardiovasculaire accru.", alto:"Protecteur.", unidad:"mg/dL", ref:"40–65" },
+          { nombre:"Triglycérides", sigla:"TG", que:"Graisses de réserve dans le sang. Augmentent avec l'alimentation, l'alcool et le diabète.", bajo:"Normal.", alto:"Risque cardiovasculaire et pancréatique.", unidad:"mg/dL", ref:"50–165" },
+        ]
+      },
+      {
+        nombre: "🔥 Inflammation",
+        params: [
+          { nombre:"CRP (Protéine C Réactive)", sigla:"CRP", que:"Marqueur d'inflammation ou d'infection active dans le corps.", bajo:"Normal.", alto:"Infection, inflammation ou maladie auto-immune.", unidad:"mg/L", ref:"<10" },
+          { nombre:"Fibrinogène", sigla:"Fib", que:"Protéine de la coagulation qui augmente aussi avec l'inflammation.", bajo:"Risque hémorragique.", alto:"Inflammation ou thrombose.", unidad:"mg/dL", ref:"200–400" },
+        ]
+      },
+      {
+        nombre: "🌡️ Vitamines et Hormones",
+        params: [
+          { nombre:"Vitamine D (Calcidiol)", sigla:"VitD", que:"Vitamine essentielle pour les os, le système immunitaire et le cerveau. Obtenue par le soleil.", bajo:"<30 : déficit · <20 : déficit sévère. Risque de chutes, déclin cognitif, dépression.", alto:"Rare. Seulement avec suppléments à très hautes doses.", unidad:"ng/mL", ref:"30–100" },
+          { nombre:"Vitamine B12", sigla:"B12", que:"Vitamine essentielle pour le système nerveux et la formation des globules rouges.", bajo:"Anémie, fourmillements, problèmes neurologiques.", alto:"Généralement sans conséquences.", unidad:"pg/mL", ref:"180–914" },
+          { nombre:"Acide Folique", sigla:"Fol", que:"Vitamine B9 : essentielle pour la formation des cellules et le système nerveux.", bajo:"Anémie, problèmes neurologiques.", alto:"Sans conséquences.", unidad:"ng/mL", ref:"4–16" },
+          { nombre:"TSH (Thyréostimuline)", sigla:"TSH", que:"Hormone qui contrôle la thyroïde. Indique si la thyroïde fonctionne bien.", bajo:"Hyperthyroïdie : palpitations, perte de poids.", alto:"Hypothyroïdie : fatigue, froid, prise de poids.", unidad:"mUI/L", ref:"0.38–5.33" },
+          { nombre:"Ferritine", sigla:"Fer", que:"Réserve de fer dans le corps.", bajo:"Déficit en fer — anémie.", alto:"Inflammation ou surcharge en fer.", unidad:"ng/mL", ref:"20–300" },
+        ]
+      },
+      {
+        nombre: "🫀 Foie",
+        params: [
+          { nombre:"ALAT / GPT", sigla:"GPT", que:"Enzyme hépatique. Indique une lésion des cellules du foie.", bajo:"Normal.", alto:"Inflammation du foie (hépatite, médicaments, alcool).", unidad:"UI/L", ref:"10–37" },
+          { nombre:"GGT", sigla:"GGT", que:"Enzyme qui augmente avec l'alcool, certains médicaments ou une maladie hépatique.", bajo:"Normal.", alto:"Alcool, médicaments hépatotoxiques.", unidad:"UI/L", ref:"7–50" },
+          { nombre:"Phosphatases alcalines", sigla:"PAL", que:"Enzyme du foie et des os.", bajo:"Normal.", alto:"Maladie hépatique ou osseuse.", unidad:"UI/L", ref:"40–145" },
+          { nombre:"Albumine", sigla:"Alb", que:"Principale protéine du sang, fabriquée par le foie. Indique l'état nutritionnel.", bajo:"Dénutrition ou maladie hépatique grave.", alto:"Normal.", unidad:"g/dL", ref:"3.5–5.2" },
+          { nombre:"INR", sigla:"INR", que:"Mesure la coagulation du sang. Important chez les patients sous anticoagulants.", bajo:"Le sang coagule trop vite.", alto:"Risque hémorragique — sang trop fluide.", unidad:"", ref:"0.85–1.25" },
+        ]
+      },
+    ]
+  },
+  en: {
+    categorias: [
+      {
+        nombre: "🩸 Haematology — Blood",
+        params: [
+          { nombre:"Haemoglobin", sigla:"Hb", que:"Red blood cell protein that carries oxygen around the body.", bajo:"Anaemia: fatigue, pallor, breathlessness.", alto:"Dehydration or lung disease.", unidad:"g/dL", ref:"12–18" },
+          { nombre:"Haematocrit", sigla:"Hct", que:"Percentage of blood volume occupied by red blood cells.", bajo:"Anaemia.", alto:"Dehydration or lung disease.", unidad:"%", ref:"37–52" },
+          { nombre:"Leucocytes (WBC)", sigla:"WBC", que:"White blood cells: immune system defence cells.", bajo:"Increased risk of infections.", alto:"Active infection or inflammation.", unidad:"x10³/µL", ref:"4.8–10.8" },
+          { nombre:"Platelets", sigla:"PLT", que:"Small cells that stop bleeding by forming clots.", bajo:"Haemorrhage risk.", alto:"Thrombosis risk.", unidad:"x10³/µL", ref:"130–400" },
+          { nombre:"ESR (Sed Rate)", sigla:"ESR", que:"Erythrocyte sedimentation rate: measures general body inflammation.", bajo:"Normal.", alto:"Infection, inflammation or autoimmune disease.", unidad:"mm/h", ref:"0–20" },
+          { nombre:"MCV (Mean Cell Volume)", sigla:"MCV", que:"Size of red blood cells.", bajo:"Iron deficiency anaemia.", alto:"B12 or folate deficiency (macrocytosis).", unidad:"fL", ref:"80–96" },
+        ]
+      },
+      {
+        nombre: "🍬 Blood Sugar and Diabetes",
+        params: [
+          { nombre:"Glucose (fasting)", sigla:"GLU", que:"Fasting blood sugar level.", bajo:"Hypoglycaemia: dizziness, trembling.", alto:"Diabetes or prediabetes.", unidad:"mg/dL", ref:"70–110" },
+          { nombre:"Haemoglobin A1c", sigla:"HbA1c", que:"Reflects average blood sugar over the past 2–3 months.", bajo:"Normal.", alto:"≥6.5%: diabetes · 5.7–6.4%: prediabetes.", unidad:"%", ref:"<6.5" },
+        ]
+      },
+      {
+        nombre: "🫀 Heart and Kidneys",
+        params: [
+          { nombre:"Creatinine", sigla:"Crea", que:"Muscle waste product filtered by the kidneys. Indicates kidney function.", bajo:"Normal.", alto:"Kidneys not filtering well.", unidad:"mg/dL", ref:"0.51–0.95" },
+          { nombre:"GFR (Glomerular Filtration Rate)", sigla:"GFR", que:"Amount of blood filtered by the kidneys per minute. Main measure of kidney function.", bajo:"<60: chronic kidney disease · <30: severe.", alto:"Normal.", unidad:"ml/min", ref:">60" },
+          { nombre:"Urea (BUN)", sigla:"BUN", que:"Protein waste eliminated by the kidneys.", bajo:"Normal.", alto:"Kidney problem or dehydration.", unidad:"mg/dL", ref:"10–50" },
+          { nombre:"Troponin", sigla:"TnI", que:"Protein released when heart muscle is damaged. Marker of heart attack.", bajo:"Normal.", alto:"Possible heart attack or cardiac damage — medical emergency.", unidad:"ng/L", ref:"<14" },
+          { nombre:"NT-ProBNP / BNP", sigla:"BNP", que:"Hormone produced when the heart is overworked. Indicates heart failure.", bajo:"Normal.", alto:"Heart is under stress.", unidad:"pg/mL", ref:"<125" },
+          { nombre:"Sodium", sigla:"Na", que:"Mineral regulating water in the body and blood pressure.", bajo:"Confusion, seizures.", alto:"Dehydration.", unidad:"mmol/L", ref:"134–145" },
+          { nombre:"Potassium", sigla:"K", que:"Essential mineral for the heart and muscles.", bajo:"Muscle weakness, arrhythmias.", alto:"Cardiac arrhythmias.", unidad:"mmol/L", ref:"3.5–5" },
+        ]
+      },
+      {
+        nombre: "🧈 Cholesterol and Fats",
+        params: [
+          { nombre:"Total Cholesterol", sigla:"CHOL", que:"Total blood fat. Includes 'good' (HDL) and 'bad' (LDL).", bajo:"Normal.", alto:"Increased cardiovascular risk.", unidad:"mg/dL", ref:"<200 ideal" },
+          { nombre:"LDL (bad cholesterol)", sigla:"LDL", que:"Cholesterol that deposits in arteries and blocks them.", bajo:"Normal.", alto:"Risk of heart attack and stroke. Target: <116 mg/dL.", unidad:"mg/dL", ref:"<116" },
+          { nombre:"HDL (good cholesterol)", sigla:"HDL", que:"Protective cholesterol that cleans arteries.", bajo:"Increased cardiovascular risk.", alto:"Protective.", unidad:"mg/dL", ref:"40–65" },
+          { nombre:"Triglycerides", sigla:"TG", que:"Reserve fats in the blood. Rise with diet, alcohol and diabetes.", bajo:"Normal.", alto:"Cardiovascular and pancreatic risk.", unidad:"mg/dL", ref:"50–165" },
+        ]
+      },
+      {
+        nombre: "🔥 Inflammation",
+        params: [
+          { nombre:"CRP (C-Reactive Protein)", sigla:"CRP", que:"Marker of active inflammation or infection in the body.", bajo:"Normal.", alto:"Infection, inflammation or autoimmune disease.", unidad:"mg/L", ref:"<10" },
+          { nombre:"Fibrinogen", sigla:"Fib", que:"Clotting protein that also rises with inflammation.", bajo:"Haemorrhage risk.", alto:"Inflammation or thrombosis.", unidad:"mg/dL", ref:"200–400" },
+        ]
+      },
+      {
+        nombre: "🌡️ Vitamins and Hormones",
+        params: [
+          { nombre:"Vitamin D (Calcidiol)", sigla:"VitD", que:"Essential vitamin for bones, immune system and brain. Obtained from sunlight.", bajo:"<30: deficient · <20: severely deficient. Risk of falls, cognitive decline, depression.", alto:"Rare. Only with very high-dose supplements.", unidad:"ng/mL", ref:"30–100" },
+          { nombre:"Vitamin B12", sigla:"B12", que:"Essential vitamin for the nervous system and red blood cell formation.", bajo:"Anaemia, tingling, neurological problems.", alto:"Generally no consequences.", unidad:"pg/mL", ref:"180–914" },
+          { nombre:"Folic Acid", sigla:"Fol", que:"Vitamin B9: essential for cell formation and the nervous system.", bajo:"Anaemia, neurological problems.", alto:"No consequences.", unidad:"ng/mL", ref:"4–16" },
+          { nombre:"TSH (Thyroid Stimulating Hormone)", sigla:"TSH", que:"Hormone controlling the thyroid. Indicates whether the thyroid is working well.", bajo:"Hyperthyroidism: palpitations, weight loss.", alto:"Hypothyroidism: fatigue, feeling cold, weight gain.", unidad:"mUI/L", ref:"0.38–5.33" },
+          { nombre:"Ferritin", sigla:"Fer", que:"Iron store in the body.", bajo:"Iron deficiency — anaemia.", alto:"Inflammation or iron overload.", unidad:"ng/mL", ref:"20–300" },
+        ]
+      },
+      {
+        nombre: "🫀 Liver",
+        params: [
+          { nombre:"ALT / GPT", sigla:"GPT", que:"Liver enzyme. Indicates damage to liver cells.", bajo:"Normal.", alto:"Liver inflammation (hepatitis, drugs, alcohol).", unidad:"UI/L", ref:"10–37" },
+          { nombre:"GGT", sigla:"GGT", que:"Enzyme that rises with alcohol, certain drugs or liver disease.", bajo:"Normal.", alto:"Alcohol, hepatotoxic medications.", unidad:"UI/L", ref:"7–50" },
+          { nombre:"Alkaline Phosphatase", sigla:"ALP", que:"Liver and bone enzyme.", bajo:"Normal.", alto:"Liver or bone disease.", unidad:"UI/L", ref:"40–145" },
+          { nombre:"Albumin", sigla:"Alb", que:"Main blood protein made by the liver. Indicates nutritional status.", bajo:"Malnutrition or severe liver disease.", alto:"Normal.", unidad:"g/dL", ref:"3.5–5.2" },
+          { nombre:"INR", sigla:"INR", que:"Measures blood clotting. Important in patients on anticoagulants.", bajo:"Blood clots too quickly.", alto:"Haemorrhage risk — blood too thin.", unidad:"", ref:"0.85–1.25" },
+        ]
+      },
+    ]
+  }
+};
+
+let glosarioLang = 'es';
+
+function openGlosario() {
+  document.getElementById('glosario-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  renderGlosario();
+}
+function closeGlosario() {
+  document.getElementById('glosario-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function setGlosarioLang(l) {
+  glosarioLang = l;
+  ['es','fr','en'].forEach(x => {
+    document.getElementById('g-'+x).className = x===l ? 'btn primary' : 'btn';
+  });
+  renderGlosario();
+}
+function renderGlosario() {
+  const g = GLOSARIO[glosarioLang];
+  const el = document.getElementById('glosario-content');
+  el.innerHTML = '';
+  g.categorias.forEach(cat => {
+    const section = document.createElement('div');
+    section.style.cssText = 'margin-bottom:24px';
+    section.innerHTML = `<div style="font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--accent);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)">${cat.nombre}</div>`;
+    cat.params.forEach(p => {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--surface2);border-radius:8px;padding:12px 16px;margin-bottom:8px';
+      card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px;margin-bottom:6px">
+          <div style="font-size:14px;font-weight:600;color:var(--text)">${p.nombre} <span style="font-family:var(--mono);font-size:10px;color:var(--accent);margin-left:6px">${p.sigla}</span></div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--accent2)">Ref: ${p.ref} ${p.unidad}</div>
+        </div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:8px">${p.que}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <div style="background:rgba(74,232,164,0.1);border-radius:4px;padding:6px 10px;font-size:11px">
+            <span style="color:#4ae8a4;font-weight:600">↓ Bajo:</span> <span style="color:var(--muted)">${p.bajo}</span>
+          </div>
+          <div style="background:rgba(232,74,74,0.1);border-radius:4px;padding:6px 10px;font-size:11px">
+            <span style="color:#e84a4a;font-weight:600">↑ Alto:</span> <span style="color:var(--muted)">${p.alto}</span>
+          </div>
+        </div>`;
+      section.appendChild(card);
+    });
+    el.appendChild(section);
+  });
+}
+
+/* Fermer glosario avec Echap */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeGlosario(); closePdf(); }
+});
+document.getElementById('glosario-modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeGlosario();
+});
+
+/* ================================================================
+   ANTECEDENTES — panel statique
+================================================================ */
+function buildAntecedentes() {
+  /* Contenu statique HTML — rien à construire dynamiquement */
 }
 
 /* ================================================================
