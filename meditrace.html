@@ -1395,16 +1395,17 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closePdf(); 
 /* Données d'observance — basées sur les documents médicaux */
 const OBSERVANCIA = [
   {
-    med: "Xarelto (Rivaroxaban) 20mg/día",
-    indicacion: "Anticoagulación TEP",
+    med: "Xarelto / Rivaroxaban 20mg/día",
+    indicacion: "Anticoagulación TEP — misma molécula, distintas presentaciones",
     inicio: "2016-11",
     fin: "2024-07",
     periodos: [
-      { de:"2016-11", a:"2017-11", estado:"verde",  razon:"Confirmado — 1er año post-TEP", fuente:"CUN Navarra 10/2017" },
-      { de:"2017-11", a:"2022-01", estado:"rojo",   razon:"Suspendido — CUN recomienda parar si no hipercoagulabilidad", fuente:"Informe CUN 04/10/2017" },
-      { de:"2022-01", a:"2022-07", estado:"verde",  razon:"Reiniciado post 2º TEP — Xarelto 20mg/día", fuente:"Alta HGC 14/01/2022" },
-      { de:"2022-07", a:"2024-07", estado:"amarillo", razon:"Incierto — Paciente refiere no querer pagarlo, presión familiar", fuente:"Nota Hematología HGC" },
-    ]
+      { de:"2016-11", a:"2017-11", estado:"verde",    razon:"Xarelto (Bayer) confirmado — 1er año post-TEP", fuente:"CUN Navarra 10/2017" },
+      { de:"2017-11", a:"2022-01", estado:"rojo",     razon:"SUSPENDIDO — CUN recomienda parar si no hipercoagulabilidad", fuente:"Informe CUN 04/10/2017" },
+      { de:"2022-01", a:"2022-07", estado:"verde",    razon:"Xarelto 20mg/día reiniciado post 2º TEP — no financiado, coste elevado", fuente:"Alta HGC 14/01/2022" },
+      { de:"2022-07", a:"2024-07", estado:"amarillo", razon:"Presión para cambiar a genérico financiado. Rivaroxaban = misma molécula que Xarelto pero comprimidos más grandes. No financiado en prevención → razón principal del abandono posterior", fuente:"Nota Hematología HGC · Sistema sanitario valenciano" },
+    ],
+    nota: "⚕️ Xarelto (marca Bayer) y Rivaroxaban (genérico) son la misma molécula. El sistema sanitario no financia Xarelto en indicación de prevención, solo en patología establecida. El coste fue la razón documentada del abandono. Los comprimidos del genérico son de mayor tamaño — factor de tolerancia en paciente anciana."
   },
   {
     med: "Dabigatrán (Pradaxa) 150mg/12h",
@@ -1544,6 +1545,14 @@ function buildObservancia() {
         </div>`;
       card.appendChild(row);
     });
+
+    /* Note spéciale si présente */
+    if (med.nota) {
+      const nota = document.createElement('div');
+      nota.style.cssText = 'background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px 14px;margin-top:4px;font-size:12px;color:var(--muted);font-style:italic';
+      nota.innerHTML = med.nota;
+      card.appendChild(nota);
+    }
 
     el.appendChild(card);
   });
