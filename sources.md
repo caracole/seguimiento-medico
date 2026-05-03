@@ -1,100 +1,105 @@
 # 📋 Index des documents — Suivi Médical M.E.J.
 
 > Dernière mise à jour : Mai 2026  
-> Ce fichier recense tous les documents utilisés dans l'application `index.html`  
+> Ce fichier recense tous les documents utilisés dans l'application `meditrace.html`  
 > Pour éviter les doublons, vérifier ici avant d'envoyer un nouveau document à Claude.
 
 ---
 
-## ✅ Documents intégrés dans l'application
+## ✅ Documents intégrés
 
-### 🏥 Hospital General de Castellón — Hematología
-
+### 🏥 HGC — Hematología
 | Fichier | Date | Contenu | Statut |
 |---|---|---|---|
-| `Documentacion-Clinica___p1-p114_-041_Hematologia.pdf` | 12/02/2025 | Note évolution CCEE — Hb 15.1, biochimie complète, fibrinogène | ✅ Intégré |
-| `Documentacion-Clinica___p1-p114_-042_Hematologia.pdf` | 12/02/2025 | Biochimie complète + hémostase (suite -041) | ✅ Intégré |
-| `Documentacion-Clinica___p1-p114_-043_Hematologia.pdf` | 12/02/2025 | Conclusion + signature (suite -042) | ✅ Intégré |
-| `Documentacion-Clinica___p1-p114_-044_Hematologia.pdf` | 10/07/2024 | Note évolution — Hb 13.8, Plaq 236.000, début Dabigatrán | ✅ Intégré |
-| `Documentacion-Clinica___p1-p114_-045_Hematologia.pdf` | 10/07/2024 | Signature + plan (suite -044) | ✅ Intégré |
-| `Documentacion-Clinica___p1-p114_-046_Hematologia.pdf` | 06/02/2023 | Consultation téléphonique — pas d'analítica | ✅ Intégré |
-| `Documentacion-Clinica___p1-p114_-047_Hematologia.pdf` | 06/02/2023 | Signature (suite -046) | ✅ Intégré |
-| `Documentacion-Clinica___p1-p114_-048_Hematologia.pdf` | 28/09/2022 | Hoja anamnesis — analítica complète + hémogramme | ✅ Intégré |
-| `Documentacion-Clinica___p1-p114_-049_Hematologia.pdf` | 28/09/2022 | Suite analítica — LDL, vitamines, hormones, hémogramme complet | ✅ Intégré |
-| `Documentacion-Clinica___p1-p114_-050_Hematologia.pdf` | 07/02/2022 | 1ère cita — No acude | ✅ Intégré |
-| `Documentacion-Clinica___p1-p114_-051_Hematologia.pdf` | 25/02/2022 | 1ère visite — Hb 14.5, Crea 0.62, FG 83, début Xarelto | ✅ Intégré |
+| `Joaquina_Informes.pdf` | 2021→2025 | PDF unique 114p — toutes analyses HGC fusionnées | ✅ Intégré |
+| `-041 à -051_Hematologia.pdf` | 02/2022→02/2025 | Notes évolution CCEE Hematología | ✅ Intégré |
 
-### 🧠 Hospital General de Castellón — Neurología
-
+### 🧠 HGC — Neurología
 | Fichier | Date | Contenu | Statut |
 |---|---|---|---|
-| `Documentacion-Clinica___p1-p114_-052_Neurologia.pdf` | 09/10/2024 | MMSE 16/30 — sospecha Alzheimer, alucinaciones, RM demandée | ✅ Intégré |
-| `Documentacion-Clinica___p1-p114_-053_Neurologia.pdf` | 09/10/2024 | Signature (suite -052) | ✅ Intégré |
-| `Documentacion-Clinica___p1-p114_-054_Neurologia.pdf` | 21/10/2022 | Empeoramiento conducta, fallos memoria | ✅ Intégré |
-| `Documentacion-Clinica___p1-p114_-055_Neurologia.pdf` | 21/10/2022 | Signature (suite -054) | ✅ Intégré |
-| `Documentacion-Clinica___p1-p114_-056_Neurologia.pdf` | 22/04/2022 | MMSE 22/30 — fluctuation, ajout memantina | ✅ Intégré |
-| `Documentacion-Clinica___p1-p114_-057_Neurologia.pdf` | 11/11/2021 | 1ère visite post-ictus — MMSE 25/30, écho-cardio, écho cervicale | ✅ Intégré |
+| `-052 à -057_Neurologia.pdf` | 11/2021→10/2024 | MMSE 25→22→16 · ECG prescrit 03/2026 non réalisé | ✅ Intégré |
 
-### 🚑 Hospital General de Castellón — Urgencias
-
+### 🚑 HGC — Urgencias
 | Fichier | Date | Contenu | Statut |
 |---|---|---|---|
-| `Documentacion-Clinica___p1-p114_-019_Urgencias.pdf` | 23/01/2024 | Flemón dentario — TA 150/62, SaO2 95% | ✅ Intégré |
-| `Documentacion-Clinica___p1-p114_-020_Urgencias.pdf` | 23/01/2024 | Traitement + recommandations (suite -019) | ✅ Intégré |
-| `Documentacion-Clinica___p1-p114_-021_Urgencias.pdf` | 23/01/2024 | Doublon -019 (autre version) | ⚠️ Doublon |
-| `Documentacion-Clinica___p1-p114_-022_Urgencias.pdf` | 23/01/2024 | Doublon -020 (autre version) | ⚠️ Doublon |
-| `Documentacion-Clinica___p1-p114_-023_Urgencias.pdf` | 23/01/2024 | Signature (suite) | ✅ Intégré |
-| `Documentacion-Clinica___p1-p114_-024_Urgencias.pdf` | 28/10/2022 | Bronchite aiguë — SaO2 92%, PCR 22.9 ⚠️, fibrinogène 701 ⚠️ | ✅ Intégré |
-| `Documentacion-Clinica___p1-p114_-025_Urgencias.pdf` | 28/10/2022 | Suite analítica + traitement (suite -024) | ✅ Intégré |
+| `-019 à -025_Urgencias.pdf` | 10/2022→01/2024 | Bronchite · Flemón dentaire | ✅ Intégré |
 
-### 🏨 Vithas Castellón — Privado
-
+### 🏨 Vithas Castellón
 | Fichier | Date | Contenu | Statut |
 |---|---|---|---|
-| `VITHAS_Analisis_2022-01-16.pdf` | 16/01/2022 | Hématologie + biochimie urgences TEP — Troponine 76.68 ⚠️ | ✅ Intégré |
-| `VITHAS_Urgencias_2022-01-16.pdf` | 16/01/2022 | Hoja urgencias Vithas — FC 70, SaO2 94%, Glasgow 15 | ✅ Intégré |
-| `VITHAS_informe_alta_chu.pdf` | 14/01→16/01/2022 | Informe alta hospitalización TEP — NT-ProBNP 11.924 ⚠️ | ✅ Intégré |
-| `VITHAS_Analisis_2025-03-10.pdf` | 10/03/2025 | Hématologie + biochimie + TSH — VCM 98.1 ⚠️ | ✅ Intégré |
+| `VITHAS_Analisis_2022-01-16.pdf` | 16/01/2022 | Troponine 76.68 ⚠️ · NT-ProBNP 11.924 ⚠️ | ✅ Intégré |
+| `VITHAS_informe_alta_chu.pdf` | 14-16/01/2022 | Alta hospitalización TEP | ✅ Intégré |
+| `VITHAS_Urgencias_2022-01-16.pdf` | 16/01/2022 | Hoja urgencias TEP | ✅ Intégré |
+| `2022-01-22_hematologia.pdf` | 17/01/2022 | Sangrado HBPM | ✅ Intégré |
+| `VITHAS_Analisis_2025-03-10.pdf` | 10/03/2025 | VCM 98.1 ⚠️ · FG 70.8 · TSH 1.45 | ✅ Intégré |
+| `VITHAS_2024-03-18_TAC.pdf` | 18/03/2024 | TAC craneal — leucoaraiosis | ✅ Intégré |
+| `VITHAS_2024-03-18_TAC.zip` | 18/03/2024 | 66 coupes DICOM analysées | ✅ Analysé |
 
-### 🔬 Centro de Salud Atzeneta del Maestrat
-
+### 🔬 Centro de Salud Atzeneta
 | Fichier | Date | Contenu | Statut |
 |---|---|---|---|
-| `resultados_pruebas_laboratorio_2024-05-06.pdf` | 25/04/2024 | Bilan complet — Hématologie, biochimie, hormones, orine | ✅ Intégré |
+| `resultados_pruebas_laboratorio_2024-05-06.pdf` | 25/04/2024 | Bilan complet | ✅ Intégré |
+
+### 🏛️ Clínica Universidad de Navarra
+| Fichier | Date | Contenu | Statut |
+|---|---|---|---|
+| `Neumología_2017-12-04_11136714.pdf` | 04/10/2017 | Valoración TEP · FVC 64% · FC 52 | ✅ Intégré |
+| `CUN_PET_2021-12-27.pdf` | 27/12/2021 | PET/CT FDG — hypométabolisme frontal gauche ⚠️ | ✅ Intégré |
+
+### 🧬 Ascires Castellón
+| Fichier | Date | Contenu | Statut |
+|---|---|---|---|
+| `RM_VASCULAR_ENDOCRANEAL_2026-03-13.pdf` | 10/03/2026 | 🚨 Occlusion complète ACI gauche | ✅ Intégré |
 
 ---
 
 ## ⏳ Documents à intégrer
 
-| Fichier / Description | Date | Source | Priorité |
-|---|---|---|---|
-| Documents anciens (papier/scanné) | Avant 2021 | Divers | 🔴 Dès que OCR prêt |
-| Documents pharmacovigilance | — | Fabricants / AEMPS | 🟡 Futur module |
-| RM cérébrale (demandée 10/2024) | ? | HGC Neurología | 🟡 Si disponible |
+| Description | Priorité |
+|---|---|
+| ECG de contrôle (prescrit HGC 03/2026 — non réalisé) | 🔴 URGENT |
+| Documents papier antérieurs à 2021 (Tesseract OCR) | 🔴 Dès que prêt |
+| Résultat Vitamina D post-Hidroferol | 🟡 Prochaine analítica |
+| Informe neurólogo privado (03/2026) | 🟡 Si disponible |
 
 ---
 
-## 📊 Récapitulatif
+## 🔑 Stock médicaments vérifié — Mai 2026
 
-| Source | Documents | Dates couvertes |
+| Médicament | Situation | Note |
 |---|---|---|
-| HGC Hematología | 11 fichiers | 02/2022 → 02/2025 |
-| HGC Neurología | 6 fichiers | 11/2021 → 10/2024 |
-| HGC Urgencias | 7 fichiers | 10/2022 → 01/2024 |
-| Vithas (privé) | 4 fichiers | 01/2022 → 03/2025 |
-| Centro Salud | 1 fichier | 04/2024 |
-| **Total** | **29 fichiers** | **01/2022 → 03/2025** |
+| Dabigatrán 150mg | ❌ Abandonné 02/2025 | Décision famille |
+| Donepezilo / Lixben | 🟡 Prescrit — non commencé | Attente ECG |
+| Haloperidol | ✅ Arrêté définitivement | Neurólogo privado |
+| Hidroferol 0.266mg/mensuel | ✅ En cours | Stock 6 mois · renouveler dans ~3 mois |
+| Quetiapina STADA | ✅ Substituée | 8 pastillas · remplacée par Haloperidol |
+| Melitraceno/Flupentixol | ❓ Probable arrêt | Non trouvé dans le stock |
+| Atorvastatine | ❓ Incertain | LDL 202 mg/dL malgré traitement |
 
 ---
 
-## 📝 Notes
+## 🚨 Actions urgentes — Mai 2026
 
-- Les fichiers numérotés `-041` à `-057` proviennent du système informatisé HGC
-- Les fichiers Vithas sont des documents privés (clinique privée)
-- Les doublons (`-021`, `-022`) sont des versions alternatives du même document — non réintégrés
-- La date dans le nom de fichier Vithas correspond à la date de prélèvement
-- Les documents antérieurs à 2022 sont en format papier → nécessitent Tesseract OCR
+1. 🔴 **ECG** — prescrit HGC 03/2026 — non réalisé — obligatoire avant Donepezilo
+2. 🟡 **Magnésium sérique** — Pantoprazol long terme → risque hypomagnesémie
+3. 🟡 **Renouveler Hidroferol** dans ~3 mois
+4. 🟡 **Confirmer statut Melitraceno** — arrêté ou non ?
+5. 🟡 **Prochain bilan Vitamina D** — vérifier efficacité Hidroferol (objectif >30 ng/mL)
 
 ---
 
-*Ce fichier est à maintenir manuellement. Ajouter chaque nouveau document dans la section correspondante avant de l'envoyer à Claude.*
+## 📊 Statistiques
+
+| Source | Fichiers | Période |
+|---|---|---|
+| HGC (Hemat + Neuro + Urg) | 21 | 11/2021→02/2025 |
+| Vithas | 7 | 01/2022→03/2025 |
+| Centro Salud | 1 | 04/2024 |
+| CUN Navarra | 2 | 10/2017 · 12/2021 |
+| Ascires | 1 | 03/2026 |
+| **Total** | **32** | **10/2017→03/2026** |
+
+---
+
+*© 2026 Pierre-Henri Giraud × Claude (Anthropic) — MediTrace v2026.2*  
+*DOI: https://doi.org/10.5281/zenodo.19973451*
