@@ -1109,13 +1109,21 @@ function exportPDF() {
 </html>`;
 
   /* Ouvrir dans une nouvelle fenêtre et imprimer */
-  const filename = 'MediTrace_Informe_Medico_MEJ_' + new Date().toISOString().slice(0,10);
+  const filename = 'MediTrace_Informe_Medico_MEJ_' + new Date().toISOString().slice(0,10) + '.html';
+
+  /* Téléchargement direct avec le bon nom */
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+
+  /* Ouvrir aussi pour impression/PDF */
   const win = window.open('', '_blank');
   win.document.open();
-  win.document.write(html.replace(
-    '<title>MediTrace — Informe Médico — M.E.J. — ' + new Date().toISOString().slice(0,10) + '</title>',
-    '<title>' + filename + '</title>'
-  ));
+  win.document.write(html);
   win.document.close();
   win.focus();
   setTimeout(() => win.print(), 800);
