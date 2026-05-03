@@ -296,6 +296,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <div class="nav-tab" onclick="showPanel('curvas',this)"             data-i18n="tab_curvas">Curvas</div>
   <div class="nav-tab" onclick="showPanel('tabla',this)"              data-i18n="tab_tabla">Tabla</div>
   <div class="nav-tab" onclick="showPanel('timeline',this)"           data-i18n="tab_timeline">Cronología</div>
+  <div class="nav-tab" onclick="showPanel('vascular',this)"           data-i18n="tab_vasc">🧠 Análisis Vascular</div>
   <div class="nav-tab" onclick="showPanel('observancia',this)"        data-i18n="tab_obs">Observancia</div>
   <div class="nav-tab alert" onclick="showPanel('farma',this)"        data-i18n="tab_farma">⚠ Farmacovigilancia</div>
   <div class="nav-tab" onclick="showPanel('importar',this)"           data-i18n="tab_import">+ Datos</div>
@@ -342,6 +343,173 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 <div id="panel-timeline" class="panel">
   <div class="section-label" data-i18n="clinical_timeline">Cronología clínica</div>
   <div class="timeline" id="timeline-el"></div>
+</div>
+
+<!-- ===== PANEL ANÁLISIS VASCULAR ===== -->
+<div id="panel-vascular" class="panel">
+  <div class="section-label">🧠 Análisis Vascular — Síntesis para evaluación médica</div>
+
+  <!-- ALERTA PRINCIPAL -->
+  <div style="background:rgba(232,74,74,0.12);border:2px solid #e84a4a;border-radius:var(--radius);padding:20px 24px;margin-bottom:24px">
+    <div style="font-family:var(--mono);font-size:10px;letter-spacing:3px;color:#e84a4a;margin-bottom:12px">🚨 HALLAZGO CRÍTICO — MARZO 2026</div>
+    <div style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:8px">Obstrucción completa arteria carótida interna izquierda desde su origen</div>
+    <div style="font-size:13px;color:var(--muted);line-height:1.8">
+      IRM Vascular ASCIRES Castelló — 10/03/2026 · Dr. Ricardo Broseta Torres<br>
+      <strong style="color:var(--text)">Arteria cerebral media izquierda vicariada</strong> — compensación por circulación colateral.<br>
+      Leucoaraiosis Fazekas II-III · Atrofia corticosubcortical · Lesiones ictales secuelares en ganglios basales, tálamos y protuberancia.<br>
+      Espondilodiscartrosis cervical.
+    </div>
+  </div>
+
+  <!-- CRONOLOGÍA VASCULAR -->
+  <div class="section-label">Cronología vascular reconstituida — 2016 → 2026</div>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:24px">
+
+    <div style="position:relative;padding-left:28px">
+      <div style="position:absolute;left:10px;top:0;bottom:0;width:2px;background:var(--border)"></div>
+
+      <!-- 2016 -->
+      <div style="margin-bottom:20px;position:relative">
+        <div style="position:absolute;left:-22px;top:4px;width:14px;height:14px;border-radius:50%;background:#e84a4a;border:2px solid var(--bg)"></div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted)">Noviembre 2016</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin:2px 0">1er TEP bilateral — Viaje Alemania</div>
+        <div style="font-size:12px;color:var(--muted)">HTpulmonar PAPs 55-60mmHg · Disfunción VD · Inicio Xarelto.<br>
+        <strong style="color:var(--warn)">Primera atteinte vasculaire majeure documentée.</strong></div>
+      </div>
+
+      <!-- 2017 -->
+      <div style="margin-bottom:20px;position:relative">
+        <div style="position:absolute;left:-22px;top:4px;width:14px;height:14px;border-radius:50%;background:#e8a44a;border:2px solid var(--bg)"></div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted)">Junio 2017</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin:2px 0">Angio-TAC — Signos TEP crónico</div>
+        <div style="font-size:12px;color:var(--muted)">TAC vascular confirma TEP crónico. Espirometría CUN: patrón restrictivo severo FVC 64%.<br>
+        FC 52 (bradicardia). TA 155/79. SpO2 96%.</div>
+      </div>
+
+      <!-- 2021-09 -->
+      <div style="margin-bottom:20px;position:relative">
+        <div style="position:absolute;left:-22px;top:4px;width:14px;height:14px;border-radius:50%;background:#e84a4a;border:2px solid var(--bg)"></div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted)">Septiembre 2021</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin:2px 0">⚠️ Ictus isquémico vertebrobasilar — Diagnóstico tardío</div>
+        <div style="font-size:12px;color:var(--muted)">
+          <strong style="color:#e84a4a">Diagnosticado 27 horas después del primer llamado a urgencias.</strong><br>
+          Diagnóstico inicial erróneo: enolismo. Territorio vertebrobasilar (circulación posterior).<br>
+          Inicio deterioro cognitivo documentado.
+        </div>
+      </div>
+
+      <!-- 2021-12 -->
+      <div style="margin-bottom:20px;position:relative">
+        <div style="position:absolute;left:-22px;top:4px;width:14px;height:14px;border-radius:50%;background:#7d3c98;border:2px solid var(--bg)"></div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted)">Diciembre 2021</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin:2px 0">🔬 PET/CT Cerebral FDG — CUN Navarra</div>
+        <div style="font-size:12px;color:var(--muted)">
+          <strong style="color:#7d3c98">Hipometabolismo frontal IZQUIERDO dominante</strong> → señal precoz de oclusión carotídea izquierda en progresión.<br>
+          Hipometabolismo cerebeloso bilateral → secuela ictus VB.<br>
+          Diagnóstico diferencial con DFT (Demencia FrontoTemporal) — <strong style="color:var(--accent2)">no Alzheimer clásico.</strong><br>
+          Glucemia en inyección: 93 mg/dL (normal).
+        </div>
+      </div>
+
+      <!-- 2022-01 -->
+      <div style="margin-bottom:20px;position:relative">
+        <div style="position:absolute;left:-22px;top:4px;width:14px;height:14px;border-radius:50%;background:#e84a4a;border:2px solid var(--bg)"></div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted)">Enero 2022</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin:2px 0">2º TEP agudo + Souffrance cardiaque</div>
+        <div style="font-size:12px;color:var(--muted)">Troponina 76.68 ng/L ⚠️ · NT-ProBNP 11.924 pg/mL ⚠️ · PCR 66.44 ⚠️.<br>
+        TAC: defectos repleción bilaterales TEP agudo. Ecocardio: FE &lt;65%, sobrecarga VD.</div>
+      </div>
+
+      <!-- 2024-03 -->
+      <div style="margin-bottom:20px;position:relative">
+        <div style="position:absolute;left:-22px;top:4px;width:14px;height:14px;border-radius:50%;background:#e8a44a;border:2px solid var(--bg)"></div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted)">Marzo 2024</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin:2px 0">TAC Craneal Vithas — Leucoaraiosis</div>
+        <div style="font-size:12px;color:var(--muted)">Marcada atrofia corticosubcortical global. Leucoaraiosis periventricular.<br>
+        Dilatación ventricular simétrica. Sin isquemia aguda. 66 cortes DICOM disponibles.</div>
+      </div>
+
+      <!-- 2026-03 -->
+      <div style="margin-bottom:0;position:relative">
+        <div style="position:absolute;left:-22px;top:4px;width:14px;height:14px;border-radius:50%;background:#e84a4a;border:2px solid var(--bg)"></div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--muted)">Marzo 2026</div>
+        <div style="font-size:14px;font-weight:600;color:#e84a4a;margin:2px 0">🚨 IRM Vascular ASCIRES — Oclusión completa carotídea</div>
+        <div style="font-size:12px;color:var(--muted)">
+          <strong style="color:#e84a4a">Obstrucción completa ACI izquierda desde su origen.</strong><br>
+          ACM izquierda vicariada. Articulares vertebrales normales, dominancia izquierda.<br>
+          Leucoaraiosis Fazekas II-III · Atrofia corticosubcortical · Lesiones ictales múltiples.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYSE POUR LE MÉDECIN -->
+  <div class="section-label">Preguntas clave para el médico</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;margin-bottom:24px">
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid #e84a4a;border-radius:var(--radius);padding:16px 20px">
+      <div style="font-family:var(--mono);font-size:10px;color:#e84a4a;margin-bottom:8px">❓ PREGUNTA 1 — CRONOLOGÍA</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.7">
+        ¿Desde cuándo está ocluida la carótida interna izquierda?<br>
+        El PET/CT de <strong>diciembre 2021</strong> ya mostraba hipometabolismo frontal izquierdo dominante — zona irrigada por la ACI izquierda.<br>
+        <strong style="color:var(--warn)">¿Fue el ictus de sept-2021 el evento oclusivo inicial?</strong>
+      </div>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid #e8a44a;border-radius:var(--radius);padding:16px 20px">
+      <div style="font-family:var(--mono);font-size:10px;color:#e8a44a;margin-bottom:8px">❓ PREGUNTA 2 — DIAGNÓSTICO COGNITIVO</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.7">
+        ¿Es el deterioro cognitivo de origen vascular (oclusión carotídea) y no Alzheimer?<br>
+        El PET/CT sugiere <strong>Demencia FrontoTemporal o vascular</strong>, no Alzheimer clásico.<br>
+        <strong style="color:var(--warn)">¿Está el tratamiento cognitivo adaptado a esta etiología?</strong>
+      </div>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid #e84a4a;border-radius:var(--radius);padding:16px 20px">
+      <div style="font-family:var(--mono);font-size:10px;color:#e84a4a;margin-bottom:8px">❓ PREGUNTA 3 — OPORTUNIDAD PERDIDA</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.7">
+        Si el PET/CT de 2021 mostraba hipometabolismo frontal izquierdo,<br>
+        <strong style="color:var(--warn)">¿se realizó eco-doppler carotídeo en ese momento?</strong><br>
+        ¿Habría permitido una intervención preventiva antes de la oclusión completa?
+      </div>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid #e8a44a;border-radius:var(--radius);padding:16px 20px">
+      <div style="font-family:var(--mono);font-size:10px;color:#e8a44a;margin-bottom:8px">❓ PREGUNTA 4 — ANTICOAGULACIÓN</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.7">
+        La paciente tiene historial de TEP recurrente + oclusión carotídea.<br>
+        El abandono del anticoagulante (02/2025) es especialmente peligroso en este contexto.<br>
+        <strong style="color:var(--warn)">¿Qué riesgo representa la falta de anticoagulación con ACI izquierda ocluida?</strong>
+      </div>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid #4ae8a4;border-radius:var(--radius);padding:16px 20px">
+      <div style="font-family:var(--mono);font-size:10px;color:#4ae8a4;margin-bottom:8px">💡 OBSERVACIÓN — VITAMINA D</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.7">
+        Vitamina D crónicamente baja: 27→15.96→12.33 ng/mL (ref &gt;30).<br>
+        La deficiencia de VitD se asocia a mayor riesgo cardiovascular y deterioro cognitivo.<br>
+        <strong style="color:#4ae8a4">No consta tratamiento sustitutivo prescrito en ningún documento.</strong>
+      </div>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid #4ae8a4;border-radius:var(--radius);padding:16px 20px">
+      <div style="font-family:var(--mono);font-size:10px;color:#4ae8a4;margin-bottom:8px">💡 OBSERVACIÓN — FUNCIÓN RENAL</div>
+      <div style="font-size:13px;color:var(--text);line-height:1.7">
+        FG CKD-EPI en descenso progresivo: 83→75.97→70.8 ml/min.<br>
+        Dabigatrán requiere control renal semestral en &gt;75 años (AEMPS).<br>
+        <strong style="color:#4ae8a4">Con FG entre 50-80: usar con precaución. Monitorización obligatoria.</strong>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- NOTE FINALE -->
+  <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;font-family:var(--mono);font-size:10px;color:var(--muted)">
+    📋 Análisis elaborado por Pierre-Henri Giraud × Claude (Anthropic) · MediTrace v2026.2<br>
+    Fuentes: IRM ASCIRES 10/03/2026 · PET/CT CUN 27/12/2021 · TAC Vithas 18/03/2024 · Analíticas HGC/Vithas 2021-2026<br>
+    DOI: <a href="https://doi.org/10.5281/zenodo.19973451" target="_blank" style="color:var(--accent)">10.5281/zenodo.19973451</a>
+    · Este análisis es informativo y no sustituye el criterio médico profesional.
+  </div>
 </div>
 
 <!-- ===== PANEL OBSERVANCIA ===== -->
@@ -641,6 +809,7 @@ function showPanel(name, tabEl) {
   if (name === 'curvas')      buildAllCharts(data);
   if (name === 'tabla')       buildTable(data);
   if (name === 'timeline')    buildTimeline();
+  if (name === 'vascular')    buildVascular();
   if (name === 'observancia') buildObservancia();
   if (name === 'farma')       buildFarma();
   if (name === 'importar') updateDataSummary(data);
@@ -1016,6 +1185,38 @@ function exportPDF() {
       Documentos: ${data.length} fechas de análisis<br>
       DOI: 10.5281/zenodo.19973451<br>
       <strong>⚠ Documento informativo — No diagnóstico</strong>
+    </div>
+  </div>
+
+  <!-- ANÁLISIS VASCULAR -->
+  <div class="section">
+    <div class="section-title">🧠 Análisis Vascular — Síntesis</div>
+
+    <div class="alert critical">
+      <div class="alert-title">🚨 HALLAZGO CRÍTICO — IRM Vascular ASCIRES 10/03/2026</div>
+      Obstrucción completa arteria carótida interna izquierda desde su origen. ACM izquierda vicariada.
+      Leucoaraiosis Fazekas II-III. Lesiones ictales: ganglios basales, tálamos, protuberancia.
+    </div>
+
+    <table style="margin-bottom:10px">
+      <thead><tr><th>Fecha</th><th>Exploración</th><th>Hallazgo clave</th></tr></thead>
+      <tbody>
+        <tr><td>11/2016</td><td>TEP bilateral</td><td>HTpulmonar PAPs 55-60mmHg · Disfunción VD</td></tr>
+        <tr><td>06/2017</td><td>Angio-TAC</td><td>Signos TEP crónico</td></tr>
+        <tr><td>09/2021</td><td>Ictus VB</td><td class="val-bad">Diagnóstico tardío 27h · Enolismo inicial erróneo</td></tr>
+        <tr><td>12/2021</td><td>PET/CT FDG CUN</td><td class="val-bad">Hipometabolismo frontal IZQUIERDO → oclusión carotídea precoz</td></tr>
+        <tr><td>01/2022</td><td>2º TEP agudo</td><td class="val-bad">Troponina 76.68 · NT-ProBNP 11.924 · PCR 66.44</td></tr>
+        <tr><td>03/2024</td><td>TAC craneal</td><td>Leucoaraiosis · Atrofia corticosubcortical</td></tr>
+        <tr><td>03/2026</td><td>IRM Vascular</td><td class="val-bad">Oclusión COMPLETA ACI izquierda · Fazekas II-III</td></tr>
+      </tbody>
+    </table>
+
+    <div class="alert warn">
+      <div class="alert-title">❓ Preguntas para el médico</div>
+      1. ¿Fue el ictus de 09/2021 el evento oclusivo carotídeo inicial?
+      2. ¿El deterioro cognitivo es vascular (DFT) y no Alzheimer? ¿Está el tratamiento adaptado?
+      3. ¿Se realizó eco-doppler carotídeo tras el PET/CT de 2021?
+      4. ¿Qué riesgo representa el abandono del anticoagulante con ACI izquierda ocluida?
     </div>
   </div>
 
@@ -1398,6 +1599,13 @@ function loadPdfView(input) {
 }
 document.getElementById('pdf-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closePdf(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closePdf(); });
+
+/* ================================================================
+   ANÁLISIS VASCULAR — panel statique
+================================================================ */
+function buildVascular() {
+  /* Le contenu est statique HTML — rien à construire dynamiquement */
+}
 
 /* ================================================================
    OBSERVANCIA TERAPÉUTICA
