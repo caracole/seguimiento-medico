@@ -1494,6 +1494,87 @@ function buildResumen(data) {
   chartsEl.innerHTML = '';
   if (!data.length) return;
 
+  /* ── ENCADRÉ SITUATION ACTUELLE ── */
+  const situacion = document.createElement('div');
+  situacion.style.cssText = 'margin-bottom:24px';
+  situacion.innerHTML = `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:0">
+      <!-- Titre -->
+      <div style="background:var(--accent);padding:12px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div style="font-family:var(--mono);font-size:11px;letter-spacing:2px;color:white;font-weight:600">
+          📋 SITUACIÓN CLÍNICA ACTUAL — MAYO 2026
+        </div>
+        <div style="font-family:var(--mono);font-size:9px;color:rgba(255,255,255,0.7)">M.E.J. · F · 87 años · Castellón</div>
+      </div>
+      <!-- Contenu -->
+      <div style="padding:16px 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px">
+
+        <!-- ECG URGENT -->
+        <div style="background:rgba(232,74,74,0.12);border:1px solid rgba(232,74,74,0.4);border-left:4px solid #e84a4a;border-radius:6px;padding:10px 14px">
+          <div style="font-family:var(--mono);font-size:9px;color:#e84a4a;letter-spacing:1px;margin-bottom:4px">🚨 ACCIÓN URGENTE</div>
+          <div style="font-size:12px;color:var(--text);line-height:1.6">
+            <strong>ECG pendiente</strong> — Prescrito por neurólogo HGC (03/2026). No realizado.
+            Obligatorio antes de iniciar <strong>Donepezilo</strong>.
+          </div>
+        </div>
+
+        <!-- ANTICOAGULACIÓN -->
+        <div style="background:rgba(232,74,74,0.12);border:1px solid rgba(232,74,74,0.4);border-left:4px solid #e84a4a;border-radius:6px;padding:10px 14px">
+          <div style="font-family:var(--mono);font-size:9px;color:#e84a4a;letter-spacing:1px;margin-bottom:4px">🚨 RIESGO TROMBÓTICO</div>
+          <div style="font-size:12px;color:var(--text);line-height:1.6">
+            <strong>Sin anticoagulación</strong> desde 02/2025 (decisión familiar).
+            ACI izquierda <strong>completamente ocluida</strong> (IRM 03/2026).
+          </div>
+        </div>
+
+        <!-- DONEPEZILO -->
+        <div style="background:rgba(232,164,74,0.12);border:1px solid rgba(232,164,74,0.4);border-left:4px solid #e8a44a;border-radius:6px;padding:10px 14px">
+          <div style="font-family:var(--mono);font-size:9px;color:#e8a44a;letter-spacing:1px;margin-bottom:4px">⏳ PENDIENTE</div>
+          <div style="font-size:12px;color:var(--text);line-height:1.6">
+            <strong>Donepezilo</strong> re-prescrito por neurólogo privado.
+            Caja Lixben sin abrir. Esperando ECG.
+          </div>
+        </div>
+
+        <!-- VITAMINA D -->
+        <div style="background:rgba(74,232,164,0.12);border:1px solid rgba(74,232,164,0.4);border-left:4px solid #4ae8a4;border-radius:6px;padding:10px 14px">
+          <div style="font-family:var(--mono);font-size:9px;color:#4ae8a4;letter-spacing:1px;margin-bottom:4px">✅ EN CURSO</div>
+          <div style="font-size:12px;color:var(--text);line-height:1.6">
+            <strong>Hidroferol</strong> 0.266mg/mensual — stock 6 meses.
+            Déficit previo: 27→15.96→12.33 ng/mL. Renovar en ~3 meses.
+          </div>
+        </div>
+
+        <!-- HALOPERIDOL -->
+        <div style="background:rgba(74,232,164,0.12);border:1px solid rgba(74,232,164,0.4);border-left:4px solid #4ae8a4;border-radius:6px;padding:10px 14px">
+          <div style="font-family:var(--mono);font-size:9px;color:#4ae8a4;letter-spacing:1px;margin-bottom:4px">✅ RESUELTO</div>
+          <div style="font-size:12px;color:var(--text);line-height:1.6">
+            <strong>Haloperidol</strong> suspendido definitivamente por neurólogo privado.
+            Riesgo QTc triple resuelto parcialmente.
+          </div>
+        </div>
+
+        <!-- COLESTEROL -->
+        <div style="background:rgba(232,164,74,0.12);border:1px solid rgba(232,164,74,0.4);border-left:4px solid #e8a44a;border-radius:6px;padding:10px 14px">
+          <div style="font-family:var(--mono);font-size:9px;color:#e8a44a;letter-spacing:1px;margin-bottom:4px">⚠ A VIGILAR</div>
+          <div style="font-size:12px;color:var(--text);line-height:1.6">
+            <strong>LDL 202 mg/dL</strong> ⚠ (objetivo &lt;116) · Colesterol 281.7 ⚠.
+            A pesar del tratamiento con Atorvastatina (observancia incierta).
+          </div>
+        </div>
+
+      </div>
+      <!-- Footer -->
+      <div style="padding:8px 20px;border-top:1px solid var(--border);font-family:var(--mono);font-size:9px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px">
+        <span>MediTrace v2026.2 · Pierre-Henri Giraud × Claude (Anthropic)</span>
+        <span>DOI: <a href="https://doi.org/10.5281/zenodo.19973451" target="_blank" style="color:var(--accent)">10.5281/zenodo.19973451</a></span>
+      </div>
+    </div>`;
+
+  /* Insérer avant la grille KPI */
+  grid.parentNode.insertBefore(situacion, grid.previousElementSibling);
+
+  /* ── KPIs ── */
   const KEY_PARAMS = ['hemoglobina','glucosa','colesterol','creatinina','filtrado','hba1c','vitamina_d','pcr','tsh','albumina'];
   KEY_PARAMS.forEach(key => {
     const series = getSeriesForParam(data, key);
