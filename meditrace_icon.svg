@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#0e1117"/>
+      <stop offset="100%" stop-color="#1a2744"/>
+    </linearGradient>
+    <linearGradient id="pulse" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#4a8fe8"/>
+      <stop offset="100%" stop-color="#4ae8a4"/>
+    </linearGradient>
+    <linearGradient id="cross" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#4ae8a4"/>
+      <stop offset="100%" stop-color="#4a8fe8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Fond arrondi -->
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+
+  <!-- Cercle décoratif externe -->
+  <circle cx="256" cy="256" r="210" fill="none" stroke="#4a8fe8" stroke-width="1.5" stroke-opacity="0.2"/>
+  <circle cx="256" cy="256" r="185" fill="none" stroke="#4ae8a4" stroke-width="1" stroke-opacity="0.15"/>
+
+  <!-- Courbe ECG / pouls — ligne principale -->
+  <polyline
+    points="56,256 120,256 148,256 162,180 176,340 190,210 204,300 218,256 282,256 296,156 310,356 324,256 388,256 456,256"
+    fill="none"
+    stroke="url(#pulse)"
+    stroke-width="18"
+    stroke-linecap="round"
+    stroke-linejoin="round"/>
+
+  <!-- Croix médicale centrée sur le pic -->
+  <rect x="230" y="108" width="52" height="52" rx="10" fill="url(#cross)" opacity="0.95"/>
+  <rect x="230" y="108" width="52" height="52" rx="10" fill="none" stroke="white" stroke-width="1.5" stroke-opacity="0.3"/>
+  <!-- Barre horizontale croix -->
+  <rect x="236" y="127" width="40" height="14" rx="4" fill="white"/>
+  <!-- Barre verticale croix -->
+  <rect x="249" y="114" width="14" height="40" rx="4" fill="white"/>
+
+  <!-- Texte MEDI -->
+  <text x="256" y="390"
+        text-anchor="middle"
+        font-family="Georgia, serif"
+        font-size="68"
+        font-weight="bold"
+        fill="white"
+        letter-spacing="2">Medi</text>
+
+  <!-- Texte TRACE en accent -->
+  <text x="256" y="455"
+        text-anchor="middle"
+        font-family="Georgia, serif"
+        font-size="68"
+        font-weight="bold"
+        font-style="italic"
+        fill="url(#pulse)"
+        letter-spacing="2">Trace</text>
+
+  <!-- Points décoratifs sur la courbe -->
+  <circle cx="162" cy="180" r="8" fill="#4a8fe8" opacity="0.9"/>
+  <circle cx="296" cy="156" r="8" fill="#4ae8a4" opacity="0.9"/>
+  <circle cx="176" cy="340" r="6" fill="#e84a4a" opacity="0.8"/>
+  <circle cx="310" cy="356" r="6" fill="#e84a4a" opacity="0.8"/>
+
+</svg>
