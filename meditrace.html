@@ -883,24 +883,29 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <!-- IMPORT JSON — toujours visible -->
   <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent2);border-radius:var(--radius);padding:18px 22px;margin-bottom:20px">
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
-      <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--accent2)">📥 IMPORTAR JSON — desde Claude.ai u otra fuente</div>
+      <div style="font-family:var(--mono);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--accent2)">📥 IMPORTAR JSON</div>
     </div>
-    <div style="font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.7">
-      Pega un JSON de extracción médica (generado por Claude, por OCR+Claude, o manualmente).
+    <div style="font-size:15px;color:var(--muted);margin-bottom:14px;line-height:1.7">
+      Copia el JSON de Claude, luego pulsa el botón — se pega e importa automáticamente.
     </div>
-    <textarea id="json-input-global" placeholder='Pega aquí el JSON — ejemplo:
-{
-  "date": "2023-08-01",
-  "source": "Hospital General",
-  "valeurs": { "hemoglobina": 13.2 },
-  "evenement": { "type": "laboratorio", "titre": "...", "texte": "..." }
-}' style="width:100%;height:120px;font-family:var(--mono);font-size:11px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:12px;resize:vertical"></textarea>
-    <div style="display:flex;gap:8px;margin-top:10px;align-items:center;flex-wrap:wrap">
-      <button class="btn primary" onclick="importClaudeJsonGlobal()" style="font-size:12px;padding:8px 18px">
-        ✓ Importar datos
+    <div style="display:flex;gap:10px;margin-bottom:10px;align-items:center;flex-wrap:wrap">
+      <button class="btn primary" onclick="pasteAndImport()" style="font-size:15px;padding:12px 24px">
+        📋 Pegar e importar desde portapapeles
       </button>
-      <button class="btn" onclick="document.getElementById('json-input-global').value=''" style="font-size:11px;padding:6px 12px">Limpiar</button>
-      <div id="json-import-result-global" style="font-family:var(--mono);font-size:11px;flex:1"></div>
+      <button class="btn" onclick="document.getElementById('json-manual-area').style.display=document.getElementById('json-manual-area').style.display==='none'?'block':'none'" style="font-size:12px;padding:8px 14px">
+        ✏️ Pegar manualmente
+      </button>
+    </div>
+    <div id="json-import-result-global" style="font-family:var(--mono);font-size:13px;margin-top:4px"></div>
+    <!-- Fallback: textarea pour coller manuellement si le navigateur bloque le presse-papiers -->
+    <div id="json-manual-area" style="display:none;margin-top:12px">
+      <textarea id="json-input-global" placeholder="Si el botón no funciona, pega el JSON aquí manualmente..." style="width:100%;height:120px;font-family:var(--mono);font-size:13px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:12px;resize:vertical"></textarea>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn primary" onclick="importClaudeJsonGlobal()" style="font-size:13px;padding:8px 18px">
+          ✓ Importar
+        </button>
+        <button class="btn" onclick="document.getElementById('json-input-global').value=''" style="font-size:12px;padding:6px 12px">Limpiar</button>
+      </div>
     </div>
   </div>
 
@@ -1689,6 +1694,23 @@ function importClaudeJsonGlobal() {
   _doImportJson(raw, resultEl, 'json-input-global');
 }
 
+async function pasteAndImport() {
+  const resultEl = document.getElementById('json-import-result-global');
+  try {
+    const raw = await navigator.clipboard.readText();
+    if (!raw || !raw.trim()) {
+      resultEl.innerHTML = '<span style="color:var(--danger)">⚠ El portapapeles está vacío. Copia el JSON primero.</span>';
+      return;
+    }
+    resultEl.innerHTML = '<span style="color:var(--accent)">⏳ Importando...</span>';
+    _doImportJson(raw.trim(), resultEl, null);
+  } catch(e) {
+    /* Le navigateur peut bloquer l'accès au presse-papiers */
+    resultEl.innerHTML = '<span style="color:var(--warn)">⚠ El navegador no permite leer el portapapeles automáticamente.<br>Usa el botón "✏️ Pegar manualmente" para pegar el JSON a mano.</span>';
+    document.getElementById('json-manual-area').style.display = 'block';
+  }
+}
+
 function _doImportJson(raw, resultEl, textareaId) {
   if (!raw) {
     resultEl.innerHTML = '<span style="color:var(--danger)">⚠ Pega el JSON primero</span>';
@@ -1787,7 +1809,7 @@ function _doImportJson(raw, resultEl, textareaId) {
     resultEl.innerHTML = `<span style="color:var(--accent2)">✅ Importado con éxito — ${parsed.date} · ${parsed.source || 'OCR'}<br>${summary.join(' · ')}</span>`;
 
     /* Nettoyer le textarea */
-    document.getElementById(textareaId).value = '';
+    if (textareaId) document.getElementById(textareaId).value = '';
 
   } catch (e) {
     resultEl.innerHTML = `<span style="color:var(--danger)">✗ Error al parsear JSON: ${e.message}<br>Asegúrate de copiar sólo el JSON (sin texto adicional).</span>`;
