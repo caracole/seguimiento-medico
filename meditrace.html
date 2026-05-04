@@ -791,12 +791,41 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
       <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--warn)">🔍 TEXTO EXTRAÍDO POR OCR</div>
       <div style="display:flex;gap:6px">
-        <button class="btn" onclick="copyOcrText()" style="font-size:10px;padding:4px 10px">📋 Copiar</button>
+        <button class="btn" onclick="copyOcrText()" style="font-size:10px;padding:4px 10px">📋 Copiar texto</button>
         <button class="btn" onclick="document.getElementById('ocr-result-box').style.display='none'" style="font-size:10px;padding:4px 10px">✕</button>
       </div>
     </div>
     <div id="ocr-meta" style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:10px"></div>
-    <pre id="ocr-text" style="font-family:var(--mono);font-size:12px;color:var(--text);white-space:pre-wrap;word-break:break-word;max-height:400px;overflow-y:auto;background:var(--surface2);border-radius:6px;padding:14px;line-height:1.7"></pre>
+    <pre id="ocr-text" style="font-family:var(--mono);font-size:12px;color:var(--text);white-space:pre-wrap;word-break:break-word;max-height:300px;overflow-y:auto;background:var(--surface2);border-radius:6px;padding:14px;line-height:1.7"></pre>
+
+    <!-- Workflow Claude : copier prompt + coller JSON -->
+    <div style="border-top:1px solid var(--border);margin-top:14px;padding-top:14px">
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:10px">🔄 EXTRAER DATOS VÍA CLAUDE.AI (sin clave API)</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.7">
+        <strong style="color:var(--text)">Paso 1</strong> — Copia el texto + instrucciones para Claude<br>
+        <strong style="color:var(--text)">Paso 2</strong> — Pégalo en <a href="https://claude.ai" target="_blank" style="color:var(--accent)">claude.ai</a> (tu cuenta Max)<br>
+        <strong style="color:var(--text)">Paso 3</strong> — Copia el JSON que devuelve Claude<br>
+        <strong style="color:var(--text)">Paso 4</strong> — Pégalo aquí abajo
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+        <button class="btn primary" onclick="copyForClaude()" id="btn-copy-claude" style="font-size:12px;padding:8px 16px">
+          📋 Paso 1 — Copiar para Claude
+        </button>
+        <button class="btn" onclick="document.getElementById('json-paste-area').style.display='block';document.getElementById('json-input').focus()" style="font-size:12px;padding:8px 16px;border-color:var(--accent2);color:var(--accent2)">
+          📥 Paso 4 — Pegar JSON de Claude
+        </button>
+      </div>
+      <div id="json-paste-area" style="display:none">
+        <textarea id="json-input" placeholder="Pega aquí el JSON que devolvió Claude..." style="width:100%;height:150px;font-family:var(--mono);font-size:11px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:12px;resize:vertical"></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn primary" onclick="importClaudeJson()" style="font-size:12px;padding:8px 16px">
+            ✓ Importar datos
+          </button>
+          <button class="btn" onclick="document.getElementById('json-paste-area').style.display='none'" style="font-size:11px;padding:6px 12px">Cancelar</button>
+        </div>
+        <div id="json-import-result" style="font-family:var(--mono);font-size:11px;margin-top:8px"></div>
+      </div>
+    </div>
   </div>
 
   <!-- Progress -->
@@ -1560,6 +1589,131 @@ function copyOcrText() {
     btn.textContent = '✓ Copiado';
     setTimeout(() => btn.textContent = orig, 1500);
   });
+}
+
+function copyForClaude() {
+  const ocrText = document.getElementById('ocr-text').textContent;
+  const fullPrompt = EXTRACTION_PROMPT +
+    '\n\n--- TEXTO EXTRAÍDO POR OCR DE UN DOCUMENTO MÉDICO ---\n\n' +
+    ocrText;
+
+  navigator.clipboard.writeText(fullPrompt).then(() => {
+    const btn = document.getElementById('btn-copy-claude');
+    btn.textContent = '✓ Copiado — ahora pégalo en claude.ai';
+    btn.style.background = 'var(--accent2)';
+    setTimeout(() => {
+      btn.textContent = '📋 Paso 1 — Copiar para Claude';
+      btn.style.background = '';
+    }, 4000);
+  });
+}
+
+function importClaudeJson() {
+  const raw = document.getElementById('json-input').value.trim();
+  const resultEl = document.getElementById('json-import-result');
+
+  if (!raw) {
+    resultEl.innerHTML = '<span style="color:var(--danger)">⚠ Pega el JSON primero</span>';
+    return;
+  }
+
+  try {
+    /* Nettoyer : enlever les backticks markdown si présents */
+    const clean = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
+    const parsed = JSON.parse(clean);
+
+    if (!parsed.date) {
+      resultEl.innerHTML = '<span style="color:var(--danger)">⚠ JSON inválido: falta el campo "date"</span>';
+      return;
+    }
+
+    let summary = [];
+
+    /* Sauvegarder mesures */
+    if (parsed.valeurs && Object.keys(parsed.valeurs).length) {
+      const data = loadData();
+      const existing = data.findIndex(d => d.date === parsed.date && d.src === parsed.source);
+      if (existing >= 0) {
+        data[existing].vals = { ...data[existing].vals, ...parsed.valeurs };
+      } else {
+        data.push({ date: parsed.date, src: parsed.source || 'OCR Import', vals: parsed.valeurs });
+      }
+      data.sort((a, b) => a.date.localeCompare(b.date));
+      saveData(data);
+      summary.push(`📊 ${Object.keys(parsed.valeurs).length} parámetros`);
+    }
+
+    /* Sauvegarder événement */
+    if (parsed.evenement) {
+      const evts = loadEvents();
+      const ev = {
+        date: parsed.date,
+        type: parsed.evenement.type || 'laboratorio',
+        title: parsed.evenement.titre || 'Import OCR',
+        text: parsed.evenement.texte || '',
+        src: parsed.source || 'OCR Import'
+      };
+      if (parsed.diagnostics?.length)   ev.diagnostics   = parsed.diagnostics;
+      if (parsed.antecedents?.length)   ev.antecedents   = parsed.antecedents;
+      if (parsed.signes_vitaux && Object.keys(parsed.signes_vitaux).length)
+                                        ev.signes_vitaux = parsed.signes_vitaux;
+      if (parsed.alertes?.length)       ev.alertes       = parsed.alertes;
+      if (parsed.bacteriologie)         ev.bacteriologie = parsed.bacteriologie;
+      evts.push(ev);
+      evts.sort((a, b) => a.date.localeCompare(b.date));
+      saveEvents(evts);
+      summary.push('📅 1 evento');
+    }
+
+    /* Sauvegarder bactériologie */
+    if (parsed.bacteriologie) {
+      const bacts = loadBacterio();
+      bacts.push({
+        date: parsed.date,
+        source: parsed.source || 'OCR Import',
+        ...parsed.bacteriologie
+      });
+      bacts.sort((a, b) => a.date.localeCompare(b.date));
+      saveBacterio(bacts);
+      summary.push('🦠 bacteriología');
+    }
+
+    /* Sauvegarder médicaments */
+    if (parsed.medicaments?.length) {
+      const meds = loadMeds();
+      for (const m of parsed.medicaments) {
+        meds.push({
+          date: parsed.date,
+          nom: m.nom, dose: m.dose || '', frequence: m.frequence || '',
+          statut: m.statut || 'en_cours',
+          source: parsed.source || 'OCR Import'
+        });
+      }
+      meds.sort((a, b) => a.date.localeCompare(b.date));
+      saveMeds(meds);
+      summary.push(`💊 ${parsed.medicaments.length} medicamento(s)`);
+    }
+
+    /* Sauvegarder la source */
+    if (parsed.source) addCustomSource(parsed.source);
+
+    /* Alertes */
+    if (parsed.alertes?.length) {
+      summary.push(`⚠ ${parsed.alertes.length} alerta(s)`);
+    }
+
+    showMainNav();
+    updateDataSummary(loadData());
+    fillSourceList();
+
+    resultEl.innerHTML = `<span style="color:var(--accent2)">✅ Importado con éxito — ${parsed.date} · ${parsed.source || 'OCR'}<br>${summary.join(' · ')}</span>`;
+
+    /* Nettoyer le textarea */
+    document.getElementById('json-input').value = '';
+
+  } catch (e) {
+    resultEl.innerHTML = `<span style="color:var(--danger)">✗ Error al parsear JSON: ${e.message}<br>Asegúrate de copiar sólo el JSON de Claude (sin texto adicional).</span>`;
+  }
 }
 
 /* ================================================================
