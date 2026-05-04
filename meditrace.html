@@ -207,6 +207,17 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 .badge-bad { background: rgba(232,74,74,0.15);  color: #e84a4a; border-radius: 4px; padding: 1px 6px; font-size: 10px; }
 .badge-warn{ background: rgba(232,164,74,0.15); color: #e8a44a; border-radius: 4px; padding: 1px 6px; font-size: 10px; }
 
+/* ── PARAM TOOLTIPS ── */
+.param-tip {
+  cursor: help;
+  border-bottom: 1px dotted var(--muted);
+  transition: color 0.15s, border-color 0.15s;
+}
+.param-tip:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
 /* ── KPI GRID ── */
 .kpi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 28px; }
 .kpi-card {
@@ -307,6 +318,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <div class="nav-tab" onclick="showPanel('vascular',this)"           data-i18n="tab_vasc">🧠 Análisis Vascular</div>
   <div class="nav-tab" onclick="showPanel('correlaciones',this)"      data-i18n="tab_corr">📊 Correlaciones</div>
   <div class="nav-tab" onclick="showPanel('observancia',this)"        data-i18n="tab_obs">Observancia</div>
+  <div class="nav-tab" onclick="showPanel('medicamentos',this)"      data-i18n="tab_meds">💊 Medicamentos</div>
   <div class="nav-tab alert" onclick="showPanel('farma',this)"        data-i18n="tab_farma">⚠ Farmacovigilancia</div>
   <div class="nav-tab" onclick="showPanel('importar',this)"           data-i18n="tab_import">+ Datos</div>
 </div>
@@ -684,6 +696,28 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <div id="obs-content"></div>
 </div>
 
+<!-- ===== PANEL MEDICAMENTOS ===== -->
+<div id="panel-medicamentos" class="panel">
+  <div class="section-label">💊 Historial de medicamentos — Extraído automáticamente de los documentos PDF</div>
+
+  <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:var(--radius);padding:14px 18px;margin-bottom:24px;font-size:13px;color:var(--muted)">
+    💡 <strong style="color:var(--text)">Fuentes</strong> —
+    Los medicamentos se extraen automáticamente de los informes médicos (urgencias, altas, consultas).
+    Cada entrada indica la fecha del documento, la fuente, y el estado del tratamiento en ese momento.
+    <strong style="color:var(--warn)">Este módulo NO sustituye la conciliación farmacéutica profesional.</strong>
+  </div>
+
+  <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;font-family:var(--mono);font-size:11px">
+    <span>🟢 <span style="color:var(--accent2)">En curso</span></span>
+    <span>🆕 <span style="color:var(--accent)">Nouveau</span></span>
+    <span>⏸️ <span style="color:var(--warn)">Suspendu</span></span>
+    <span>🔴 <span style="color:var(--danger)">Abandonné</span></span>
+  </div>
+
+  <div id="meds-summary" style="margin-bottom:16px;font-family:var(--mono);font-size:12px;color:var(--muted)"></div>
+  <div id="meds-content"></div>
+</div>
+
 <!-- ===== PANEL FARMA ===== -->
 <div id="panel-farma" class="panel">
   <div class="section-label">⚠ Farmacovigilancia — Interacciones & Contraindicaciones · Fuente: CIMA/AEMPS</div>
@@ -912,38 +946,77 @@ function setLang(l) {
    PARAMÈTRES BIOLOGIQUES
 ================================================================ */
 const PARAMS = {
-  hemoglobina:   { label:"Hemoglobina",       unit:"g/dL",    ref:[12,18],     color:"#922b21" },
-  hematocrito:   { label:"Hematocrito",        unit:"%",       ref:[37,52],     color:"#c0634c" },
-  leucocitos:    { label:"Leucocitos",         unit:"x10³/µL", ref:[4.8,10.8],  color:"#1a5276" },
-  plaquetas:     { label:"Plaquetas",          unit:"x10³/µL", ref:[130,400],   color:"#117a65" },
-  glucosa:       { label:"Glucosa",            unit:"mg/dL",   ref:[70,110],    color:"#784212" },
-  hba1c:         { label:"HbA1c",              unit:"%",       ref:[4,6.5],     color:"#a05c2a" },
-  creatinina:    { label:"Creatinina",         unit:"mg/dL",   ref:[0.51,0.95], color:"#117a65" },
-  filtrado:      { label:"Filtrado glom.",     unit:"ml/min",  ref:[60,200],    color:"#148f77" },
-  colesterol:    { label:"Colesterol total",   unit:"mg/dL",   ref:null,        color:"#7d3c98" },
-  hdl:           { label:"HDL",                unit:"mg/dL",   ref:[40,65],     color:"#5b2c6f" },
-  ldl:           { label:"LDL",                unit:"mg/dL",   ref:[null,116],  color:"#922b21" },
-  trigliceridos: { label:"Triglicéridos",      unit:"mg/dL",   ref:[50,165],    color:"#935116" },
-  vitamina_d:    { label:"Vitamina D",         unit:"ng/mL",   ref:[30,100],    color:"#b7950b" },
-  vitamina_b12:  { label:"Vitamina B12",       unit:"pg/mL",   ref:[180,914],   color:"#a04000" },
-  folico:        { label:"Ácido Fólico",       unit:"ng/mL",   ref:[4,16],      color:"#1d8348" },
-  tsh:           { label:"TSH",                unit:"mUI/L",   ref:[0.38,5.33], color:"#1a5276" },
-  ferritina:     { label:"Ferritina",          unit:"ng/mL",   ref:[20,300],    color:"#6e2f1a" },
-  pcr:           { label:"PCR",                unit:"mg/L",    ref:[1,10],      color:"#922b21" },
-  fibrinogeno:   { label:"Fibrinógeno",        unit:"mg/dL",   ref:[200,400],   color:"#6c3483" },
-  vsg:           { label:"VSG",                unit:"mm/h",    ref:[0,10],      color:"#922b21" },
-  albumina:      { label:"Albúmina",           unit:"g/dL",    ref:[3.5,5.2],   color:"#1e8449" },
-  proteinas:     { label:"Proteínas totales",  unit:"g/dL",    ref:[6.6,8],     color:"#1d8348" },
-  urea:          { label:"Urea",               unit:"mg/dL",   ref:[10,50],     color:"#7f8c8d" },
-  sodio:         { label:"Sodio",              unit:"mmol/L",  ref:[134,145],   color:"#148f77" },
-  potasio:       { label:"Potasio",            unit:"mmol/L",  ref:[3.5,5],     color:"#1a5276" },
-  bnp:           { label:"BNP/NT-ProBNP",      unit:"pg/mL",   ref:[20,125],    color:"#922b21" },
-  troponina:     { label:"Troponina",          unit:"ng/L",    ref:[0,14],      color:"#c0392b" },
-  inr:           { label:"INR",                unit:"",        ref:[0.85,1.25], color:"#6c3483" },
-  gpt:           { label:"GPT/ALT",            unit:"UI/L",    ref:[10,37],     color:"#7f8c8d" },
-  ggt:           { label:"GGT",                unit:"UI/L",    ref:[7,50],      color:"#7f8c8d" },
-  fosfatasa:     { label:"Fosfatasa alcalina", unit:"UI/L",    ref:[40,145],    color:"#7f8c8d" },
+  hemoglobina:   { label:"Hemoglobina",       unit:"g/dL",    ref:[12,18],     color:"#922b21", desc:"Proteína que transporta O₂. Baja=anemia. Alta=deshidratación o policitemia." },
+  hematocrito:   { label:"Hematocrito",        unit:"%",       ref:[37,52],     color:"#c0634c", desc:"% de glóbulos rojos en sangre. Refleja capacidad de transporte de O₂." },
+  vcm:           { label:"VCM",               unit:"fL",      ref:[80,96],     color:"#c0634c", desc:"Volumen Corpuscular Medio. Alto(macrocitosis)=déficit B12/folatos. Bajo=déficit hierro." },
+  hcm:           { label:"HCM",               unit:"pg",      ref:[27,33],     color:"#c0634c", desc:"Hemoglobina Corpuscular Media. Cantidad de Hb por glóbulo rojo." },
+  leucocitos:    { label:"Leucocitos",         unit:"x10³/µL", ref:[4.8,10.8],  color:"#1a5276", desc:"Glóbulos blancos (defensas). Altos=infección/inflamación. Bajos=inmunosupresión." },
+  plaquetas:     { label:"Plaquetas",          unit:"x10³/µL", ref:[130,400],   color:"#117a65", desc:"Esenciales para coagulación. Bajas=riesgo sangrado. Altas=riesgo trombótico." },
+  glucosa:       { label:"Glucosa",            unit:"mg/dL",   ref:[70,110],    color:"#784212", desc:"Azúcar en sangre (ayunas). >126=diabetes. 110–126=prediabetes." },
+  hba1c:         { label:"HbA1c",              unit:"%",       ref:[4,6.5],     color:"#a05c2a", desc:"Hemoglobina glicosilada — media de glucosa de 2-3 meses. >6.5%=diabetes." },
+  creatinina:    { label:"Creatinina",         unit:"mg/dL",   ref:[0.51,0.95], color:"#117a65", desc:"Desecho muscular filtrado por riñones. Alta=posible insuficiencia renal." },
+  filtrado:      { label:"Filtrado glom.",     unit:"ml/min",  ref:[60,200],    color:"#148f77", desc:"Filtración Glomerular CKD-EPI — función renal. <60=insuf. renal. <30=severa." },
+  colesterol:    { label:"Colesterol total",   unit:"mg/dL",   ref:null,        color:"#7d3c98", desc:"Grasa total en sangre (HDL+LDL+VLDL). Objetivo según riesgo cardiovascular." },
+  hdl:           { label:"HDL",                unit:"mg/dL",   ref:[40,65],     color:"#5b2c6f", desc:"Colesterol 'bueno' — protector cardiovascular. Más alto=mejor. <40=riesgo." },
+  ldl:           { label:"LDL",                unit:"mg/dL",   ref:[null,116],  color:"#922b21", desc:"Colesterol 'malo' — se acumula en arterias. Objetivo <70 si RCV muy alto." },
+  trigliceridos: { label:"Triglicéridos",      unit:"mg/dL",   ref:[50,165],    color:"#935116", desc:"Grasas circulantes. Elevados=riesgo CV + pancreatitis si >500." },
+  no_hdl:        { label:"Col. no-HDL",        unit:"mg/dL",   ref:[null,130],  color:"#7d3c98", desc:"Colesterol total menos HDL. Marcador de riesgo cardiovascular aterogénico." },
+  vitamina_d:    { label:"Vitamina D",         unit:"ng/mL",   ref:[30,100],    color:"#b7950b", desc:"Esencial para huesos, inmunidad y cerebro. <20=carencia. <30=insuficiencia. Frecuente en ancianos." },
+  vitamina_b12:  { label:"Vitamina B12",       unit:"pg/mL",   ref:[180,914],   color:"#a04000", desc:"Vital para sistema nervioso y glóbulos rojos. <200=carencia → anemia macrocítica, deterioro cognitivo." },
+  folico:        { label:"Ácido Fólico",       unit:"ng/mL",   ref:[4,16],      color:"#1d8348", desc:"Vitamina B9 — síntesis de ADN y glóbulos rojos. Carencia=anemia megaloblástica." },
+  tsh:           { label:"TSH",                unit:"mUI/L",   ref:[0.38,5.33], color:"#1a5276", desc:"Hormona tireostimulante. Alta=hipotiroidismo. Baja=hipertiroidismo." },
+  ferritina:     { label:"Ferritina",          unit:"ng/mL",   ref:[20,300],    color:"#6e2f1a", desc:"Reserva de hierro. Baja=carencia de hierro. Muy alta=inflamación o sobrecarga." },
+  hierro:        { label:"Hierro",             unit:"µg/dL",   ref:[50,150],    color:"#6e2f1a", desc:"Hierro sérico. Bajo=anemia ferropénica. Alto=sobrecarga o hemólisis." },
+  pcr:           { label:"PCR",                unit:"mg/L",    ref:[1,10],      color:"#922b21", desc:"Proteína C Reactiva — inflamación. >10=infección activa. >50=severa." },
+  fibrinogeno:   { label:"Fibrinógeno",        unit:"mg/dL",   ref:[200,400],   color:"#6c3483", desc:"Proteína de coagulación. Elevado=inflamación aguda o riesgo trombótico." },
+  vsg:           { label:"VSG",                unit:"mm/h",    ref:[0,10],      color:"#922b21", desc:"Velocidad de Sedimentación — inflamación inespecífica. Aumenta con la edad." },
+  albumina:      { label:"Albúmina",           unit:"g/dL",    ref:[3.5,5.2],   color:"#1e8449", desc:"Proteína hepática. Baja=desnutrición, insuf. hepática, síndrome nefrótico." },
+  proteinas:     { label:"Proteínas totales",  unit:"g/dL",    ref:[6.6,8],     color:"#1d8348", desc:"Albúmina + globulinas. Marcador nutricional y hepático." },
+  urea:          { label:"Urea",               unit:"mg/dL",   ref:[10,50],     color:"#7f8c8d", desc:"Desecho del metabolismo proteico. Alta=insuf. renal o deshidratación." },
+  sodio:         { label:"Sodio",              unit:"mmol/L",  ref:[134,145],   color:"#148f77", desc:"Electrolito — hidratación y tensión arterial. Bajo(hiponatremia)=confusión, caídas." },
+  potasio:       { label:"Potasio",            unit:"mmol/L",  ref:[3.5,5],     color:"#1a5276", desc:"Electrolito vital para el corazón. Muy bajo o muy alto=arritmia peligrosa." },
+  cloro:         { label:"Cloro",              unit:"mmol/L",  ref:[95,105],    color:"#148f77", desc:"Electrolito — equilibrio ácido-base. Sigue generalmente al sodio." },
+  calcio:        { label:"Calcio",             unit:"mg/dL",   ref:[8.5,10.5],  color:"#148f77", desc:"Mineral óseo y neuromuscular. Bajo=tetania. Alto=hiperparatiroidismo." },
+  fosforo:       { label:"Fósforo",            unit:"mg/dL",   ref:[2.5,4.5],   color:"#148f77", desc:"Mineral ligado al calcio y energía celular. Alto=insuf. renal." },
+  magnesio:      { label:"Magnesio",           unit:"mg/dL",   ref:[1.6,2.6],   color:"#148f77", desc:"Cofactor de 300+ enzimas. Bajo=calambres, arritmia. Riesgo bajo IPP (Pantoprazol) crónico." },
+  bicarbonato:   { label:"Bicarbonato",        unit:"mmol/L",  ref:[24,29],     color:"#148f77", desc:"Tampón ácido-base. Bajo=acidosis metabólica. Alto=alcalosis." },
+  bnp:           { label:"BNP/NT-ProBNP",      unit:"pg/mL",   ref:[20,125],    color:"#922b21", desc:"Marcador de insuficiencia cardíaca. Más alto=peor función cardíaca. >300=IC probable." },
+  troponina:     { label:"Troponina",          unit:"ng/L",    ref:[0,14],      color:"#c0392b", desc:"Proteína cardíaca — liberada si daño miocárdico. Elevada=infarto o sufrimiento cardíaco." },
+  dimero_d:      { label:"Dímero D",           unit:"ng/mL",   ref:[null,500],  color:"#922b21", desc:"Producto de degradación de fibrina. Elevado=sospecha trombosis (TVP, TEP)." },
+  inr:           { label:"INR",                unit:"",        ref:[0.85,1.25], color:"#6c3483", desc:"Coagulación. Bajo AVK: objetivo 2-3. Bajo Xarelto/Dabigatrán: INR normal esperado." },
+  tp:            { label:"T. Protrombina",     unit:"seg",     ref:[9,13],      color:"#6c3483", desc:"Tiempo de Protrombina — mide la vía extrínseca de coagulación." },
+  ttpa:          { label:"TTPA",               unit:"seg",     ref:[25,38],     color:"#6c3483", desc:"Tiempo de Tromboplastina Parcial Activada — vía intrínseca de coagulación." },
+  actividad_protrombina: { label:"Act. Protrombina", unit:"%", ref:[75,120],    color:"#6c3483", desc:"Porcentaje de actividad de protrombina. Bajo=riesgo de sangrado." },
+  gpt:           { label:"GPT/ALT",            unit:"UI/L",    ref:[10,37],     color:"#7f8c8d", desc:"Enzima hepática — daño del hígado. Alta=hepatitis, toxicidad medicamentosa." },
+  got:           { label:"GOT/AST",            unit:"UI/L",    ref:[10,38],     color:"#7f8c8d", desc:"Enzima hepática y muscular. Relación GOT/GPT ayuda al diagnóstico." },
+  ggt:           { label:"GGT",                unit:"UI/L",    ref:[7,50],      color:"#7f8c8d", desc:"Gamma-GT — sensible al alcohol y medicamentos. Alta=colestasis, toxicidad hepática." },
+  fosfatasa:     { label:"Fosfatasa alcalina", unit:"UI/L",    ref:[40,145],    color:"#7f8c8d", desc:"Enzima ósea y hepática. Alta=patología ósea o colestasis." },
+  cpk:           { label:"CPK",                unit:"UI/L",    ref:[50,195],    color:"#7f8c8d", desc:"Creatina Fosfoquinasa — enzima muscular. Alta=rabdomiólisis, infarto, efecto de estatinas." },
+  ldh:           { label:"LDH",                unit:"UI/L",    ref:[0,248],     color:"#7f8c8d", desc:"Lactato Deshidrogenasa — daño tisular inespecífico. Alta=hemólisis, infarto, cáncer." },
+  bilirrubina:   { label:"Bilirrubina",        unit:"mg/dL",   ref:[0.5,1.0],   color:"#b7950b", desc:"Pigmento de degradación de glóbulos rojos. Alta=ictericia, patología hepática o hemólisis." },
+  acido_urico:   { label:"Ácido úrico",        unit:"mg/dL",   ref:[2.4,7.0],   color:"#7f8c8d", desc:"Metabolismo de purinas. Elevado=riesgo de gota y cálculos renales." },
 };
+
+/* Helper: tooltip interactif pour les noms de paramètres */
+function paramTip(key) {
+  const p = PARAMS[key];
+  if (!p) return '';
+  const ref = p.ref ? p.ref.filter(v=>v!==null).join('–') + ' ' + p.unit : 'sin rango definido';
+  return p.desc + '\nRef: ' + ref;
+}
+function paramSpan(key, shortLabel, extraStyle) {
+  const p = PARAMS[key];
+  if (!p) return key;
+  const ref = p.ref ? p.ref.filter(v=>v!==null).join(' – ') + ' ' + p.unit : '';
+  const tip = (p.desc || p.label) + (ref ? '\nRef: ' + ref : '');
+  const label = shortLabel || p.label;
+  return '<span class="param-tip" title="' + tip.replace(/"/g, '&quot;') + '"' + (extraStyle ? ' style="'+extraStyle+'"' : '') + '>' + label + '</span>';
+}
+
+/* Alias court pour templates */
+function paramTip(key, short) {
+  return paramSpan(key, short);
+}
 
 function fillParamSelect() {
   const sel = document.getElementById('m-param');
@@ -1007,6 +1080,7 @@ function showPanel(name, tabEl) {
   if (name === 'vascular')      buildVascular();
   if (name === 'correlaciones') buildCorrelaciones(data);
   if (name === 'observancia')   buildObservancia();
+  if (name === 'medicamentos') buildMedicamentos();
   if (name === 'farma')         buildFarma();
   if (name === 'importar') updateDataSummary(data);
 }
@@ -1146,7 +1220,7 @@ Retourne UNIQUEMENT le JSON, sans markdown, sans backticks, sans commentaire.`;
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         max_tokens: 4000,
         messages: [{
           role: 'user',
@@ -1575,7 +1649,7 @@ function exportPDF() {
         const p  = PARAMS[k];
         const st = getStatus(k, info.v);
         return `<div class="kpi-card ${st}">
-          <div class="kpi-label">${p.label}</div>
+          <div class="kpi-label">${paramSpan(k)}</div>
           <div class="kpi-value">${info.v} <span class="kpi-unit">${p.unit}</span></div>
           <div class="kpi-date">${fmtDate(info.date)}</div>
           ${st==='bad' ? '<div class="kpi-bad">⚠ Fuera de rango</div>' : ''}
@@ -1591,8 +1665,8 @@ function exportPDF() {
       <thead>
         <tr>
           <th>Fecha</th><th>Fuente</th>
-          <th>Hb</th><th>Leuc.</th><th>Gluc.</th><th>Creat.</th><th>FG</th>
-          <th>Colest.</th><th>PCR</th><th>Fibr.</th><th>TSH</th><th>VitD</th>
+          <th>${paramTip('hemoglobina','Hb')}</th><th>${paramTip('leucocitos','Leuc.')}</th><th>${paramTip('glucosa','Gluc.')}</th><th>${paramTip('creatinina','Creat.')}</th><th>${paramTip('filtrado','FG')}</th>
+          <th>${paramTip('colesterol','Colest.')}</th><th>${paramTip('pcr','PCR')}</th><th>${paramTip('fibrinogeno','Fibr.')}</th><th>${paramTip('tsh','TSH')}</th><th>${paramTip('vitamina_d','VitD')}</th>
         </tr>
       </thead>
       <tbody>
@@ -1867,7 +1941,7 @@ function buildResumen(data) {
     const card = document.createElement('div');
     card.className = `kpi-card ${st === 'bad' ? 'bad' : 'ok'}`;
     card.innerHTML = `
-      <div class="kpi-label">${p.label}</div>
+      <div class="kpi-label">${paramTip(key)}</div>
       <div class="kpi-value">${last.y} <span class="kpi-unit">${p.unit}</span></div>
       <div class="kpi-date">${fmtDate(last.x)} · ${last.src}</div>
       ${prev ? `<div class="kpi-trend ${trend}">${trend==='up'?'↑':trend==='down'?'↓':'→'} vs ${prev.y}</div>` : ''}`;
@@ -1898,7 +1972,7 @@ function buildAllCharts(data) {
     const p = PARAMS[key];
     const div = document.createElement('div');
     div.className = 'chart-card';
-    div.innerHTML = `<div class="chart-title">${p.label}</div><div class="chart-sub">${p.unit}${p.ref?'·Ref:'+p.ref.filter(v=>v!==null).join('–'):''}</div><canvas id="ac-${key}" height="150"></canvas>`;
+    div.innerHTML = `<div class="chart-title">${paramSpan(key)}</div><div class="chart-sub">${p.unit}${p.ref?'·Ref:'+p.ref.filter(v=>v!==null).join('–'):''}</div><canvas id="ac-${key}" height="150"></canvas>`;
     el.appendChild(div);
     setTimeout(() => makeChart('ac-'+key, key, data), 50);
   });
@@ -1927,7 +2001,7 @@ function renderTable() {
   head.innerHTML = '';
   const tr = document.createElement('tr');
   tr.innerHTML = `<th onclick="sortTable('date')">Fecha ${arrow('date')}</th><th onclick="sortTable('src')">Fuente ${arrow('src')}</th>` +
-    keys.map(k => `<th onclick="sortTable('${k}')">${PARAMS[k].label} ${arrow(k)}</th>`).join('');
+    keys.map(k => `<th onclick="sortTable('${k}')">${paramSpan(k)} ${arrow(k)}</th>`).join('');
   head.appendChild(tr);
 
   const sorted = [...data].sort((a,b) => {
@@ -2804,6 +2878,92 @@ const OBS_COLORS = {
   amarillo: { bg: 'rgba(232,164,74,0.15)', border: '#e8a44a', dot: '#e8a44a', emoji: '🟡' },
   rojo:     { bg: 'rgba(232,74,74,0.15)',  border: '#e84a4a', dot: '#e84a4a', emoji: '🔴' },
 };
+
+/* ================================================================
+   PANEL MEDICAMENTOS — Vue chronologique des médicaments extraits
+================================================================ */
+function buildMedicamentos() {
+  const meds = loadMeds();
+  const el = document.getElementById('meds-content');
+  const summary = document.getElementById('meds-summary');
+  el.innerHTML = '';
+
+  if (!meds.length) {
+    summary.textContent = '';
+    el.innerHTML = '<div style="color:var(--muted);padding:40px;text-align:center;font-size:14px">' +
+      '💊 No hay medicamentos registrados.<br><br>' +
+      'Los medicamentos se extraen automáticamente al importar PDFs con la API Claude,<br>' +
+      'o bien al restaurar un archivo .mt que los contiene.' +
+      '</div>';
+    return;
+  }
+
+  /* Regrouper par nom de médicament */
+  const byName = {};
+  meds.forEach(m => {
+    const key = m.nom;
+    if (!byName[key]) byName[key] = [];
+    byName[key].push(m);
+  });
+
+  const names = Object.keys(byName).sort();
+  const uniqueDates = [...new Set(meds.map(m => m.date))].sort();
+  summary.innerHTML = `💊 ${names.length} médicaments distincts · ${meds.length} entrées · ` +
+    `${uniqueDates.length} dates · ${uniqueDates[0]} → ${uniqueDates[uniqueDates.length-1]}`;
+
+  /* Statut → style */
+  const STAT = {
+    en_cours:   { bg: 'rgba(74,232,164,0.12)', border: 'var(--accent2)', icon: '🟢', label: 'En curso' },
+    nouveau:    { bg: 'rgba(74,143,232,0.12)',  border: 'var(--accent)',  icon: '🆕', label: 'Nuevo' },
+    suspendu:   { bg: 'rgba(232,164,74,0.12)',  border: 'var(--warn)',    icon: '⏸️', label: 'Suspendido' },
+    abandonne:  { bg: 'rgba(232,74,74,0.12)',   border: 'var(--danger)',  icon: '🔴', label: 'Abandonado' }
+  };
+
+  names.forEach(name => {
+    const entries = byName[name];
+    const lastEntry = entries[entries.length - 1];
+    const lastStat = STAT[lastEntry.statut] || STAT.en_cours;
+
+    const card = document.createElement('div');
+    card.style.cssText = `background:var(--surface);border:1px solid var(--border);border-left:4px solid ${lastStat.border};border-radius:var(--radius);padding:18px 22px;margin-bottom:12px`;
+
+    /* Header: nom + dernier statut */
+    const header = document.createElement('div');
+    header.style.cssText = 'display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px';
+    header.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:18px">${lastStat.icon}</span>
+        <div>
+          <div style="font-family:var(--mono);font-weight:600;font-size:14px;color:var(--text)">${name}</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--muted)">${lastEntry.dose}${lastEntry.frequence ? ' · ' + lastEntry.frequence : ''}</div>
+        </div>
+      </div>
+      <div style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;background:${lastStat.bg};border:1px solid ${lastStat.border};color:var(--text)">
+        ${lastStat.label}
+      </div>`;
+    card.appendChild(header);
+
+    /* Timeline des apparitions */
+    if (entries.length > 1 || entries[0].source) {
+      const timeline = document.createElement('div');
+      timeline.style.cssText = 'border-top:1px solid var(--border);padding-top:10px;margin-top:6px';
+      entries.forEach((entry, i) => {
+        const st = STAT[entry.statut] || STAT.en_cours;
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:4px 0;font-family:var(--mono);font-size:11px';
+        row.innerHTML = `
+          <span style="color:${st.border};font-size:12px">${i === entries.length-1 ? '●' : '│'}</span>
+          <span style="color:var(--muted);min-width:80px">${fmtDate(entry.date)}</span>
+          <span style="color:var(--text)">${entry.dose}${entry.frequence ? ' · ' + entry.frequence : ''}</span>
+          <span style="color:var(--muted);font-size:10px">— ${entry.source || ''}</span>`;
+        timeline.appendChild(row);
+      });
+      card.appendChild(timeline);
+    }
+
+    el.appendChild(card);
+  });
+}
 
 function buildObservancia() {
   const el = document.getElementById('obs-content');
