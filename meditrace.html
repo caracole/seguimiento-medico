@@ -796,8 +796,10 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
       </div>
       <div class="form-field">
         <label data-i18n="lbl_source">Fuente</label>
-        <input type="text" id="m-source" placeholder="Hospital / Laboratorio..." list="source-list" autocomplete="off"/>
-        <datalist id="source-list"></datalist>
+        <select id="m-source-select" onchange="onSourceChange()" style="margin-bottom:4px">
+          <option value="">— Seleccionar fuente —</option>
+        </select>
+        <input type="text" id="m-source-new" placeholder="Nombre del hospital / laboratorio..." style="display:none"/>
       </div>
       <div class="form-field">
         <label data-i18n="lbl_param">Parámetro</label>
@@ -1089,23 +1091,59 @@ function fillParamSelect() {
 }
 
 function fillSourceList() {
-  const dl = document.getElementById('source-list');
-  if (!dl) return;
-  dl.innerHTML = '';
-  const sources = new Set();
+  const sel = document.getElementById('m-source-select');
+  if (!sel) return;
 
-  /* Depuis les mesures */
+  /* Collecter toutes les sources connues */
+  const sources = new Set();
   loadData().forEach(d => { if (d.src) sources.add(d.src); });
-  /* Depuis les événements */
   loadEvents().forEach(e => { if (e.src) sources.add(e.src); });
-  /* Depuis les sources custom sauvegardées */
   loadCustomSources().forEach(s => sources.add(s));
 
+  /* Garder la sélection actuelle */
+  const prev = sel.value;
+
+  sel.innerHTML = '<option value="">— Seleccionar fuente —</option>';
+
+  /* Sources existantes */
   [...sources].sort().forEach(s => {
     const opt = document.createElement('option');
-    opt.value = s;
-    dl.appendChild(opt);
+    opt.value = s; opt.textContent = s;
+    sel.appendChild(opt);
   });
+
+  /* Séparateur + option nouvelle */
+  if (sources.size > 0) {
+    const sep = document.createElement('option');
+    sep.disabled = true; sep.textContent = '────────────────';
+    sel.appendChild(sep);
+  }
+  const addOpt = document.createElement('option');
+  addOpt.value = '__NEW_SOURCE__'; addOpt.textContent = '➕ Nueva fuente...';
+  sel.appendChild(addOpt);
+
+  /* Restaurer sélection si possible */
+  if (prev && [...sel.options].some(o => o.value === prev)) sel.value = prev;
+}
+
+function onSourceChange() {
+  const sel = document.getElementById('m-source-select');
+  const inp = document.getElementById('m-source-new');
+  if (sel.value === '__NEW_SOURCE__') {
+    inp.style.display = 'block';
+    inp.focus();
+  } else {
+    inp.style.display = 'none';
+    inp.value = '';
+  }
+}
+
+function getSelectedSource() {
+  const sel = document.getElementById('m-source-select');
+  if (sel.value === '__NEW_SOURCE__') {
+    return document.getElementById('m-source-new').value.trim() || '';
+  }
+  return sel.value || '';
 }
 
 /* Gestion des paramètres personnalisés */
@@ -1614,7 +1652,7 @@ function showMainNav() {
 ================================================================ */
 function addManual() {
   const date = document.getElementById('m-date').value;
-  const src  = document.getElementById('m-source').value || 'Manuel';
+  const src  = getSelectedSource() || 'Manuel';
   let   key  = document.getElementById('m-param').value;
   const val  = parseFloat(document.getElementById('m-value').value);
 
@@ -1642,28 +1680,34 @@ function addManual() {
   showMainNav();
 
   document.getElementById('m-value').value = '';
+  document.getElementById('m-source-new').value = '';
+  document.getElementById('m-source-new').style.display = 'none';
   const log = document.getElementById('progress-log');
   const pb  = document.getElementById('progress-box');
   pb.style.display = 'block';
   const p = PARAMS[key];
-  log.innerHTML += `✓ Añadido: ${p?.label || key} = ${val} ${p?.unit || ''} (${date})<br>`;
+  log.innerHTML += `✓ Añadido: ${p?.label || key} = ${val} ${p?.unit || ''} (${date}) · Fuente: ${src}<br>`;
 
-  /* Rafraîchir la liste des sources */
+  /* Rafraîchir la liste des sources et re-sélectionner la source utilisée */
   fillSourceList();
+  document.getElementById('m-source-select').value = src;
 }
 
 function addEvent() {
   const date  = document.getElementById('m-date').value;
-  const src   = document.getElementById('m-source').value || 'Manuel';
+  const src   = getSelectedSource() || 'Manuel';
   if (!date) { alert('Indica la fecha'); return; }
   const title = prompt('Título del evento clínico:');
   if (!title) return;
   const text  = prompt('Descripción breve (opcional):') || '';
-  const type  = prompt('Tipo (laboratorio/urgencias/hematologia/neurologia):') || 'laboratorio';
+  const type  = prompt('Tipo (laboratorio/urgencias/hematologia/neurologia/bacteriologia):') || 'laboratorio';
+  addCustomSource(src);
   const evts  = loadEvents();
   evts.push({ date, type, title, text, src });
   evts.sort((a,b) => a.date.localeCompare(b.date));
   saveEvents(evts);
+  fillSourceList();
+  document.getElementById('m-source-select').value = src;
   alert('✓ Evento añadido');
 }
 
