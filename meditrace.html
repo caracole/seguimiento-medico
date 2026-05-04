@@ -4,11 +4,15 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>MediTrace — Seguimiento Médico</title>
+<link rel="manifest" href="manifest.json"/>
 <link rel="icon" type="image/svg+xml" href="icon_ardoise_cyan.svg"/>
-<link rel="apple-touch-icon" href="icon_ardoise_cyan.svg"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
 <meta name="theme-color" content="#1a1f2e"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="MediTrace"/>
 <meta name="application-name" content="MediTrace"/>
-<meta name="description" content="Seguimiento médico longitudinal — MediTrace v2026.2"/>
+<meta name="description" content="Seguimiento médico longitudinal — MediTrace v2026.3"/>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
 :root {
@@ -4308,6 +4312,13 @@ function updateThemeBtn() {
 }
 
 window.addEventListener('load', () => {
+  /* Enregistrer le Service Worker pour PWA hors-ligne */
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('[MediTrace] SW registered:', reg.scope))
+      .catch(err => console.warn('[MediTrace] SW registration failed:', err));
+  }
+
   /* Charger le thème sauvegardé — défaut: clair pour meilleure lisibilité */
   const savedTheme = localStorage.getItem('mt_theme');
   if (savedTheme === 'dark') {

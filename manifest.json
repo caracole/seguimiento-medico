@@ -1,0 +1,32 @@
+{
+  "name": "MediTrace — Seguimiento Médico",
+  "short_name": "MediTrace",
+  "description": "Dossier médical longitudinal, interactif et visuel",
+  "start_url": "./meditrace.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0e1117",
+  "theme_color": "#1a1f2e",
+  "categories": ["medical", "health"],
+  "icons": [
+    {
+      "src": "icon_ardoise_cyan.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
