@@ -251,6 +251,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 .tl-dot.urgencias   { background: var(--danger); }
 .tl-dot.hematologia { background: var(--accent); }
 .tl-dot.neurologia  { background: #7d3c98; }
+.tl-dot.bacteriologia { background: #e8a44a; }
 .tl-date { font-family: var(--mono); font-size: 9px; color: var(--muted); margin-bottom: 2px; }
 .tl-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; }
 .tl-service { font-family: var(--mono); font-size: 8px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; color: var(--accent); }
@@ -319,6 +320,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <div class="nav-tab" onclick="showPanel('correlaciones',this)"      data-i18n="tab_corr">📊 Correlaciones</div>
   <div class="nav-tab" onclick="showPanel('observancia',this)"        data-i18n="tab_obs">Observancia</div>
   <div class="nav-tab" onclick="showPanel('medicamentos',this)"      data-i18n="tab_meds">💊 Medicamentos</div>
+  <div class="nav-tab" onclick="showPanel('bacterio',this)"          data-i18n="tab_bacterio">🦠 Bacteriología</div>
   <div class="nav-tab alert" onclick="showPanel('farma',this)"        data-i18n="tab_farma">⚠ Farmacovigilancia</div>
   <div class="nav-tab" onclick="showPanel('importar',this)"           data-i18n="tab_import">+ Datos</div>
 </div>
@@ -718,6 +720,20 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <div id="meds-content"></div>
 </div>
 
+<!-- ===== PANEL BACTERIOLOGÍA ===== -->
+<div id="panel-bacterio" class="panel">
+  <div class="section-label">🦠 Bacteriología — Resultados de cultivos y antibiogramas</div>
+
+  <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:var(--radius);padding:14px 18px;margin-bottom:24px;font-size:13px;color:var(--muted)">
+    💡 <strong style="color:var(--text)">Fuentes</strong> —
+    Los resultados bacteriológicos se extraen automáticamente de los informes médicos (laboratorio, urgencias).
+    Incluyen cultivos, antibiogramas y comentarios del laboratorio.
+    <strong style="color:var(--warn)">Este módulo NO sustituye la interpretación microbiológica profesional.</strong>
+  </div>
+
+  <div id="bacterio-content"></div>
+</div>
+
 <!-- ===== PANEL FARMA ===== -->
 <div id="panel-farma" class="panel">
   <div class="section-label">⚠ Farmacovigilancia — Interacciones & Contraindicaciones · Fuente: CIMA/AEMPS</div>
@@ -757,9 +773,9 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
        ondrop="handleDrop(event)">
     <div class="import-hero-icon">📄</div>
     <div class="import-hero-title" data-i18n="drop_title">Arrastra un PDF aquí o haz clic para seleccionar</div>
-    <div class="import-hero-sub" data-i18n="drop_sub">Informes de laboratorio · Notas de evolución · Informes de urgencias<br>La IA extraerá automáticamente los valores biológicos y las fechas</div>
+    <div class="import-hero-sub" data-i18n="drop_sub">Informes de laboratorio · Notas de evolución · Informes de urgencias<br>PDF, imágenes (JPG, PNG, TIFF) — OCR automático via Tesseract.js para documentos escaneados</div>
   </div>
-  <input type="file" id="pdf-input" accept=".pdf" style="display:none" onchange="handleFiles(this.files)"/>
+  <input type="file" id="pdf-input" accept=".pdf,.jpg,.jpeg,.png,.tiff,.tif,.bmp,.webp" multiple style="display:none" onchange="handleFiles(this.files)"/>
 
   <!-- Progress -->
   <div class="progress-box" id="progress-box">
@@ -847,6 +863,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 <input type="file" id="pdf-view-input" accept=".pdf" style="display:none" onchange="loadPdfView(this)"/>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script>
 /* ================================================================
    TRADUCTIONS
@@ -1035,6 +1052,7 @@ function fillParamSelect() {
 const STORE_KEY = 'mt_mesures';
 const EVENT_KEY = 'mt_events';
 const MED_KEY   = 'mt_meds';
+const BACTERIO_KEY = 'mt_bacterio';
 const PATIENT_LABEL_KEY = 'mt_patient_label';
 
 function loadData() {
@@ -1049,6 +1067,10 @@ function loadMeds() {
   try { return JSON.parse(localStorage.getItem(MED_KEY) || '[]'); } catch { return []; }
 }
 function saveMeds(meds) { localStorage.setItem(MED_KEY, JSON.stringify(meds)); }
+function loadBacterio() {
+  try { return JSON.parse(localStorage.getItem(BACTERIO_KEY) || '[]'); } catch { return []; }
+}
+function saveBacterio(data) { localStorage.setItem(BACTERIO_KEY, JSON.stringify(data)); }
 function getPatientLabel() { return localStorage.getItem(PATIENT_LABEL_KEY) || ''; }
 function setPatientLabel(l) {
   if (l) localStorage.setItem(PATIENT_LABEL_KEY, l);
@@ -1081,6 +1103,7 @@ function showPanel(name, tabEl) {
   if (name === 'correlaciones') buildCorrelaciones(data);
   if (name === 'observancia')   buildObservancia();
   if (name === 'medicamentos') buildMedicamentos();
+  if (name === 'bacterio')     buildBacterio();
   if (name === 'farma')         buildFarma();
   if (name === 'importar') updateDataSummary(data);
 }
@@ -1142,34 +1165,51 @@ function handleDrop(e) {
   handleFiles(e.dataTransfer.files);
 }
 
-async function extractPdf(file) {
-  const apiKey = localStorage.getItem('mt_apikey') || document.getElementById('api-key-input').value;
-  if (!apiKey) { alert(LANG[currentLang].no_key); return; }
+/* ================================================================
+   OCR — Tesseract.js côté client
+================================================================ */
+const IMAGE_TYPES = ['image/jpeg','image/png','image/tiff','image/bmp','image/webp'];
 
-  const pb = document.getElementById('progress-box');
-  const pbar = document.getElementById('progress-bar');
-  const plog = document.getElementById('progress-log');
-  const ptitle = document.getElementById('progress-title');
+function isImageFile(file) {
+  return IMAGE_TYPES.includes(file.type) || /\.(jpe?g|png|tiff?|bmp|webp)$/i.test(file.name);
+}
 
-  pb.style.display = 'block';
-  ptitle.textContent = LANG[currentLang].extracting + ' ' + file.name;
-  pbar.style.width = '10%';
-  plog.innerHTML = '→ Lecture du PDF...<br>';
+async function ocrFromImage(file, plog, pbar) {
+  plog.innerHTML += '🔍 OCR Tesseract.js — reconnaissance du texte...<br>';
+  pbar.style.width = '15%';
 
-  try {
-    /* Lire le PDF en base64 */
-    const b64 = await new Promise((res, rej) => {
-      const r = new FileReader();
-      r.onload = () => res(r.result.split(',')[1]);
-      r.onerror = () => rej(new Error('Lecture échouée'));
-      r.readAsDataURL(file);
-    });
+  const worker = await Tesseract.createWorker('spa+fra', 1, {
+    logger: m => {
+      if (m.status === 'recognizing text') {
+        const pct = Math.round(m.progress * 100);
+        pbar.style.width = (15 + pct * 0.35) + '%';
+        if (pct % 20 === 0) plog.innerHTML += `  OCR: ${pct}%<br>`;
+      }
+    }
+  });
 
-    pbar.style.width = '30%';
-    plog.innerHTML += '→ Envoi à Claude pour extraction...<br>';
+  const { data: { text, confidence } } = await worker.recognize(file);
+  await worker.terminate();
 
-    const prompt = `Tu es un assistant spécialisé en extraction de données médicales pour MediTrace.
-Analyse ce document PDF médical et extrais TOUTES les informations cliniquement pertinentes.
+  plog.innerHTML += `✓ OCR terminé — ${text.length} caractères · confiance ${Math.round(confidence)}%<br>`;
+  pbar.style.width = '50%';
+  return { text, confidence };
+}
+
+async function ocrFromPdfFallback(file, plog, pbar) {
+  /* Convertir la 1ère page du PDF en image via canvas pour OCR */
+  plog.innerHTML += '⚠ PDF probablement scanné — tentative OCR...<br>';
+  plog.innerHTML += '🔄 Conversion PDF → image pour OCR...<br>';
+
+  /* Utiliser le PDF comme image directement via Tesseract (supporte les PDF) */
+  return await ocrFromImage(file, plog, pbar);
+}
+
+/* ================================================================
+   PROMPT CLAUDE — Extraction médicale (partagé entre PDF natif et OCR)
+================================================================ */
+const EXTRACTION_PROMPT = `Tu es un assistant spécialisé en extraction de données médicales pour MediTrace.
+Analyse ce document médical et extrais TOUTES les informations cliniquement pertinentes.
 
 Retourne un JSON strictement valide avec cette structure :
 {
@@ -1180,7 +1220,7 @@ Retourne un JSON strictement valide avec cette structure :
     "glucosa": 102.2
   },
   "evenement": {
-    "type": "laboratorio|urgencias|hematologia|neurologia|cardiologia|neumologia|consulta|imagen",
+    "type": "laboratorio|urgencias|hematologia|neurologia|cardiologia|neumologia|consulta|imagen|bacteriologia",
     "titre": "Titre court (max 80 car) — préfixer 🚨 si critique, ⚠️ si anormal majeur",
     "texte": "Résumé clinique 1-3 phrases avec valeurs anormales clés et flags ⚠️"
   },
@@ -1191,6 +1231,18 @@ Retourne un JSON strictement valide avec cette structure :
   "antecedents": ["TBC infancia", "ICTUS vertebrobasilar 2021"],
   "signes_vitaux": {
     "ta_sys": 155, "ta_dia": 79, "fc": 52, "spo2": 96, "peso_kg": 59, "temperatura": 36.8
+  },
+  "bacteriologie": {
+    "prelevement": "hémoculture|ECBU|coproculture|expectoration|prélèvement cutané|autre",
+    "date_prelevement": "YYYY-MM-DD",
+    "germe": "Nom du germe identifié ou 'négatif'",
+    "quantite": "ex: >100.000 UFC/mL",
+    "antibiogramme": {
+      "sensible": ["Amoxicilline", "Ciprofloxacine"],
+      "resistant": ["Ampicilline"],
+      "intermediaire": ["Cotrimoxazol"]
+    },
+    "commentaire": "Note libre du labo"
   },
   "alertes": ["Vitamina D 12.33 ng/mL ⚠️ déficit sévère", "LDL 185 ⚠️ au-dessus cible RCV"]
 }
@@ -1211,37 +1263,130 @@ RÈGLES :
 - Pour "valeurs" : ne mets QUE les clés biologiques de la liste ci-dessus, en nombre (pas de string, pas d'unité).
 - Pour "alertes" : signale les valeurs hors normes critiques (Vit D <20, LDL >130, troponina élevée, BNP élevé, PCR >10, déficit B12 <200, etc.) avec ⚠️ ou 🚨.
 - Pour "medicaments" : si le document liste un traitement en cours, capture chaque ligne. Statut "abandonne" si explicitement arrêté/suspendu.
-- Pour "evenement.type" : choisis le plus représentatif du document.
+- Pour "bacteriologie" : si le document contient des résultats bactériologiques (culture, antibiogramme), extrais-les dans cette section. Omets si absent.
+- Pour "evenement.type" : choisis le plus représentatif du document (inclure "bacteriologia" si c'est un résultat de culture).
 - Date : si plusieurs dates, prends la date du prélèvement/consultation, pas la date d'impression.
+- Si le texte provient d'un OCR, il peut contenir des erreurs de reconnaissance. Corrige intelligemment les erreurs évidentes (ex: "Hemog1obina" → hemoglobina, "g1ucosa" → glucosa).
 
 Retourne UNIQUEMENT le JSON, sans markdown, sans backticks, sans commentaire.`;
 
+/* ================================================================
+   EXTRACTION — Gère PDF natif, PDF scanné et images
+================================================================ */
+async function extractPdf(file) {
+  const apiKey = localStorage.getItem('mt_apikey') || document.getElementById('api-key-input').value;
+  if (!apiKey) { alert(LANG[currentLang].no_key); return; }
+
+  const pb = document.getElementById('progress-box');
+  const pbar = document.getElementById('progress-bar');
+  const plog = document.getElementById('progress-log');
+  const ptitle = document.getElementById('progress-title');
+
+  pb.style.display = 'block';
+  pbar.style.background = 'var(--accent)';
+  ptitle.textContent = LANG[currentLang].extracting + ' ' + file.name;
+  pbar.style.width = '5%';
+  plog.innerHTML = '';
+
+  try {
+    let messageContent;
+
+    if (isImageFile(file)) {
+      /* ── CAS 1 : IMAGE DIRECTE → OCR puis texte à Claude ── */
+      plog.innerHTML += `📷 Image détectée : ${file.name}<br>`;
+      const ocr = await ocrFromImage(file, plog, pbar);
+
+      if (ocr.text.trim().length < 20) {
+        throw new Error('OCR : texte trop court (' + ocr.text.length + ' car). Image illisible ou non-texte.');
+      }
+
+      plog.innerHTML += '→ Envoi du texte OCR à Claude pour extraction...<br>';
+      messageContent = [{
+        type: 'text',
+        text: EXTRACTION_PROMPT + '\n\n--- TEXTE EXTRAIT PAR OCR (confiance ' + Math.round(ocr.confidence) + '%) ---\n\n' + ocr.text
+      }];
+
+    } else {
+      /* ── CAS 2 : PDF ── */
+      plog.innerHTML += `📄 PDF détecté : ${file.name}<br>`;
+      plog.innerHTML += '→ Lecture du PDF...<br>';
+
+      const b64 = await new Promise((res, rej) => {
+        const r = new FileReader();
+        r.onload = () => res(r.result.split(',')[1]);
+        r.onerror = () => rej(new Error('Lecture échouée'));
+        r.readAsDataURL(file);
+      });
+
+      pbar.style.width = '20%';
+
+      /* D'abord, essayer envoi direct du PDF à Claude (PDF natif) */
+      plog.innerHTML += '→ Envoi du PDF à Claude...<br>';
+      messageContent = [{
+        type: 'document',
+        source: { type: 'base64', media_type: 'application/pdf', data: b64 }
+      }, {
+        type: 'text', text: EXTRACTION_PROMPT
+      }];
+    }
+
+    pbar.style.width = '55%';
+
+    /* ── APPEL CLAUDE ── */
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 4000,
-        messages: [{
-          role: 'user',
-          content: [{
-            type: 'document',
-            source: { type: 'base64', media_type: 'application/pdf', data: b64 }
-          }, {
-            type: 'text', text: prompt
-          }]
-        }]
+        messages: [{ role: 'user', content: messageContent }]
       })
     });
 
-    pbar.style.width = '70%';
+    pbar.style.width = '75%';
 
     if (!response.ok) {
-      const err = await response.json();
-      throw new Error(err.error?.message || 'Erreur API');
+      const errData = await response.json();
+      const errMsg = errData.error?.message || 'Erreur API';
+
+      /* Si Claude ne peut pas lire le PDF (scanné), fallback OCR */
+      if (!isImageFile(file) && (errMsg.includes('Could not process') || errMsg.includes('no text') || errMsg.includes('image'))) {
+        plog.innerHTML += '⚠ Claude ne peut pas lire ce PDF directement — lancement OCR...<br>';
+        pbar.style.width = '10%';
+
+        const ocr = await ocrFromPdfFallback(file, plog, pbar);
+        if (ocr.text.trim().length < 20) {
+          throw new Error('OCR : texte trop court. Document probablement non-texte.');
+        }
+
+        plog.innerHTML += '→ Renvoi du texte OCR à Claude...<br>';
+        const retryResponse = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-6',
+            max_tokens: 4000,
+            messages: [{ role: 'user', content: [{
+              type: 'text',
+              text: EXTRACTION_PROMPT + '\n\n--- TEXTE EXTRAIT PAR OCR (confiance ' + Math.round(ocr.confidence) + '%) ---\n\n' + ocr.text
+            }]}]
+          })
+        });
+
+        if (!retryResponse.ok) {
+          const retryErr = await retryResponse.json();
+          throw new Error(retryErr.error?.message || 'Erreur API (retry OCR)');
+        }
+
+        var result = await retryResponse.json();
+        plog.innerHTML += '✓ Extraction via OCR réussie<br>';
+      } else {
+        throw new Error(errMsg);
+      }
+    } else {
+      var result = await response.json();
     }
 
-    const result = await response.json();
     const text = result.content.map(c => c.text || '').join('').trim();
     const clean = text.replace(/```json|```/g, '').trim();
     const parsed = JSON.parse(clean);
@@ -1249,7 +1394,7 @@ Retourne UNIQUEMENT le JSON, sans markdown, sans backticks, sans commentaire.`;
     pbar.style.width = '90%';
     plog.innerHTML += `→ ${LANG[currentLang].extract_ok} : ${Object.keys(parsed.valeurs||{}).length} paramètres · Date: ${parsed.date}<br>`;
 
-    /* Sauvegarder */
+    /* Sauvegarder mesures */
     const data = loadData();
     const existing = data.findIndex(d => d.date === parsed.date && d.src === parsed.source);
     if (existing >= 0) {
@@ -1275,9 +1420,24 @@ Retourne UNIQUEMENT le JSON, sans markdown, sans backticks, sans commentaire.`;
       if (parsed.signes_vitaux && Object.keys(parsed.signes_vitaux).length)
                                         ev.signes_vitaux = parsed.signes_vitaux;
       if (parsed.alertes?.length)       ev.alertes       = parsed.alertes;
+      if (parsed.bacteriologie)         ev.bacteriologie = parsed.bacteriologie;
       evts.push(ev);
       evts.sort((a,b) => a.date.localeCompare(b.date));
       saveEvents(evts);
+    }
+
+    /* Sauvegarder bactériologie séparément pour accès rapide */
+    if (parsed.bacteriologie) {
+      const bacts = loadBacterio();
+      bacts.push({
+        date: parsed.date,
+        source: parsed.source,
+        pdf: file.name,
+        ...parsed.bacteriologie
+      });
+      bacts.sort((a,b) => a.date.localeCompare(b.date));
+      saveBacterio(bacts);
+      plog.innerHTML += `🦠 Bactériologie extraite : ${parsed.bacteriologie.germe || 'résultat'} (${parsed.bacteriologie.prelevement || ''})<br>`;
     }
 
     /* Sauvegarder médicaments (historique chronologique) */
@@ -1371,6 +1531,7 @@ function exportData() {
   const data   = loadData();
   const events = loadEvents();
   const meds   = loadMeds();
+  const bacts  = loadBacterio();
   const label  = getPatientLabel();
   if (!data.length && !events.length && !meds.length) { alert('No hay datos que exportar.'); return; }
   const payload = {
@@ -1379,7 +1540,8 @@ function exportData() {
     patient_label: label,
     mesures: data,
     events:  events,
-    medicaments: meds
+    medicaments: meds,
+    bacteriologie: bacts
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
   const url  = URL.createObjectURL(blob);
@@ -1410,10 +1572,12 @@ function importData(input) {
           saveData(parsed.mesures);
           if (parsed.events)        saveEvents(parsed.events);
           if (parsed.medicaments)   saveMeds(parsed.medicaments);
+          if (parsed.bacteriologie) saveBacterio(parsed.bacteriologie);
           if (parsed.patient_label) setPatientLabel(parsed.patient_label);
           alert('✓ ' + parsed.mesures.length + ' mediciones + '
                      + (parsed.events?.length||0) + ' eventos + '
-                     + (parsed.medicaments?.length||0) + ' medicamentos restaurados'
+                     + (parsed.medicaments?.length||0) + ' medicamentos + '
+                     + (parsed.bacteriologie?.length||0) + ' bactériologies restaurados'
                      + (parsed.patient_label ? '\nPaciente: ' + parsed.patient_label : ''));
         } else { alert('Format non reconnu.'); return; }
       } else {
@@ -2878,6 +3042,113 @@ const OBS_COLORS = {
   amarillo: { bg: 'rgba(232,164,74,0.15)', border: '#e8a44a', dot: '#e8a44a', emoji: '🟡' },
   rojo:     { bg: 'rgba(232,74,74,0.15)',  border: '#e84a4a', dot: '#e84a4a', emoji: '🔴' },
 };
+
+/* ================================================================
+   PANEL BACTERIOLOGÍA — Resultados de cultivos y antibiogramas
+================================================================ */
+function buildBacterio() {
+  const bacts = loadBacterio();
+  const el = document.getElementById('bacterio-content');
+  el.innerHTML = '';
+
+  if (!bacts.length) {
+    el.innerHTML = '<div style="color:var(--muted);padding:40px;text-align:center;font-size:14px">' +
+      '🦠 No hay resultados bacteriológicos registrados.<br><br>' +
+      'Los resultados bacteriológicos se extraen automáticamente al importar PDFs con la API Claude,<br>' +
+      'o bien al restaurar un archivo .mt que los contiene.' +
+      '</div>';
+    return;
+  }
+
+  bacts.forEach(b => {
+    const isPositive = b.germe && b.germe.toLowerCase() !== 'négatif' && b.germe.toLowerCase() !== 'negativo' && b.germe !== '-';
+    const borderColor = isPositive ? 'var(--danger)' : 'var(--accent2)';
+    const icon = isPositive ? '🔴' : '🟢';
+
+    const card = document.createElement('div');
+    card.style.cssText = `background:var(--surface);border:1px solid var(--border);border-left:4px solid ${borderColor};border-radius:var(--radius);padding:18px 22px;margin-bottom:16px`;
+
+    /* Header */
+    let headerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:22px">${icon}</span>
+          <div>
+            <div style="font-family:var(--mono);font-weight:600;font-size:14px;color:var(--text)">${b.germe || 'Resultado'}</div>
+            <div style="font-family:var(--mono);font-size:11px;color:var(--muted)">${b.prelevement || ''} ${b.quantite ? '· ' + b.quantite : ''}</div>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--muted)">${fmtDate(b.date_prelevement || b.date)}</div>
+          <div style="font-family:var(--mono);font-size:10px;color:var(--muted)">${b.source || ''}</div>
+        </div>
+      </div>`;
+    card.innerHTML = headerHTML;
+
+    /* Antibiogramme */
+    if (b.antibiogramme) {
+      const abg = document.createElement('div');
+      abg.style.cssText = 'border-top:1px solid var(--border);padding-top:12px;margin-top:8px';
+
+      let abgHTML = '<div style="font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">ANTIBIOGRAMA</div>';
+
+      if (b.antibiogramme.sensible?.length) {
+        abgHTML += '<div style="margin-bottom:6px"><span style="font-family:var(--mono);font-size:10px;color:#4ae8a4;margin-right:8px">S — Sensible:</span>';
+        abgHTML += b.antibiogramme.sensible.map(a =>
+          '<span style="background:rgba(74,232,164,0.15);color:#4ae8a4;border-radius:4px;padding:2px 8px;font-family:var(--mono);font-size:11px;margin:2px">' + a + '</span>'
+        ).join(' ');
+        abgHTML += '</div>';
+      }
+
+      if (b.antibiogramme.intermediaire?.length) {
+        abgHTML += '<div style="margin-bottom:6px"><span style="font-family:var(--mono);font-size:10px;color:#e8a44a;margin-right:8px">I — Intermedio:</span>';
+        abgHTML += b.antibiogramme.intermediaire.map(a =>
+          '<span style="background:rgba(232,164,74,0.15);color:#e8a44a;border-radius:4px;padding:2px 8px;font-family:var(--mono);font-size:11px;margin:2px">' + a + '</span>'
+        ).join(' ');
+        abgHTML += '</div>';
+      }
+
+      if (b.antibiogramme.resistant?.length) {
+        abgHTML += '<div style="margin-bottom:6px"><span style="font-family:var(--mono);font-size:10px;color:#e84a4a;margin-right:8px">R — Resistente:</span>';
+        abgHTML += b.antibiogramme.resistant.map(a =>
+          '<span style="background:rgba(232,74,74,0.15);color:#e84a4a;border-radius:4px;padding:2px 8px;font-family:var(--mono);font-size:11px;margin:2px">' + a + '</span>'
+        ).join(' ');
+        abgHTML += '</div>';
+      }
+
+      abg.innerHTML = abgHTML;
+      card.appendChild(abg);
+    }
+
+    /* Commentaire */
+    if (b.commentaire) {
+      const note = document.createElement('div');
+      note.style.cssText = 'background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px 14px;margin-top:10px;font-size:12px;color:var(--muted);font-style:italic';
+      note.textContent = b.commentaire;
+      card.appendChild(note);
+    }
+
+    /* Source PDF */
+    if (b.pdf) {
+      const src = document.createElement('div');
+      src.style.cssText = 'font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:8px';
+      src.textContent = '📄 ' + b.pdf;
+      card.appendChild(src);
+    }
+
+    el.appendChild(card);
+  });
+
+  /* Résumé */
+  const positives = bacts.filter(b => b.germe && b.germe.toLowerCase() !== 'négatif' && b.germe.toLowerCase() !== 'negativo').length;
+  const summary = document.createElement('div');
+  summary.style.cssText = 'background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;margin-top:8px;display:flex;gap:24px;flex-wrap:wrap;font-family:var(--mono);font-size:11px';
+  summary.innerHTML = `
+    <div>🦠 <strong>${bacts.length}</strong> cultivo(s) registrado(s)</div>
+    <div>🔴 <strong style="color:#e84a4a">${positives}</strong> positivo(s)</div>
+    <div>🟢 <strong style="color:#4ae8a4">${bacts.length - positives}</strong> negativo(s)</div>`;
+  el.appendChild(summary);
+}
 
 /* ================================================================
    PANEL MEDICAMENTOS — Vue chronologique des médicaments extraits
