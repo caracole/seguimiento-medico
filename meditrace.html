@@ -4,6 +4,11 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>MediTrace — Seguimiento Médico</title>
+<link rel="icon" type="image/svg+xml" href="icon_ardoise_cyan.svg"/>
+<link rel="apple-touch-icon" href="icon_ardoise_cyan.svg"/>
+<meta name="theme-color" content="#1a1f2e"/>
+<meta name="application-name" content="MediTrace"/>
+<meta name="description" content="Seguimiento médico longitudinal — MediTrace v2026.2"/>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
 :root {
@@ -278,6 +283,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 <div class="topbar">
   <a href="index.html" class="topbar-logo">Medi<span>Trace</span></a>
   <div class="topbar-right">
+    <span id="patient-badge" style="display:none; padding:4px 10px; background:rgba(74,143,232,0.2); border:1px solid var(--accent); border-radius:6px; font-size:13px; margin-right:8px"></span>
     <button class="lang-btn active" onclick="setLang('es')">ES</button>
     <button class="lang-btn" onclick="setLang('fr')">FR</button>
     <button class="lang-btn" onclick="setLang('en')">EN</button>
@@ -286,6 +292,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
     <button class="btn-topbar" onclick="exportPDF()" title="Generar informe PDF" style="color:#4ae8a4;border-color:#4ae8a4">📄 Informe PDF</button>
     <input type="file" id="import-json" accept=".json,.js,.mt,application/json,text/plain" style="display:none" onchange="importData(this)"/>
     <button class="btn-topbar" onclick="showPanel('importar',this)" data-i18n="nav_import">+ Añadir datos</button>
+    <button class="btn-topbar" onclick="nuevoPaciente()" title="Cambiar de paciente (guarda y limpia)" style="color:#e8a44a;border-color:#e8a44a">👥 Nuevo paciente</button>
     <button class="btn-topbar danger" onclick="confirmReset()" data-i18n="nav_reset">⟳ Reiniciar</button>
   </div>
 </div>
@@ -954,6 +961,8 @@ function fillParamSelect() {
 ================================================================ */
 const STORE_KEY = 'mt_mesures';
 const EVENT_KEY = 'mt_events';
+const MED_KEY   = 'mt_meds';
+const PATIENT_LABEL_KEY = 'mt_patient_label';
 
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORE_KEY) || '[]'); } catch { return []; }
@@ -963,6 +972,23 @@ function loadEvents() {
   try { return JSON.parse(localStorage.getItem(EVENT_KEY) || '[]'); } catch { return []; }
 }
 function saveEvents(evts) { localStorage.setItem(EVENT_KEY, JSON.stringify(evts)); }
+function loadMeds() {
+  try { return JSON.parse(localStorage.getItem(MED_KEY) || '[]'); } catch { return []; }
+}
+function saveMeds(meds) { localStorage.setItem(MED_KEY, JSON.stringify(meds)); }
+function getPatientLabel() { return localStorage.getItem(PATIENT_LABEL_KEY) || ''; }
+function setPatientLabel(l) {
+  if (l) localStorage.setItem(PATIENT_LABEL_KEY, l);
+  else localStorage.removeItem(PATIENT_LABEL_KEY);
+  updatePatientBadge();
+}
+function updatePatientBadge() {
+  const el = document.getElementById('patient-badge');
+  if (!el) return;
+  const l = getPatientLabel();
+  el.textContent = l ? '👤 ' + l : '';
+  el.style.display = l ? 'inline-block' : 'none';
+}
 
 /* ================================================================
    NAVIGATION
@@ -1006,7 +1032,34 @@ function toggleApiKey() {
    EXTRACTION PDF via Claude API
 ================================================================ */
 async function handleFiles(files) {
-  for (const file of files) await extractPdf(file);
+  const list = Array.from(files);
+  if (!list.length) return;
+  const pb = document.getElementById('progress-box');
+  const ptitle = document.getElementById('progress-title');
+  const plog = document.getElementById('progress-log');
+  pb.style.display = 'block';
+  let ok = 0, ko = 0;
+  const total = list.length;
+  if (total > 1) {
+    plog.innerHTML += `<br><b>📦 Batch: ${total} archivos PDF</b><br>`;
+  }
+  for (let i = 0; i < total; i++) {
+    const file = list[i];
+    if (total > 1) {
+      ptitle.textContent = `[${i+1}/${total}] ${file.name}`;
+      plog.innerHTML += `<br>━━━ Archivo ${i+1}/${total}: ${file.name} ━━━<br>`;
+    }
+    try {
+      await extractPdf(file);
+      ok++;
+    } catch(e) {
+      ko++;
+      plog.innerHTML += `✗ Error en ${file.name}: ${e.message}<br>`;
+    }
+  }
+  if (total > 1) {
+    plog.innerHTML += `<br><b>✅ Batch terminado:</b> ${ok} OK · ${ko} errores sobre ${total}<br>`;
+  }
   document.getElementById('pdf-input').value = '';
 }
 function handleDrop(e) {
@@ -1041,8 +1094,8 @@ async function extractPdf(file) {
     pbar.style.width = '30%';
     plog.innerHTML += '→ Envoi à Claude pour extraction...<br>';
 
-    const prompt = `Tu es un assistant spécialisé en extraction de données médicales.
-Analyse ce document PDF médical et extrais UNIQUEMENT les valeurs biologiques numériques mesurées.
+    const prompt = `Tu es un assistant spécialisé en extraction de données médicales pour MediTrace.
+Analyse ce document PDF médical et extrais TOUTES les informations cliniquement pertinentes.
 
 Retourne un JSON strictement valide avec cette structure :
 {
@@ -1050,26 +1103,51 @@ Retourne un JSON strictement valide avec cette structure :
   "source": "Nom de l'établissement ou service",
   "valeurs": {
     "hemoglobina": 13.8,
-    "glucosa": 102.2,
-    "creatinina": 0.85
+    "glucosa": 102.2
   },
   "evenement": {
-    "type": "laboratorio|urgencias|hematologia|neurologia",
-    "titre": "Titre court de la visite",
-    "texte": "Résumé en 1-2 phrases"
-  }
+    "type": "laboratorio|urgencias|hematologia|neurologia|cardiologia|neumologia|consulta|imagen",
+    "titre": "Titre court (max 80 car) — préfixer 🚨 si critique, ⚠️ si anormal majeur",
+    "texte": "Résumé clinique 1-3 phrases avec valeurs anormales clés et flags ⚠️"
+  },
+  "medicaments": [
+    { "nom": "Dabigatrán", "dose": "150mg", "frequence": "1x/12h", "statut": "en_cours|suspendu|nouveau|abandonne" }
+  ],
+  "diagnostics": ["Hipercolesterolemia", "TEP bilateral"],
+  "antecedents": ["TBC infancia", "ICTUS vertebrobasilar 2021"],
+  "signes_vitaux": {
+    "ta_sys": 155, "ta_dia": 79, "fc": 52, "spo2": 96, "peso_kg": 59, "temperatura": 36.8
+  },
+  "alertes": ["Vitamina D 12.33 ng/mL ⚠️ déficit sévère", "LDL 185 ⚠️ au-dessus cible RCV"]
 }
 
-Clés de paramètres autorisées: hemoglobina, hematocrito, leucocitos, plaquetas, glucosa, hba1c, creatinina, filtrado, colesterol, hdl, ldl, trigliceridos, vitamina_d, vitamina_b12, folico, tsh, ferritina, pcr, fibrinogeno, vsg, albumina, proteinas, urea, sodio, potasio, bnp, troponina, inr, gpt, ggt, fosfatasa
+Clés de paramètres biologiques autorisées (utilise EXACTEMENT ces clés) :
+hemoglobina, hematocrito, vcm, hcm, chcm, rdw, leucocitos, neutrofilos, linfocitos, monocitos, plaquetas, vsg,
+glucosa, hba1c, creatinina, filtrado, urea, acido_urico,
+colesterol, hdl, ldl, trigliceridos, no_hdl,
+sodio, potasio, cloro, calcio, fosforo, magnesio, bicarbonato,
+proteinas, albumina, gpt, got, ggt, fosfatasa, ldh, cpk, bilirrubina,
+ferritina, hierro, transferrina, vitamina_d, vitamina_b12, folico,
+tsh, t3, t4,
+pcr, fibrinogeno, troponina, bnp, dimero_d,
+inr, tp, ttpa, actividad_protrombina
 
-N'inclus QUE les paramètres présents dans le document. Retourne UNIQUEMENT le JSON, rien d'autre.`;
+RÈGLES :
+- N'inclus QUE les champs présents dans le document. Omets les sections vides plutôt que de mettre [] ou {}.
+- Pour "valeurs" : ne mets QUE les clés biologiques de la liste ci-dessus, en nombre (pas de string, pas d'unité).
+- Pour "alertes" : signale les valeurs hors normes critiques (Vit D <20, LDL >130, troponina élevée, BNP élevé, PCR >10, déficit B12 <200, etc.) avec ⚠️ ou 🚨.
+- Pour "medicaments" : si le document liste un traitement en cours, capture chaque ligne. Statut "abandonne" si explicitement arrêté/suspendu.
+- Pour "evenement.type" : choisis le plus représentatif du document.
+- Date : si plusieurs dates, prends la date du prélèvement/consultation, pas la date d'impression.
+
+Retourne UNIQUEMENT le JSON, sans markdown, sans backticks, sans commentaire.`;
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 2000,
+        max_tokens: 4000,
         messages: [{
           role: 'user',
           content: [{
@@ -1108,18 +1186,39 @@ N'inclus QUE les paramètres présents dans le document. Retourne UNIQUEMENT le 
     data.sort((a,b) => a.date.localeCompare(b.date));
     saveData(data);
 
-    /* Sauvegarder événement */
+    /* Sauvegarder événement enrichi */
     if (parsed.evenement) {
       const evts = loadEvents();
-      evts.push({
+      const ev = {
         date: parsed.date,
         type: parsed.evenement.type || 'laboratorio',
         title: parsed.evenement.titre || file.name,
         text: parsed.evenement.texte || '',
         pdf: file.name
-      });
+      };
+      if (parsed.diagnostics?.length)   ev.diagnostics   = parsed.diagnostics;
+      if (parsed.antecedents?.length)   ev.antecedents   = parsed.antecedents;
+      if (parsed.signes_vitaux && Object.keys(parsed.signes_vitaux).length)
+                                        ev.signes_vitaux = parsed.signes_vitaux;
+      if (parsed.alertes?.length)       ev.alertes       = parsed.alertes;
+      evts.push(ev);
       evts.sort((a,b) => a.date.localeCompare(b.date));
       saveEvents(evts);
+    }
+
+    /* Sauvegarder médicaments (historique chronologique) */
+    if (parsed.medicaments?.length) {
+      const meds = loadMeds();
+      for (const m of parsed.medicaments) {
+        meds.push({
+          date: parsed.date,
+          nom: m.nom, dose: m.dose || '', frequence: m.frequence || '',
+          statut: m.statut || 'en_cours',
+          source: parsed.source, pdf: file.name
+        });
+      }
+      meds.sort((a,b) => a.date.localeCompare(b.date));
+      saveMeds(meds);
     }
 
     pbar.style.width = '100%';
@@ -1197,18 +1296,23 @@ function updateDataSummary(data) {
 function exportData() {
   const data   = loadData();
   const events = loadEvents();
-  if (!data.length && !events.length) { alert('No hay datos que exportar.'); return; }
+  const meds   = loadMeds();
+  const label  = getPatientLabel();
+  if (!data.length && !events.length && !meds.length) { alert('No hay datos que exportar.'); return; }
   const payload = {
     version: "MediTrace-2026",
     exported: new Date().toISOString(),
+    patient_label: label,
     mesures: data,
-    events:  events
+    events:  events,
+    medicaments: meds
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
+  const safeLabel = (label || 'patient').replace(/[^a-zA-Z0-9_-]/g, '_');
   a.href     = url;
-  a.download = 'meditrace_backup_' + new Date().toISOString().slice(0,10) + '.json';
+  a.download = `meditrace_${safeLabel}_${new Date().toISOString().slice(0,10)}.mt`;
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -1216,6 +1320,11 @@ function exportData() {
 function importData(input) {
   const file = input.files[0];
   if (!file) return;
+  const hasData = loadData().length || loadEvents().length || loadMeds().length;
+  if (hasData && !confirm('Datos del paciente actual serán reemplazados. ¿Continuar?\n(Antes: usa 💾 Backup .mt para guardarlos)')) {
+    input.value = '';
+    return;
+  }
   const reader = new FileReader();
   reader.onload = e => {
     try {
@@ -1225,8 +1334,13 @@ function importData(input) {
         parsed = JSON.parse(text);
         if (parsed.mesures) {
           saveData(parsed.mesures);
-          if (parsed.events) saveEvents(parsed.events);
-          alert('✓ ' + parsed.mesures.length + ' entrées + ' + (parsed.events?.length||0) + ' événements restaurés !');
+          if (parsed.events)        saveEvents(parsed.events);
+          if (parsed.medicaments)   saveMeds(parsed.medicaments);
+          if (parsed.patient_label) setPatientLabel(parsed.patient_label);
+          alert('✓ ' + parsed.mesures.length + ' mediciones + '
+                     + (parsed.events?.length||0) + ' eventos + '
+                     + (parsed.medicaments?.length||0) + ' medicamentos restaurados'
+                     + (parsed.patient_label ? '\nPaciente: ' + parsed.patient_label : ''));
         } else { alert('Format non reconnu.'); return; }
       } else {
         const match   = text.match(/(?:const|let|var)\s+data\s*=\s*(\[[\s\S]*?\])\s*;/);
@@ -1542,8 +1656,36 @@ function confirmReset() {
   if (confirm(LANG[currentLang].confirm_reset)) {
     localStorage.removeItem(STORE_KEY);
     localStorage.removeItem(EVENT_KEY);
+    localStorage.removeItem(MED_KEY);
+    localStorage.removeItem(PATIENT_LABEL_KEY);
     location.reload();
   }
+}
+
+/* ================================================================
+   NOUVEAU PATIENT — workflow sauvegarde → reset → label
+================================================================ */
+async function nuevoPaciente() {
+  const hasData = loadData().length || loadEvents().length || loadMeds().length;
+  if (hasData) {
+    const choice = confirm(
+      '⚠️ Antes de cambiar de paciente:\n\n' +
+      '✓ OK = descargar backup .mt del paciente actual, luego limpiar\n' +
+      '✗ Cancelar = abortar (los datos NO se perderán)'
+    );
+    if (!choice) return;
+    exportData();
+    // laisser le temps au download de partir
+    await new Promise(r => setTimeout(r, 800));
+  }
+  const label = prompt('Etiqueta del nuevo paciente (ej. "Joaquina M." o "Paciente B"):', '');
+  if (label === null) return; // annulé
+  localStorage.removeItem(STORE_KEY);
+  localStorage.removeItem(EVENT_KEY);
+  localStorage.removeItem(MED_KEY);
+  if (label.trim()) setPatientLabel(label.trim());
+  else localStorage.removeItem(PATIENT_LABEL_KEY);
+  location.reload();
 }
 
 /* ================================================================
@@ -2744,6 +2886,7 @@ window.addEventListener('load', () => {
     showPanel('resumen', document.querySelector('.nav-tab'));
   }
   updateDataSummary(data);
+  updatePatientBadge();
 });
 </script>
 </body>
