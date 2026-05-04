@@ -56,11 +56,13 @@ body.light .nav-tab {
 }
 body.light .nav-tab:hover {
   color: #111118;
+  background: #f0ebe0;
 }
 body.light .nav-tab.active {
   color: #0d3b5e;
   border-bottom-color: #0d3b5e;
   font-weight: 600;
+  background: #ede8dc;
 }
 body.light .nav-tab.alert {
   color: #a82015;
@@ -171,15 +173,17 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   background: var(--surface);
   border-bottom: 2px solid var(--border);
   display: flex;
-  overflow-x: auto;
-  padding: 0 16px;
+  flex-wrap: wrap;
+  padding: 6px 16px 0;
+  gap: 2px;
 }
 .nav-tab {
-  font-family: var(--mono); font-size: 12px; letter-spacing: 1.5px;
-  text-transform: uppercase; padding: 14px 18px;
+  font-family: var(--mono); font-size: 12px; letter-spacing: 1px;
+  text-transform: uppercase; padding: 10px 14px;
   border-bottom: 3px solid transparent; cursor: pointer;
   color: var(--muted); white-space: nowrap;
   transition: all .2s; margin-bottom: -2px;
+  border-radius: 6px 6px 0 0;
 }
 .nav-tab:hover { color: var(--text); }
 .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
