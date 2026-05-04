@@ -777,6 +777,28 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   </div>
   <input type="file" id="pdf-input" accept=".pdf,.jpg,.jpeg,.png,.tiff,.tif,.bmp,.webp" multiple style="display:none" onchange="handleFiles(this.files)"/>
 
+  <!-- OCR Only -->
+  <div style="display:flex;gap:8px;margin-top:12px;margin-bottom:12px;align-items:center;flex-wrap:wrap">
+    <button class="btn" onclick="document.getElementById('ocr-input').click()" style="border-color:var(--warn);color:var(--warn)">
+      🔍 OCR sólo — ver texto extraído
+    </button>
+    <span style="font-family:var(--mono);font-size:10px;color:var(--muted)">Sin clave API · Tesseract.js local · Sólo lectura</span>
+  </div>
+  <input type="file" id="ocr-input" accept=".jpg,.jpeg,.png,.tiff,.tif,.bmp,.webp,.pdf" style="display:none" onchange="ocrOnly(this.files[0])"/>
+
+  <!-- OCR Result preview -->
+  <div id="ocr-result-box" style="display:none;background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--warn);border-radius:var(--radius);padding:16px 20px;margin-bottom:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--warn)">🔍 TEXTO EXTRAÍDO POR OCR</div>
+      <div style="display:flex;gap:6px">
+        <button class="btn" onclick="copyOcrText()" style="font-size:10px;padding:4px 10px">📋 Copiar</button>
+        <button class="btn" onclick="document.getElementById('ocr-result-box').style.display='none'" style="font-size:10px;padding:4px 10px">✕</button>
+      </div>
+    </div>
+    <div id="ocr-meta" style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:10px"></div>
+    <pre id="ocr-text" style="font-family:var(--mono);font-size:12px;color:var(--text);white-space:pre-wrap;word-break:break-word;max-height:400px;overflow-y:auto;background:var(--surface2);border-radius:6px;padding:14px;line-height:1.7"></pre>
+  </div>
+
   <!-- Progress -->
   <div class="progress-box" id="progress-box">
     <div class="progress-title" id="progress-title">Extrayendo datos...</div>
@@ -1378,6 +1400,61 @@ async function ocrFromPdfFallback(file, plog, pbar) {
 
   /* Utiliser le PDF comme image directement via Tesseract (supporte les PDF) */
   return await ocrFromImage(file, plog, pbar);
+}
+
+/* ================================================================
+   OCR SEUL — Mode test sans clé API
+================================================================ */
+async function ocrOnly(file) {
+  if (!file) return;
+
+  const pb = document.getElementById('progress-box');
+  const pbar = document.getElementById('progress-bar');
+  const plog = document.getElementById('progress-log');
+  const ptitle = document.getElementById('progress-title');
+  const resultBox = document.getElementById('ocr-result-box');
+  const resultMeta = document.getElementById('ocr-meta');
+  const resultText = document.getElementById('ocr-text');
+
+  pb.style.display = 'block';
+  pbar.style.background = 'var(--warn)';
+  pbar.style.width = '5%';
+  ptitle.textContent = '🔍 OCR sólo — ' + file.name;
+  plog.innerHTML = '';
+
+  try {
+    const t0 = performance.now();
+    const ocr = await ocrFromImage(file, plog, pbar);
+    const elapsed = ((performance.now() - t0) / 1000).toFixed(1);
+
+    pbar.style.width = '100%';
+    plog.innerHTML += `✓ OCR terminé en ${elapsed}s<br>`;
+
+    /* Afficher le résultat */
+    resultBox.style.display = 'block';
+    resultMeta.innerHTML = `📄 <strong>${file.name}</strong> · ${ocr.text.length} caractères · confiance ${Math.round(ocr.confidence)}% · ${elapsed}s`;
+    resultText.textContent = ocr.text;
+
+    /* Scroll vers le résultat */
+    resultBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  } catch(e) {
+    pbar.style.width = '100%';
+    pbar.style.background = 'var(--danger)';
+    plog.innerHTML += `✗ Error OCR: ${e.message}<br>`;
+  }
+
+  document.getElementById('ocr-input').value = '';
+}
+
+function copyOcrText() {
+  const text = document.getElementById('ocr-text').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.target;
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copiado';
+    setTimeout(() => btn.textContent = orig, 1500);
+  });
 }
 
 /* ================================================================
