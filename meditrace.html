@@ -411,6 +411,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 <div class="nav" id="main-nav" style="display:none">
   <div class="nav-tab active" onclick="showPanel('resumen',this)"     data-i18n="tab_resumen">Resumen</div>
   <div class="nav-tab" onclick="showPanel('curvas',this)"             data-i18n="tab_curvas">Curvas</div>
+  <div class="nav-tab" onclick="showPanel('radar',this)"              data-i18n="tab_radar">🕸️ Radar</div>
   <div class="nav-tab" onclick="showPanel('tabla',this)"              data-i18n="tab_tabla">Tabla</div>
   <div class="nav-tab" onclick="showPanel('timeline',this)"           data-i18n="tab_timeline">Cronología</div>
   <div class="nav-tab" onclick="showPanel('antecedentes',this)"      data-i18n="tab_ant">Antecedentes</div>
@@ -447,6 +448,41 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 <div id="panel-curvas" class="panel">
   <div class="section-label" data-i18n="all_params">Todos los parámetros</div>
   <div class="chart-grid" id="all-charts"></div>
+</div>
+
+<!-- ===== PANEL RADAR ===== -->
+<div id="panel-radar" class="panel">
+  <div class="section-label">🕸️ Vista de conjunto — Radar de parámetros biológicos</div>
+
+  <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:var(--radius);padding:14px 18px;margin-bottom:20px;font-size:15px;color:var(--muted);line-height:1.7">
+    💡 <strong style="color:var(--text)">Cómo leer este gráfico</strong> —
+    Cada eje representa un parámetro normalizado: <strong style="color:var(--text)">100% = centro del rango normal</strong>.
+    Más lejos del centro = más lejos de la norma. Las fechas se superponen para ver la evolución.
+  </div>
+
+  <!-- Sélecteur de dates -->
+  <div style="display:flex;gap:10px;margin-bottom:20px;align-items:center;flex-wrap:wrap">
+    <div style="font-family:var(--mono);font-size:12px;color:var(--muted)">Fechas a comparar:</div>
+    <div id="radar-date-selector" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+    <button class="btn" onclick="selectAllRadarDates()" style="font-size:11px;padding:5px 12px">Todas</button>
+    <button class="btn" onclick="selectLastRadarDates()" style="font-size:11px;padding:5px 12px">Últimas 3</button>
+  </div>
+
+  <!-- Sélecteur de groupe de paramètres -->
+  <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+    <button class="btn primary" onclick="setRadarGroup('general')" id="rg-general">General</button>
+    <button class="btn" onclick="setRadarGroup('hemato')" id="rg-hemato">Hematología</button>
+    <button class="btn" onclick="setRadarGroup('lipidos')" id="rg-lipidos">Lípidos</button>
+    <button class="btn" onclick="setRadarGroup('renal')" id="rg-renal">Renal</button>
+    <button class="btn" onclick="setRadarGroup('hepatico')" id="rg-hepatico">Hepático</button>
+    <button class="btn" onclick="setRadarGroup('vitaminas')" id="rg-vitaminas">Vitaminas</button>
+    <button class="btn" onclick="setRadarGroup('coagulacion')" id="rg-coagulacion">Coagulación</button>
+    <button class="btn" onclick="setRadarGroup('todos')" id="rg-todos">Todos</button>
+  </div>
+
+  <div style="max-width:800px;margin:0 auto">
+    <canvas id="radar-chart" height="500"></canvas>
+  </div>
 </div>
 
 <!-- ===== PANEL TABLA ===== -->
@@ -1455,6 +1491,7 @@ function showPanel(name, tabEl) {
   const data = loadData();
   if (name === 'resumen')       buildResumen(data);
   if (name === 'curvas')        buildAllCharts(data);
+  if (name === 'radar')         buildRadar(data);
   if (name === 'tabla')         buildTable(data);
   if (name === 'timeline')      buildTimeline();
   if (name === 'antecedentes')  buildAntecedentes();
@@ -3844,6 +3881,263 @@ function buildBacterio() {
     <div>🔴 <strong style="color:#e84a4a">${positives}</strong> positivo(s)</div>
     <div>🟢 <strong style="color:#4ae8a4">${bacts.length - positives}</strong> negativo(s)</div>`;
   el.appendChild(summary);
+}
+
+/* ================================================================
+   PANEL RADAR — Vue d'ensemble en toile d'araignée
+================================================================ */
+const RADAR_GROUPS = {
+  general:     { label: 'General',      keys: ['hemoglobina','leucocitos','plaquetas','glucosa','creatinina','pcr','tsh','vitamina_d'] },
+  hemato:      { label: 'Hematología',  keys: ['hemoglobina','hematocrito','vcm','hcm','leucocitos','plaquetas','vsg'] },
+  lipidos:     { label: 'Lípidos',      keys: ['colesterol','hdl','ldl','trigliceridos','no_hdl'] },
+  renal:       { label: 'Renal',        keys: ['creatinina','filtrado','urea','acido_urico','sodio','potasio'] },
+  hepatico:    { label: 'Hepático',     keys: ['gpt','got','ggt','fosfatasa','bilirrubina','albumina','proteinas'] },
+  vitaminas:   { label: 'Vitaminas',    keys: ['vitamina_d','vitamina_b12','folico','ferritina','hierro'] },
+  coagulacion: { label: 'Coagulación',  keys: ['inr','tp','ttpa','actividad_protrombina','fibrinogeno','dimero_d'] },
+  todos:       { label: 'Todos',        keys: null } /* null = tous les paramètres disponibles */
+};
+
+let radarChart = null;
+let radarSelectedDates = [];
+let radarCurrentGroup = 'general';
+
+/* Couleurs pour chaque date (max 8) */
+const RADAR_COLORS = [
+  { bg: 'rgba(74,143,232,0.15)',  border: '#4a8fe8' },
+  { bg: 'rgba(232,74,74,0.15)',   border: '#e84a4a' },
+  { bg: 'rgba(74,232,164,0.15)',  border: '#4ae8a4' },
+  { bg: 'rgba(232,164,74,0.15)',  border: '#e8a44a' },
+  { bg: 'rgba(125,60,152,0.15)',  border: '#7d3c98' },
+  { bg: 'rgba(232,74,164,0.15)',  border: '#e84aa4' },
+  { bg: 'rgba(74,200,232,0.15)',  border: '#4ac8e8' },
+  { bg: 'rgba(200,200,74,0.15)',  border: '#c8c84a' },
+];
+
+/* Normaliser une valeur par rapport au range de référence
+   Retourne un % : 100 = milieu du range, >100 = au-dessus, <100 = en-dessous */
+function normalizeParam(key, value) {
+  const p = PARAMS[key];
+  if (!p || !p.ref) return null;
+  const [lo, hi] = p.ref;
+
+  if (lo !== null && hi !== null) {
+    const mid = (lo + hi) / 2;
+    const range = hi - lo;
+    if (range === 0) return 100;
+    /* Normaliser : 100 = milieu du range, 0 = lo, 200 = hi */
+    return ((value - lo) / range) * 100;
+  } else if (hi !== null) {
+    /* Seulement un max (ex: LDL < 116) */
+    return (value / hi) * 100;
+  } else if (lo !== null) {
+    /* Seulement un min */
+    return (value / lo) * 100;
+  }
+  return null;
+}
+
+function buildRadarDateSelector(data) {
+  const el = document.getElementById('radar-date-selector');
+  el.innerHTML = '';
+  const dates = data.map(d => d.date);
+
+  dates.forEach((date, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'btn';
+    btn.style.cssText = 'font-size:11px;padding:4px 10px';
+    btn.textContent = fmtDate(date);
+    btn.dataset.date = date;
+
+    if (radarSelectedDates.includes(date)) {
+      const c = RADAR_COLORS[radarSelectedDates.indexOf(date) % RADAR_COLORS.length];
+      btn.style.background = c.border;
+      btn.style.color = 'white';
+      btn.style.borderColor = c.border;
+    }
+
+    btn.onclick = () => {
+      const idx = radarSelectedDates.indexOf(date);
+      if (idx >= 0) {
+        radarSelectedDates.splice(idx, 1);
+      } else if (radarSelectedDates.length < 8) {
+        radarSelectedDates.push(date);
+      }
+      buildRadar(data);
+    };
+    el.appendChild(btn);
+  });
+}
+
+function selectAllRadarDates() {
+  const data = loadData();
+  radarSelectedDates = data.map(d => d.date).slice(-8);
+  buildRadar(data);
+}
+
+function selectLastRadarDates() {
+  const data = loadData();
+  radarSelectedDates = data.map(d => d.date).slice(-3);
+  buildRadar(data);
+}
+
+function setRadarGroup(group) {
+  radarCurrentGroup = group;
+  /* Update boutons actifs */
+  document.querySelectorAll('[id^="rg-"]').forEach(b => {
+    b.classList.remove('primary');
+    if (b.id === 'rg-' + group) b.classList.add('primary');
+  });
+  buildRadar(loadData());
+}
+
+function buildRadar(data) {
+  if (!data.length) return;
+
+  /* Initialiser les dates sélectionnées si vide */
+  if (!radarSelectedDates.length) {
+    radarSelectedDates = data.map(d => d.date).slice(-3);
+  }
+
+  buildRadarDateSelector(data);
+
+  /* Déterminer les paramètres à afficher */
+  const groupDef = RADAR_GROUPS[radarCurrentGroup];
+  let paramKeys;
+
+  if (groupDef.keys) {
+    /* Filtrer aux paramètres qui ont des données */
+    paramKeys = groupDef.keys.filter(k => {
+      return PARAMS[k] && data.some(d => d.vals[k] !== undefined);
+    });
+  } else {
+    /* "Todos" : tous les paramètres avec données et range de référence */
+    const allKeys = new Set();
+    data.forEach(d => Object.keys(d.vals).forEach(k => {
+      if (PARAMS[k] && PARAMS[k].ref) allKeys.add(k);
+    }));
+    paramKeys = [...allKeys].sort();
+  }
+
+  if (paramKeys.length < 3) {
+    const canvas = document.getElementById('radar-chart');
+    const ctx = canvas.getContext('2d');
+    if (radarChart) { radarChart.destroy(); radarChart = null; }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--muted');
+    ctx.font = '16px IBM Plex Sans';
+    ctx.textAlign = 'center';
+    ctx.fillText('Se necesitan al menos 3 parámetros con datos para el radar.', canvas.width/2, canvas.height/2);
+    return;
+  }
+
+  /* Labels */
+  const labels = paramKeys.map(k => PARAMS[k]?.label || k);
+
+  /* Datasets : un par date sélectionnée */
+  const datasets = radarSelectedDates.map((date, i) => {
+    const entry = data.find(d => d.date === date);
+    const color = RADAR_COLORS[i % RADAR_COLORS.length];
+
+    const values = paramKeys.map(k => {
+      if (!entry || entry.vals[k] === undefined) return null;
+      return normalizeParam(k, entry.vals[k]);
+    });
+
+    return {
+      label: fmtDate(date) + (entry?.src ? ' · ' + entry.src : ''),
+      data: values,
+      backgroundColor: color.bg,
+      borderColor: color.border,
+      borderWidth: 2,
+      pointRadius: 4,
+      pointBackgroundColor: color.border,
+      pointHoverRadius: 6,
+    };
+  });
+
+  /* Zone de référence normale (0-100) */
+  const refData = paramKeys.map(() => 100);
+
+  /* Détruire l'ancien chart */
+  if (radarChart) radarChart.destroy();
+
+  const isLight = document.body.classList.contains('light');
+  const gridColor = isLight ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)';
+  const textColor = isLight ? '#111118' : '#e8eaf0';
+  const mutedColor = isLight ? '#3d3d50' : '#7a8499';
+
+  const ctx = document.getElementById('radar-chart').getContext('2d');
+  radarChart = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Rango normal (0–100%)',
+          data: refData,
+          backgroundColor: isLight ? 'rgba(10,92,74,0.06)' : 'rgba(74,232,164,0.06)',
+          borderColor: isLight ? 'rgba(10,92,74,0.3)' : 'rgba(74,232,164,0.3)',
+          borderWidth: 1,
+          borderDash: [4, 4],
+          pointRadius: 0,
+          fill: true,
+        },
+        ...datasets
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        r: {
+          beginAtZero: true,
+          suggestedMax: 150,
+          ticks: {
+            stepSize: 25,
+            color: mutedColor,
+            font: { size: 11, family: 'IBM Plex Mono' },
+            backdropColor: 'transparent',
+            callback: v => v + '%'
+          },
+          pointLabels: {
+            color: textColor,
+            font: { size: 13, family: 'IBM Plex Mono', weight: '600' },
+          },
+          grid: { color: gridColor },
+          angleLines: { color: gridColor },
+        }
+      },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            color: textColor,
+            font: { size: 13, family: 'IBM Plex Mono' },
+            padding: 16,
+            usePointStyle: true,
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              if (ctx.datasetIndex === 0) return 'Rango normal';
+              const key = paramKeys[ctx.dataIndex];
+              const date = radarSelectedDates[ctx.datasetIndex - 1];
+              const entry = data.find(d => d.date === date);
+              const realVal = entry?.vals[key];
+              const p = PARAMS[key];
+              if (realVal !== undefined && p) {
+                const status = getStatus(key, realVal);
+                const flag = status === 'bad' ? ' ⚠' : status === 'warn' ? ' ⚡' : ' ✓';
+                return `${p.label}: ${realVal} ${p.unit}${flag} (${Math.round(ctx.parsed.r)}%)`;
+              }
+              return ctx.dataset.label + ': ' + Math.round(ctx.parsed.r) + '%';
+            }
+          }
+        }
+      }
+    }
+  });
 }
 
 /* ================================================================
