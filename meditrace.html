@@ -796,13 +796,25 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
       </div>
       <div class="form-field">
         <label data-i18n="lbl_source">Fuente</label>
-        <input type="text" id="m-source" placeholder="Hospital / Laboratorio..."/>
+        <input type="text" id="m-source" placeholder="Hospital / Laboratorio..." list="source-list" autocomplete="off"/>
+        <datalist id="source-list"></datalist>
       </div>
       <div class="form-field">
         <label data-i18n="lbl_param">Parámetro</label>
-        <select id="m-param">
+        <select id="m-param" onchange="onParamChange()">
           <option value="">— Seleccionar —</option>
         </select>
+      </div>
+      <div class="form-field" id="custom-param-box" style="display:none">
+        <label style="color:var(--accent)">Nuevo parámetro</label>
+        <input type="text" id="cp-label" placeholder="Nombre (ej: Procalcitonina)" style="margin-bottom:4px"/>
+        <div style="display:flex;gap:6px">
+          <input type="text" id="cp-unit" placeholder="Unidad (ej: ng/mL)" style="flex:1"/>
+          <input type="text" id="cp-ref" placeholder="Ref min-max (ej: 0-0.5)" style="flex:1"/>
+        </div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:4px">
+          Se guardará y estará disponible para futuras entradas.
+        </div>
       </div>
       <div class="form-field">
         <label data-i18n="lbl_value">Valor</label>
@@ -1039,11 +1051,136 @@ function fillParamSelect() {
   const sel = document.getElementById('m-param');
   if (!sel) return;
   sel.innerHTML = '<option value="">— ' + (LANG[currentLang].lbl_param||'Parámetro') + ' —</option>';
+
+  /* Paramètres prédéfinis */
+  const optGroup1 = document.createElement('optgroup');
+  optGroup1.label = 'Parámetros estándar';
   Object.entries(PARAMS).forEach(([k,p]) => {
     const opt = document.createElement('option');
     opt.value = k; opt.textContent = p.label + ' (' + p.unit + ')';
-    sel.appendChild(opt);
+    optGroup1.appendChild(opt);
   });
+  sel.appendChild(optGroup1);
+
+  /* Paramètres personnalisés */
+  const customs = loadCustomParams();
+  if (Object.keys(customs).length) {
+    const optGroup2 = document.createElement('optgroup');
+    optGroup2.label = 'Mis parámetros';
+    Object.entries(customs).forEach(([k,p]) => {
+      const opt = document.createElement('option');
+      opt.value = k; opt.textContent = p.label + ' (' + p.unit + ')';
+      optGroup2.appendChild(opt);
+    });
+    sel.appendChild(optGroup2);
+  }
+
+  /* Option pour ajouter un nouveau */
+  const sep = document.createElement('option');
+  sep.disabled = true; sep.textContent = '────────────────';
+  sel.appendChild(sep);
+  const addOpt = document.createElement('option');
+  addOpt.value = '__NEW__'; addOpt.textContent = '➕ Nuevo parámetro...';
+  addOpt.style.color = 'var(--accent)';
+  sel.appendChild(addOpt);
+
+  /* Remplir la datalist des sources */
+  fillSourceList();
+}
+
+function fillSourceList() {
+  const dl = document.getElementById('source-list');
+  if (!dl) return;
+  dl.innerHTML = '';
+  const sources = new Set();
+
+  /* Depuis les mesures */
+  loadData().forEach(d => { if (d.src) sources.add(d.src); });
+  /* Depuis les événements */
+  loadEvents().forEach(e => { if (e.src) sources.add(e.src); });
+  /* Depuis les sources custom sauvegardées */
+  loadCustomSources().forEach(s => sources.add(s));
+
+  [...sources].sort().forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s;
+    dl.appendChild(opt);
+  });
+}
+
+/* Gestion des paramètres personnalisés */
+const CUSTOM_PARAMS_KEY = 'mt_custom_params';
+const CUSTOM_SOURCES_KEY = 'mt_custom_sources';
+
+function loadCustomParams() {
+  try { return JSON.parse(localStorage.getItem(CUSTOM_PARAMS_KEY) || '{}'); } catch { return {}; }
+}
+function saveCustomParams(p) { localStorage.setItem(CUSTOM_PARAMS_KEY, JSON.stringify(p)); }
+function loadCustomSources() {
+  try { return JSON.parse(localStorage.getItem(CUSTOM_SOURCES_KEY) || '[]'); } catch { return []; }
+}
+function saveCustomSources(s) { localStorage.setItem(CUSTOM_SOURCES_KEY, JSON.stringify(s)); }
+
+function addCustomSource(src) {
+  if (!src || src === 'Manuel') return;
+  const sources = loadCustomSources();
+  if (!sources.includes(src)) {
+    sources.push(src);
+    sources.sort();
+    saveCustomSources(sources);
+  }
+}
+
+function onParamChange() {
+  const sel = document.getElementById('m-param');
+  const box = document.getElementById('custom-param-box');
+  if (sel.value === '__NEW__') {
+    box.style.display = 'block';
+    document.getElementById('cp-label').focus();
+  } else {
+    box.style.display = 'none';
+  }
+}
+
+function registerCustomParam() {
+  const label = document.getElementById('cp-label').value.trim();
+  const unit  = document.getElementById('cp-unit').value.trim() || '';
+  const refStr = document.getElementById('cp-ref').value.trim();
+
+  if (!label) return null;
+
+  /* Générer une clé machine depuis le label */
+  const key = 'custom_' + label.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+
+  /* Parser ref "min-max" */
+  let ref = null;
+  if (refStr) {
+    const parts = refStr.split(/[-–—]/);
+    if (parts.length === 2) {
+      ref = [parseFloat(parts[0]) || null, parseFloat(parts[1]) || null];
+    }
+  }
+
+  /* Sauvegarder dans PARAMS (runtime) et localStorage */
+  const customs = loadCustomParams();
+  const paramDef = { label, unit, ref, color: '#7f8c8d', desc: 'Parámetro personalizado: ' + label };
+  customs[key] = paramDef;
+  PARAMS[key] = paramDef;
+  saveCustomParams(customs);
+
+  /* Reset les champs */
+  document.getElementById('cp-label').value = '';
+  document.getElementById('cp-unit').value = '';
+  document.getElementById('cp-ref').value = '';
+  document.getElementById('custom-param-box').style.display = 'none';
+
+  /* Recharger le select et sélectionner le nouveau */
+  fillParamSelect();
+  document.getElementById('m-param').value = key;
+
+  return key;
 }
 
 /* ================================================================
@@ -1478,9 +1615,19 @@ function showMainNav() {
 function addManual() {
   const date = document.getElementById('m-date').value;
   const src  = document.getElementById('m-source').value || 'Manuel';
-  const key  = document.getElementById('m-param').value;
+  let   key  = document.getElementById('m-param').value;
   const val  = parseFloat(document.getElementById('m-value').value);
+
+  /* Si "nouveau paramètre" sélectionné, enregistrer d'abord */
+  if (key === '__NEW__') {
+    key = registerCustomParam();
+    if (!key) { alert('Indica el nombre del nuevo parámetro'); return; }
+  }
+
   if (!date || !key || isNaN(val)) { alert('Rellena todos los campos'); return; }
+
+  /* Sauvegarder la source pour réutilisation */
+  addCustomSource(src);
 
   const data = loadData();
   const existing = data.findIndex(d => d.date === date && d.src === src);
@@ -1498,7 +1645,11 @@ function addManual() {
   const log = document.getElementById('progress-log');
   const pb  = document.getElementById('progress-box');
   pb.style.display = 'block';
-  log.innerHTML += `✓ Añadido: ${PARAMS[key]?.label} = ${val} ${PARAMS[key]?.unit} (${date})<br>`;
+  const p = PARAMS[key];
+  log.innerHTML += `✓ Añadido: ${p?.label || key} = ${val} ${p?.unit || ''} (${date})<br>`;
+
+  /* Rafraîchir la liste des sources */
+  fillSourceList();
 }
 
 function addEvent() {
@@ -1541,7 +1692,9 @@ function exportData() {
     mesures: data,
     events:  events,
     medicaments: meds,
-    bacteriologie: bacts
+    bacteriologie: bacts,
+    custom_params: loadCustomParams(),
+    custom_sources: loadCustomSources()
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
   const url  = URL.createObjectURL(blob);
@@ -1573,6 +1726,8 @@ function importData(input) {
           if (parsed.events)        saveEvents(parsed.events);
           if (parsed.medicaments)   saveMeds(parsed.medicaments);
           if (parsed.bacteriologie) saveBacterio(parsed.bacteriologie);
+          if (parsed.custom_params)  { saveCustomParams(parsed.custom_params); Object.entries(parsed.custom_params).forEach(([k,p]) => { PARAMS[k] = p; }); }
+          if (parsed.custom_sources) saveCustomSources(parsed.custom_sources);
           if (parsed.patient_label) setPatientLabel(parsed.patient_label);
           alert('✓ ' + parsed.mesures.length + ' mediciones + '
                      + (parsed.events?.length||0) + ' eventos + '
@@ -3304,6 +3459,10 @@ function buildObservancia() {
    INIT
 ================================================================ */
 window.addEventListener('load', () => {
+  /* Charger les paramètres personnalisés dans PARAMS */
+  const customs = loadCustomParams();
+  Object.entries(customs).forEach(([k,p]) => { PARAMS[k] = p; });
+
   const savedLang = localStorage.getItem('mt_lang') || 'es';
   setLang(savedLang);
   fillParamSelect();
