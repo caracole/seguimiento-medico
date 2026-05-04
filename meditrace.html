@@ -899,8 +899,13 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 <input type="file" id="pdf-view-input" accept=".pdf" style="display:none" onchange="loadPdfView(this)"/>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
+/* Configurer pdf.js worker */
+if (typeof pdfjsLib !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
 /* ================================================================
    TRADUCTIONS
 ================================================================ */
@@ -1375,31 +1380,118 @@ async function ocrFromImage(file, plog, pbar) {
   plog.innerHTML += '🔍 OCR Tesseract.js — reconnaissance du texte...<br>';
   pbar.style.width = '15%';
 
-  const worker = await Tesseract.createWorker('spa+fra', 1, {
-    logger: m => {
-      if (m.status === 'recognizing text') {
-        const pct = Math.round(m.progress * 100);
-        pbar.style.width = (15 + pct * 0.35) + '%';
-        if (pct % 20 === 0) plog.innerHTML += `  OCR: ${pct}%<br>`;
+  /* Vérifier que Tesseract est bien chargé */
+  if (typeof Tesseract === 'undefined') {
+    throw new Error('Tesseract.js no se ha cargado. Verifica tu conexión a internet.');
+  }
+
+  plog.innerHTML += '→ Chargement du moteur OCR (español)...<br>';
+
+  try {
+    const worker = await Tesseract.createWorker({
+      logger: m => {
+        if (m.status === 'recognizing text') {
+          const pct = Math.round(m.progress * 100);
+          pbar.style.width = (15 + pct * 0.35) + '%';
+          if (pct % 25 === 0) plog.innerHTML += `  OCR: ${pct}%<br>`;
+        } else if (m.status === 'loading language traineddata') {
+          plog.innerHTML += `  ⏳ Descargando datos de idioma (primera vez ~15MB)...<br>`;
+        } else if (m.status === 'initializing api') {
+          plog.innerHTML += `  ⚙️ Inicializando motor OCR...<br>`;
+        }
       }
+    });
+
+    /* Espagnol d'abord — les documents médicaux sont en español */
+    await worker.loadLanguage('spa');
+    await worker.initialize('spa');
+
+    plog.innerHTML += '→ Analyse de l\'image (español)...<br>';
+
+    const { data: { text, confidence } } = await worker.recognize(file);
+    await worker.terminate();
+
+    plog.innerHTML += `✓ OCR terminé — ${text.length} caractères · confiance ${Math.round(confidence)}%<br>`;
+    pbar.style.width = '50%';
+    return { text, confidence };
+
+  } catch(innerErr) {
+    /* Fallback : anglais (toujours disponible) */
+    plog.innerHTML += `⚠ Erreur avec español (${innerErr.message || innerErr}), tentative avec anglais...<br>`;
+    try {
+      const worker2 = await Tesseract.createWorker({
+        logger: m => {
+          if (m.status === 'recognizing text') {
+            const pct = Math.round(m.progress * 100);
+            pbar.style.width = (15 + pct * 0.35) + '%';
+          }
+        }
+      });
+      await worker2.loadLanguage('eng');
+      await worker2.initialize('eng');
+      const { data: { text, confidence } } = await worker2.recognize(file);
+      await worker2.terminate();
+      plog.innerHTML += `✓ OCR terminé (eng) — ${text.length} caractères · confiance ${Math.round(confidence)}%<br>`;
+      pbar.style.width = '50%';
+      return { text, confidence };
+    } catch(fallbackErr) {
+      throw new Error('OCR falló en todos los idiomas: ' + (fallbackErr.message || fallbackErr));
     }
-  });
-
-  const { data: { text, confidence } } = await worker.recognize(file);
-  await worker.terminate();
-
-  plog.innerHTML += `✓ OCR terminé — ${text.length} caractères · confiance ${Math.round(confidence)}%<br>`;
-  pbar.style.width = '50%';
-  return { text, confidence };
+  }
 }
 
 async function ocrFromPdfFallback(file, plog, pbar) {
-  /* Convertir la 1ère page du PDF en image via canvas pour OCR */
-  plog.innerHTML += '⚠ PDF probablement scanné — tentative OCR...<br>';
-  plog.innerHTML += '🔄 Conversion PDF → image pour OCR...<br>';
+  plog.innerHTML += '⚠ PDF probablement scanné — conversion en images pour OCR...<br>';
 
-  /* Utiliser le PDF comme image directement via Tesseract (supporte les PDF) */
-  return await ocrFromImage(file, plog, pbar);
+  if (typeof pdfjsLib === 'undefined') {
+    throw new Error('pdf.js no cargado — no se puede convertir PDF a imagen para OCR.');
+  }
+
+  /* Lire le PDF en ArrayBuffer */
+  const arrayBuffer = await new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.onerror = () => rej(new Error('Lectura del PDF fallida'));
+    r.readAsArrayBuffer(file);
+  });
+
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  const numPages = pdf.numPages;
+  plog.innerHTML += `📄 PDF: ${numPages} página(s) detectada(s)<br>`;
+
+  let allText = '';
+  let totalConfidence = 0;
+
+  /* OCR chaque page */
+  for (let i = 1; i <= Math.min(numPages, 5); i++) {
+    plog.innerHTML += `→ Página ${i}/${numPages}...<br>`;
+    pbar.style.width = (10 + (i-1) * (40 / numPages)) + '%';
+
+    const page = await pdf.getPage(i);
+    const viewport = page.getViewport({ scale: 2.0 }); /* scale 2x pour meilleure qualité OCR */
+
+    /* Créer un canvas hors-écran */
+    const canvas = document.createElement('canvas');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    const ctx = canvas.getContext('2d');
+
+    await page.render({ canvasContext: ctx, viewport }).promise;
+
+    /* Convertir le canvas en blob pour Tesseract */
+    const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+
+    /* OCR sur cette page */
+    const ocr = await ocrFromImage(blob, plog, pbar);
+    allText += ocr.text + '\n\n';
+    totalConfidence += ocr.confidence;
+  }
+
+  const avgConfidence = totalConfidence / Math.min(numPages, 5);
+  plog.innerHTML += `✓ OCR PDF terminé — ${allText.length} caractères · confiance ${Math.round(avgConfidence)}% · ${Math.min(numPages, 5)} page(s)<br>`;
+  pbar.style.width = '50%';
+
+  return { text: allText.trim(), confidence: avgConfidence };
 }
 
 /* ================================================================
@@ -1424,7 +1516,18 @@ async function ocrOnly(file) {
 
   try {
     const t0 = performance.now();
-    const ocr = await ocrFromImage(file, plog, pbar);
+    let ocr;
+
+    if (file.type === 'application/pdf' || /\.pdf$/i.test(file.name)) {
+      /* PDF → convertir en images via pdf.js puis OCR */
+      plog.innerHTML += '📄 PDF détecté — conversion en images pour OCR...<br>';
+      ocr = await ocrFromPdfFallback(file, plog, pbar);
+    } else {
+      /* Image directe */
+      plog.innerHTML += `📷 Image détectée : ${file.name}<br>`;
+      ocr = await ocrFromImage(file, plog, pbar);
+    }
+
     const elapsed = ((performance.now() - t0) / 1000).toFixed(1);
 
     pbar.style.width = '100%';
@@ -1441,7 +1544,9 @@ async function ocrOnly(file) {
   } catch(e) {
     pbar.style.width = '100%';
     pbar.style.background = 'var(--danger)';
-    plog.innerHTML += `✗ Error OCR: ${e.message}<br>`;
+    const errMsg = e && e.message ? e.message : String(e);
+    plog.innerHTML += `✗ Error OCR: ${errMsg}<br>`;
+    plog.innerHTML += `<span style="font-size:10px;color:var(--muted)">Debug: typeof Tesseract = ${typeof Tesseract} · typeof pdfjsLib = ${typeof pdfjsLib}</span><br>`;
   }
 
   document.getElementById('ocr-input').value = '';
