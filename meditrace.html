@@ -2418,17 +2418,20 @@ function exportPDF(mode) {
       .slice(0, 8);
 
     significantParams.forEach(([k]) => {
-      const canvasId = 'chart-' + k;
-      const existingCanvas = document.getElementById(canvasId);
-      if (existingCanvas && chartInstances[canvasId]) {
-        try {
-          const imgData = existingCanvas.toDataURL('image/png', 0.9);
-          const p = PARAMS[k];
-          chartsHtml += '<div style="margin-bottom:16px;page-break-inside:avoid">' +
-            '<div style="font-size:13px;font-weight:700;color:#1a5276;margin-bottom:4px">' + p.label + ' (' + p.unit + ')' +
-            (p.ref ? ' — Ref: ' + p.ref.join('-') : '') + '</div>' +
-            '<img src="' + imgData + '" style="width:100%;max-height:200px;object-fit:contain;border:1px solid #ddd;border-radius:4px"/></div>';
-        } catch(e) { /* canvas tainted or not available */ }
+      const ids = ['kc-' + k, 'ac-' + k];
+      for (const canvasId of ids) {
+        const existingCanvas = document.getElementById(canvasId);
+        if (existingCanvas && chartInstances[canvasId]) {
+          try {
+            const imgData = existingCanvas.toDataURL('image/png', 0.9);
+            const p = PARAMS[k];
+            chartsHtml += '<div style="margin-bottom:16px;page-break-inside:avoid">' +
+              '<div style="font-size:13px;font-weight:700;color:#1a5276;margin-bottom:4px">' + p.label + ' (' + p.unit + ')' +
+              (p.ref ? ' — Ref: ' + p.ref.join('-') : '') + '</div>' +
+              '<img src="' + imgData + '" style="width:100%;max-height:200px;object-fit:contain;border:1px solid #ddd;border-radius:4px"/></div>';
+            break;
+          } catch(e) { /* canvas tainted or not available */ }
+        }
       }
     });
 
