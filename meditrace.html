@@ -2371,8 +2371,8 @@ function exportPDF(mode) {
     return '<div class="kpi-card ' + st + '"><div class="kpi-label">' + (p.label||k) + '</div><div class="kpi-value">' + info.v + ' <span class="kpi-unit">' + p.unit + '</span></div><div class="kpi-date">' + fmtDate(info.date) + '</div>' + (st==='bad' ? '<div class="kpi-bad">\u26a0 Fuera de rango</div>' : '') + '</div>';
   }).join('');
 
-  /* Build synthesis table */
-  let tableRows = data.map(m => '<tr><td>' + fmtDate(m.date) + '</td><td>' + (m.src||'') + '</td>' +
+  /* Build synthesis table — dates décroissantes (plus récent en haut) */
+  let tableRowsDesc = [...data].reverse().map(m => '<tr><td>' + fmtDate(m.date) + '</td><td>' + (m.src||'') + '</td>' +
     ['hemoglobina','leucocitos','glucosa','creatinina','filtrado','colesterol','pcr','tsh','vitamina_d'].map(k => {
       const v = m.vals[k]; if (v===undefined) return '<td style="color:#ccc">\u2014</td>';
       const st = getStatus(k, v); return '<td class="' + (st==='bad'?'val-bad':'val-ok') + '">' + v + '</td>';
@@ -2398,7 +2398,7 @@ function exportPDF(mode) {
     '<style>' +
     '* { box-sizing:border-box;margin:0;padding:0 }' +
     'body { font-family:"Segoe UI",Arial,sans-serif;font-size:16px;color:#1a1a2e;background:white;line-height:1.7 }' +
-    '.page { max-width:210mm;margin:0 auto;padding:18mm 20mm;counter-reset:page }' +
+    '.page { max-width:210mm;margin:0 auto;padding:10mm 12mm;counter-reset:page }' +
     '.report-header { border-bottom:3px solid #1a5276;padding-bottom:16px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:flex-start }' +
     '.report-logo { font-family:Georgia,serif;font-size:32px;font-weight:700;color:#1a1a2e }' +
     '.report-logo span { font-style:italic;color:#1a5276 }' +
@@ -2406,7 +2406,7 @@ function exportPDF(mode) {
     '.report-meta { text-align:right;font-size:12px;color:#555;line-height:1.8 }' +
     '.section { margin-bottom:24px;page-break-inside:avoid }' +
     '.section-title { font-size:18px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#1a5276;border-bottom:2px solid #1a5276;padding-bottom:6px;margin-bottom:14px }' +
-    '.exec-summary { background:#f0f5fa;border:2px solid #1a5276;border-radius:8px;padding:20px 24px;margin-bottom:24px;page-break-after:always }' +
+    '.exec-summary { background:#f0f5fa;border:2px solid #1a5276;border-radius:8px;padding:18px 22px;margin-bottom:20px;page-break-after:always }' +
     '.exec-title { font-size:20px;font-weight:700;color:#1a5276;margin-bottom:14px;letter-spacing:2px;text-transform:uppercase }' +
     '.exec-grid { display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px }' +
     '.exec-box { background:white;border:1px solid #dde;border-radius:6px;padding:14px 16px }' +
@@ -2435,17 +2435,26 @@ function exportPDF(mode) {
     '.tl-dot.neurologia { background:#7d3c98 } .tl-dot.laboratorio { background:#1e8449 } .tl-dot.bacteriologia { background:#e8a44a }' +
     '.tl-content { flex:1 } .tl-date { font-size:12px;color:#888 } .tl-title { font-size:15px;font-weight:700;margin:2px 0 } .tl-text { font-size:13px;color:#444;line-height:1.6 }' +
     '.report-footer { border-top:2px solid #1a5276;margin-top:24px;padding-top:10px;font-size:10px;color:#888;display:flex;justify-content:space-between }' +
-    '@media print { body{font-size:15px} .page{padding:12mm 15mm} .exec-summary{page-break-after:always} .section{page-break-inside:avoid} @page{margin:15mm;@bottom-center{content:counter(page)" / "counter(pages);font-size:10px;color:#888}} }' +
+    '@media print { body{font-size:15px} .page{padding:8mm 10mm} .exec-summary{page-break-after:always} .section{page-break-inside:avoid} .share-bar{display:none} @page{size:A4;margin:10mm;@bottom-center{content:counter(page)" / "counter(pages);font-size:10px;color:#888}} }' +
     '</style></head><body><div class="page">' +
 
     '<div class="report-header"><div><div class="report-logo">Medi<span>Trace</span></div><div class="report-type">' + titleType + '</div></div>' +
     '<div class="report-meta"><strong>Paciente:</strong> ' + patLabel + '<br><strong>Generado:</strong> ' + now + '<br><strong>Per\u00edodo:</strong> ' + dateRange + '<br><strong>Datos:</strong> ' + data.length + ' fechas \u00b7 ' + events.length + ' eventos<br><strong>Autor:</strong> Pierre-Henri Giraud \u00d7 Claude (Anthropic)<br>DOI: 10.5281/zenodo.19973451<br><strong>\u26a0 Documento informativo \u2014 No diagn\u00f3stico</strong></div></div>' +
 
-    '<div class="exec-summary"><div class="exec-title">Resumen Ejecutivo</div><div class="exec-grid">' +
-    '<div class="exec-box"><div class="exec-box-title">\ud83d\udea8 Alertas cr\u00edticas</div><ul><li class="danger">Oclusi\u00f3n completa ACI izquierda (IRM 03/2026)</li><li class="danger">Dabigatr\u00e1n ABANDONADO \u2014 sin anticoagulaci\u00f3n activa</li><li class="danger">ECG pendiente antes de iniciar Donepezilo</li>' + alertListHtml + '</ul></div>' +
-    '<div class="exec-box"><div class="exec-box-title">\ud83d\udcca Datos del informe</div><ul><li>Paciente: ' + patLabel + '</li><li>Per\u00edodo: ' + dateRange + '</li><li>' + data.length + ' fechas de an\u00e1lisis</li><li>' + events.length + ' eventos cl\u00ednicos</li><li>' + Object.keys(lastVals).length + ' par\u00e1metros</li><li>' + alertParams.length + ' fuera de rango</li>' + (bacts.length?'<li>'+bacts.length+' cultivo(s)</li>':'') + '</ul></div></div>' +
-    '<div class="exec-grid"><div class="exec-box"><div class="exec-box-title">\ud83d\udc8a Medicaci\u00f3n actual</div><ul><li class="danger">Dabigatr\u00e1n 150mg \u2014 ABANDONADO (02/2025)</li><li class="warn">Donepezilo \u2014 PRESCRITO, no iniciado</li><li>Haloperidol \u2014 SUSPENDIDO \u2713</li><li>Hidroferol \u2014 EN CURSO \u2713</li><li class="warn">Atorvastatina \u2014 LDL 202 fuera de objetivo</li></ul></div>' +
-    '<div class="exec-box"><div class="exec-box-title">\u2753 Preguntas para el m\u00e9dico</div><ul><li>\u00bfRiesgo tromb\u00f3tico sin anticoagulaci\u00f3n + ACI ocluida?</li><li>\u00bfCu\u00e1ndo se realizar\u00e1 el ECG para Donepezilo?</li><li>\u00bfDeterioro cognitivo vascular vs Alzheimer?</li><li>\u00bfControl eficacia Hidroferol?</li></ul></div></div></div>' +
+    '<div class="exec-summary"><div class="exec-title">Anamnesis y Síntesis Clínica</div>' +
+    '<div style="font-size:15px;line-height:1.8;color:#1a1a2e;text-align:justify">' +
+    'Paciente <strong>' + patLabel + '</strong>, mujer de 87 años, con antecedentes de tromboembolismo pulmonar bilateral recurrente (2016, 2022), ' +
+    'ictus vertebrobasilar (septiembre 2021, diagnóstico tardío 27h), deterioro cognitivo progresivo (MMSE: 25→22→16 entre 2021-2024), ' +
+    'y oclusión completa de la arteria carótida interna izquierda confirmada por IRM vascular en marzo 2026. ' +
+    'Seguida por múltiples especialistas durante 10 años, con ' + data.length + ' fechas de análisis y ' + events.length + ' eventos clínicos documentados.<br><br>' +
+    'PET/CT FDG (12/2021): hipometabolismo frontal izquierdo, correlacionado retrospectivamente con la oclusión carotídea ya en progresión. ' +
+    'Patrón sugestivo de demencia vascular/frontotemporal.<br><br>' +
+    '<strong>Situación farmacológica:</strong> Dabigatrán abandonado (02/2025) — riesgo trombótico sin anticoagulación. ' +
+    'Donepezilo prescrito, no iniciado (pendiente ECG 03/2026). Haloperidol suspendido (QTc). Hidroferol mensual en curso. ' +
+    'Déficit crónico vitamina D (27→12 ng/mL). LDL 202 mg/dL.' +
+    '</div>' +
+    (alertParams.length ? '<div style="margin-top:14px;padding-top:12px;border-top:1px solid #cce"><div style="font-size:15px;font-weight:700;color:#c0392b;margin-bottom:8px">⚠ VALORES FUERA DE RANGO (' + alertParams.length + ')</div>' + alertListHtml + '</div>' : '') +
+    '</div>' +
 
     (isDetailed ? '<div class="section"><div class="section-title">\ud83e\udde0 An\u00e1lisis Vascular \u2014 S\u00edntesis</div><div class="alert critical"><div class="alert-title">\ud83d\udea8 HALLAZGO CR\u00cdTICO \u2014 IRM Vascular ASCIRES 10/03/2026</div>Obstrucci\u00f3n completa arteria car\u00f3tida interna izquierda. Leucoaraiosis Fazekas II-III.</div><table><thead><tr><th>Fecha</th><th>Exploraci\u00f3n</th><th>Hallazgo clave</th></tr></thead><tbody><tr><td>11/2016</td><td>TEP bilateral</td><td>HTpulmonar PAPs 55-60mmHg</td></tr><tr><td>09/2021</td><td>Ictus VB</td><td class="val-bad">Diagn\u00f3stico tard\u00edo 27h</td></tr><tr><td>12/2021</td><td>PET/CT FDG</td><td class="val-bad">Hipometabolismo frontal IZQ</td></tr><tr><td>01/2022</td><td>2\u00ba TEP agudo</td><td class="val-bad">Troponina 76.68</td></tr><tr><td>03/2026</td><td>IRM Vascular</td><td class="val-bad">Oclusi\u00f3n COMPLETA ACI izq</td></tr></tbody></table><div class="alert warn"><div class="alert-title">\u2753 Preguntas para el m\u00e9dico</div>1. \u00bfFue el ictus de 09/2021 el evento oclusivo inicial?<br>2. \u00bfDeterioro cognitivo vascular (DFT) vs Alzheimer?<br>3. \u00bfRiesgo del abandono anticoagulante con ACI ocluida?</div></div>' +
     '<div class="section"><div class="section-title">\u26a0 Farmacovigilancia \u2014 CIMA/AEMPS</div><div class="alert critical"><div class="alert-title">\ud83d\udea8 ECG PENDIENTE antes de Donepezilo</div>Haloperidol suspendido (QTc). ECG prescrito 03/2026 a\u00fan no realizado.</div><div class="alert critical"><div class="alert-title">\ud83d\udea8 Dabigatr\u00e1n ABANDONADO</div>Sin anticoagulaci\u00f3n con ACI ocluida. Riesgo tromb\u00f3tico elevado.</div><div class="alert warn"><div class="alert-title">\u26a0 Pantoprazol largo plazo \u2192 D\u00e9ficit B12</div>B12=152 pg/mL (2022). Riesgo hipomagnesemia.</div><div class="alert warn"><div class="alert-title">\u26a0 Tiotropio + Donepezilo \u2192 Antagonismo</div>Revisar necesidad de ambos.</div><div class="alert ok"><div class="alert-title">\u2713 Donepezilo + Memantina \u2014 SEGURO</div>Sin interacciones relevantes.</div></div>' +
@@ -2453,10 +2462,14 @@ function exportPDF(mode) {
 
     '<div class="section"><div class="section-title">\ud83d\udcca \u00daltimos valores conocidos</div><div class="kpi-grid">' + kpiHtml + '</div></div>' +
 
-    '<div class="section"><div class="section-title">\ud83d\udccb Tabla de s\u00edntesis cronol\u00f3gica</div><table><thead><tr><th>Fecha</th><th>Fuente</th><th>Hb</th><th>Leuc.</th><th>Gluc.</th><th>Creat.</th><th>FG</th><th>Colest.</th><th>PCR</th><th>TSH</th><th>VitD</th></tr></thead><tbody>' + tableRows + '</tbody></table></div>' +
+    '<div class="section"><div class="section-title">\ud83d\udccb Tabla de s\u00edntesis cronol\u00f3gica</div><table><thead><tr><th>Fecha</th><th>Fuente</th><th>Hb</th><th>Leuc.</th><th>Gluc.</th><th>Creat.</th><th>FG</th><th>Colest.</th><th>PCR</th><th>TSH</th><th>VitD</th></tr></thead><tbody>' + tableRowsDesc + '</tbody></table></div>' +
 
     timelineHtml + bacterioHtml +
 
+    '<div style="text-align:center;margin:16px 0;padding:10px;background:#f8f8f8;border-radius:6px" class="share-bar"><strong>Compartir este informe:</strong> ' +
+    '<a style="display:inline-block;margin:0 8px;padding:6px 16px;border-radius:6px;text-decoration:none;font-size:13px;font-weight:600;color:white;background:#0088cc" href="https://t.me/share/url?url=' + encodeURIComponent(window.location.href) + '&text=' + encodeURIComponent('Informe MediTrace') + '" target="_blank">Telegram</a>' +
+    '<a style="display:inline-block;margin:0 8px;padding:6px 16px;border-radius:6px;text-decoration:none;font-size:13px;font-weight:600;color:white;background:#25D366" href="https://wa.me/?text=' + encodeURIComponent('Informe MediTrace ' + window.location.href) + '" target="_blank">WhatsApp</a>' +
+    '<a style="display:inline-block;margin:0 8px;padding:6px 16px;border-radius:6px;text-decoration:none;font-size:13px;font-weight:600;color:white;background:#1a5276" href="mailto:?subject=' + encodeURIComponent('Informe MediTrace') + '&body=' + encodeURIComponent('Adjunto informe de seguimiento.\n' + window.location.href) + '">Email</a></div>' +
     '<div class="report-footer"><span>MediTrace v2026.3 \u00a9 Pierre-Henri Giraud \u00d7 Claude (Anthropic) \u00b7 DOI: 10.5281/zenodo.19973451</span><span>Documento informativo \u2014 No sustituye el criterio m\u00e9dico profesional.</span></div>' +
     '</div></body></html>';
 
