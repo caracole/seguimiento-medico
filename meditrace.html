@@ -403,7 +403,8 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
     <button class="btn-topbar" onclick="toggleTheme()" id="theme-btn" title="Cambiar tema claro/oscuro">☀️ Claro</button>
     <button class="btn-topbar" onclick="exportData()" title="Guardar copia de seguridad">💾 Backup .mt</button>
     <button class="btn-topbar" onclick="document.getElementById('import-json').click()" title="Restaurar desde backup">📂 Restaurar</button>
-    <button class="btn-topbar" onclick="exportPDF()" title="Generar informe PDF" style="color:#4ae8a4;border-color:#4ae8a4">📄 Informe PDF</button>
+    <button class="btn-topbar" onclick="exportPDF('detallado')" title="Informe completo detallado" style="color:#4ae8a4;border-color:#4ae8a4">📄 Informe Detallado</button>
+    <button class="btn-topbar" onclick="exportPDF('sintetico')" title="Resumen ejecutivo 1-2 páginas" style="color:#e8a44a;border-color:#e8a44a">📋 Informe Sintético</button>
     <input type="file" id="import-json" accept=".json,.js,.mt,application/json,text/plain" style="display:none" onchange="importData(this)"/>
     <button class="btn-topbar" onclick="showPanel('importar',this)" data-i18n="nav_import">+ Añadir datos</button>
     <button class="btn-topbar" onclick="nuevoPaciente()" title="Cambiar de paciente (guarda y limpia)" style="color:#e8a44a;border-color:#e8a44a">👥 Nuevo paciente</button>
@@ -789,7 +790,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 
   <!-- NOTE FINALE -->
   <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;font-family:var(--mono);font-size:10px;color:var(--muted)">
-    📋 Análisis elaborado por Pierre-Henri Giraud × Claude (Anthropic) · MediTrace v2026.2<br>
+    📋 Análisis elaborado por Pierre-Henri Giraud × Claude (Anthropic) · MediTrace v2026.3<br>
     Fuentes: IRM ASCIRES 10/03/2026 · PET/CT CUN 27/12/2021 · TAC Vithas 18/03/2024 · Analíticas HGC/Vithas 2021-2026<br>
     DOI: <a href="https://doi.org/10.5281/zenodo.19973451" target="_blank" style="color:var(--accent)">10.5281/zenodo.19973451</a>
     · Este análisis es informativo y no sustituye el criterio médico profesional.
@@ -2338,291 +2339,135 @@ function importData(input) {
 /* ================================================================
    EXPORT PDF — Rapport médical
 ================================================================ */
-function exportPDF() {
+function exportPDF(mode) {
+  mode = mode || 'detallado';
   const data   = loadData();
   const events = loadEvents();
+  const meds   = loadMeds();
+  const bacts  = loadBacterio();
   if (!data.length) { alert('No hay datos que exportar.'); return; }
 
-  /* Dernières valeurs connues */
   const lastVals = {};
   data.forEach(m => Object.entries(m.vals).forEach(([k,v]) => {
     if (!lastVals[k] || m.date > lastVals[k].date) lastVals[k] = { v, date: m.date, src: m.src };
   }));
 
+  const alertParams = Object.entries(lastVals).filter(([k, info]) => PARAMS[k] && getStatus(k, info.v) === 'bad');
   const now = new Date().toLocaleDateString('es-ES');
-  const dateRange = data[0].date + ' → ' + data[data.length-1].date;
+  const dateRange = data[0].date + ' \u2192 ' + data[data.length-1].date;
+  const patLabel = getPatientLabel() || 'M.E.J.';
+  const isDetailed = mode === 'detallado';
+  const titleType = isDetailed ? 'INFORME DETALLADO DE SEGUIMIENTO M\u00c9DICO' : 'INFORME SINT\u00c9TICO DE SEGUIMIENTO M\u00c9DICO';
 
-  /* Construction HTML du rapport */
-  const html = `<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8"/>
-<title>MediTrace — Informe Médico — M.E.J. — ${new Date().toISOString().slice(0,10)}</title>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: Arial, sans-serif; font-size: 11px; color: #1a1a2e; background: white; }
-  .page { max-width: 210mm; margin: 0 auto; padding: 15mm; }
+  /* Build exec summary alert list */
+  let alertListHtml = alertParams.map(([k, info]) => {
+    const p = PARAMS[k];
+    return '<li class="warn">' + p.label + ': ' + info.v + ' ' + p.unit + ' \u26a0 (ref: ' + (p.ref ? p.ref.join('-') : '?') + ')</li>';
+  }).join('');
 
-  /* HEADER */
-  .header { display: flex; justify-content: space-between; align-items: flex-start;
-    border-bottom: 3px solid #1a5276; padding-bottom: 12px; margin-bottom: 20px; }
-  .header-logo { font-family: Georgia, serif; font-size: 28px; font-weight: 700; color: #1a5276; }
-  .header-logo span { font-style: italic; color: #4a8fe8; }
-  .header-meta { text-align: right; font-size: 10px; color: #555; line-height: 1.8; }
+  /* Build KPI cards */
+  let kpiHtml = Object.entries(lastVals).filter(([k]) => PARAMS[k]).slice(0, isDetailed ? 16 : 8).map(([k, info]) => {
+    const p = PARAMS[k]; const st = getStatus(k, info.v);
+    return '<div class="kpi-card ' + st + '"><div class="kpi-label">' + (p.label||k) + '</div><div class="kpi-value">' + info.v + ' <span class="kpi-unit">' + p.unit + '</span></div><div class="kpi-date">' + fmtDate(info.date) + '</div>' + (st==='bad' ? '<div class="kpi-bad">\u26a0 Fuera de rango</div>' : '') + '</div>';
+  }).join('');
 
-  /* SECTIONS */
-  .section { margin-bottom: 20px; }
-  .section-title {
-    font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-    color: #1a5276; border-bottom: 1px solid #cce; padding-bottom: 4px; margin-bottom: 10px;
-  }
+  /* Build synthesis table */
+  let tableRows = data.map(m => '<tr><td>' + fmtDate(m.date) + '</td><td>' + (m.src||'') + '</td>' +
+    ['hemoglobina','leucocitos','glucosa','creatinina','filtrado','colesterol','pcr','tsh','vitamina_d'].map(k => {
+      const v = m.vals[k]; if (v===undefined) return '<td style="color:#ccc">\u2014</td>';
+      const st = getStatus(k, v); return '<td class="' + (st==='bad'?'val-bad':'val-ok') + '">' + v + '</td>';
+    }).join('') + '</tr>').join('');
 
-  /* ALERTES */
-  .alert { border-radius: 4px; padding: 8px 12px; margin-bottom: 8px; font-size: 10px; }
-  .alert.critical { background: #fde8e8; border-left: 4px solid #c0392b; color: #7b241c; }
-  .alert.warn     { background: #fef9e7; border-left: 4px solid #d68910; color: #7d6608; }
-  .alert.ok       { background: #e8f8f5; border-left: 4px solid #1e8449; color: #1a5c35; }
-  .alert-title    { font-weight: 700; margin-bottom: 2px; }
+  /* Build timeline */
+  let timelineHtml = isDetailed && events.length ? '<div class="section"><div class="section-title">\ud83d\udd50 Cronolog\u00eda cl\u00ednica (' + events.length + ' eventos)</div>' +
+    [...events].reverse().map(ev => '<div class="tl-item"><div class="tl-dot ' + (ev.type||'laboratorio') + '"></div><div class="tl-content"><div class="tl-date">' + ev.date + ' \u00b7 ' + (ev.type||'').toUpperCase() + '</div><div class="tl-title">' + (ev.title||'') + '</div><div class="tl-text">' + (ev.text||'') + '</div></div></div>').join('') + '</div>' : '';
 
-  /* KPI GRID */
-  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
-  .kpi-card { border: 1px solid #ddd; border-radius: 4px; padding: 8px; }
-  .kpi-card.bad  { border-top: 3px solid #c0392b; }
-  .kpi-card.ok   { border-top: 3px solid #1e8449; }
-  .kpi-label { font-size: 8px; text-transform: uppercase; letter-spacing: 1px; color: #888; }
-  .kpi-value { font-size: 18px; font-weight: 700; color: #1a1a2e; }
-  .kpi-unit  { font-size: 8px; color: #888; }
-  .kpi-date  { font-size: 8px; color: #aaa; margin-top: 2px; }
-  .kpi-bad   { color: #c0392b; font-size: 8px; font-weight: 700; }
+  /* Build bacterio */
+  let bacterioHtml = isDetailed && bacts.length ? '<div class="section"><div class="section-title">\ud83e\udda0 Bacteriolog\u00eda (' + bacts.length + ' cultivo(s))</div>' +
+    bacts.map(b => {
+      const isPos = b.germe && b.germe.toLowerCase() !== 'n\u00e9gatif' && b.germe.toLowerCase() !== 'negativo';
+      return '<div class="alert ' + (isPos?'critical':'ok') + '"><div class="alert-title">' + (isPos?'\ud83d\udd34':'\ud83d\udfe2') + ' ' + (b.germe||'Resultado') + ' \u2014 ' + (b.prelevement||'') + ' ' + (b.quantite||'') + '</div>' +
+        (b.date ? fmtDate(b.date_prelevement||b.date) + '<br>' : '') +
+        (b.antibiogramme?.sensible?.length ? '<strong>S:</strong> ' + b.antibiogramme.sensible.join(', ') + '<br>' : '') +
+        (b.antibiogramme?.resistant?.length ? '<strong>R:</strong> ' + b.antibiogramme.resistant.join(', ') + '<br>' : '') +
+        (b.commentaire ? '<em>' + b.commentaire + '</em>' : '') + '</div>';
+    }).join('') + '</div>' : '';
 
-  /* TABLE */
-  table { width: 100%; border-collapse: collapse; font-size: 9px; }
-  th { background: #1a5276; color: white; padding: 5px 6px; text-align: left; font-size: 8px; letter-spacing: 1px; }
-  td { padding: 4px 6px; border-bottom: 1px solid #eee; }
-  tr:nth-child(even) td { background: #f5f8ff; }
-  .val-bad  { color: #c0392b; font-weight: 700; }
-  .val-ok   { color: #1e8449; }
+  const html = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"/>' +
+    '<title>MediTrace \u2014 ' + titleType + ' \u2014 ' + patLabel + '</title>' +
+    '<style>' +
+    '* { box-sizing:border-box;margin:0;padding:0 }' +
+    'body { font-family:"Segoe UI",Arial,sans-serif;font-size:16px;color:#1a1a2e;background:white;line-height:1.7 }' +
+    '.page { max-width:210mm;margin:0 auto;padding:18mm 20mm;counter-reset:page }' +
+    '.report-header { border-bottom:3px solid #1a5276;padding-bottom:16px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:flex-start }' +
+    '.report-logo { font-family:Georgia,serif;font-size:32px;font-weight:700;color:#1a1a2e }' +
+    '.report-logo span { font-style:italic;color:#1a5276 }' +
+    '.report-type { font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#1a5276;margin-top:6px }' +
+    '.report-meta { text-align:right;font-size:12px;color:#555;line-height:1.8 }' +
+    '.section { margin-bottom:24px;page-break-inside:avoid }' +
+    '.section-title { font-size:18px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#1a5276;border-bottom:2px solid #1a5276;padding-bottom:6px;margin-bottom:14px }' +
+    '.exec-summary { background:#f0f5fa;border:2px solid #1a5276;border-radius:8px;padding:20px 24px;margin-bottom:24px;page-break-after:always }' +
+    '.exec-title { font-size:20px;font-weight:700;color:#1a5276;margin-bottom:14px;letter-spacing:2px;text-transform:uppercase }' +
+    '.exec-grid { display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px }' +
+    '.exec-box { background:white;border:1px solid #dde;border-radius:6px;padding:14px 16px }' +
+    '.exec-box-title { font-size:14px;font-weight:700;color:#1a5276;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px }' +
+    '.exec-box ul { list-style:none;padding:0 } .exec-box li { font-size:14px;margin-bottom:5px;padding-left:16px;position:relative }' +
+    '.exec-box li::before { content:"\u2022";position:absolute;left:0;color:#1a5276;font-weight:700 }' +
+    '.exec-box li.danger::before { content:"\ud83d\udea8";left:-2px } .exec-box li.warn::before { content:"\u26a0";left:0;color:#d68910 }' +
+    '.alert { border-radius:6px;padding:12px 16px;margin-bottom:10px;font-size:14px;line-height:1.6 }' +
+    '.alert.critical { background:#fde8e8;border-left:5px solid #c0392b;color:#7b241c }' +
+    '.alert.warn { background:#fef9e7;border-left:5px solid #d68910;color:#7d6608 }' +
+    '.alert.ok { background:#e8f8f5;border-left:5px solid #1e8449;color:#1a5c35 }' +
+    '.alert-title { font-weight:700;margin-bottom:4px;font-size:15px }' +
+    '.kpi-grid { display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px }' +
+    '.kpi-card { border:1px solid #ddd;border-radius:6px;padding:10px 12px }' +
+    '.kpi-card.bad { border-top:4px solid #c0392b } .kpi-card.ok { border-top:4px solid #1e8449 }' +
+    '.kpi-label { font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#888;font-weight:600 }' +
+    '.kpi-value { font-size:26px;font-weight:700;color:#1a1a2e } .kpi-unit { font-size:11px;color:#888 }' +
+    '.kpi-date { font-size:11px;color:#aaa;margin-top:2px } .kpi-bad { color:#c0392b;font-size:11px;font-weight:700 }' +
+    'table { width:100%;border-collapse:collapse;font-size:14px;margin-bottom:12px }' +
+    'th { background:#1a5276;color:white;padding:8px;text-align:left;font-size:12px;font-weight:600;letter-spacing:1px }' +
+    'td { padding:7px 8px;border-bottom:1px solid #eee;font-size:13px } tr:nth-child(even) td { background:#f5f8ff }' +
+    '.val-bad { color:#c0392b;font-weight:700 } .val-ok { color:#1e8449 }' +
+    '.tl-item { display:flex;gap:12px;margin-bottom:10px }' +
+    '.tl-dot { width:14px;height:14px;border-radius:50%;margin-top:4px;flex-shrink:0 }' +
+    '.tl-dot.urgencias { background:#c0392b } .tl-dot.hematologia { background:#1a5276 }' +
+    '.tl-dot.neurologia { background:#7d3c98 } .tl-dot.laboratorio { background:#1e8449 } .tl-dot.bacteriologia { background:#e8a44a }' +
+    '.tl-content { flex:1 } .tl-date { font-size:12px;color:#888 } .tl-title { font-size:15px;font-weight:700;margin:2px 0 } .tl-text { font-size:13px;color:#444;line-height:1.6 }' +
+    '.report-footer { border-top:2px solid #1a5276;margin-top:24px;padding-top:10px;font-size:10px;color:#888;display:flex;justify-content:space-between }' +
+    '@media print { body{font-size:15px} .page{padding:12mm 15mm} .exec-summary{page-break-after:always} .section{page-break-inside:avoid} @page{margin:15mm;@bottom-center{content:counter(page)" / "counter(pages);font-size:10px;color:#888}} }' +
+    '</style></head><body><div class="page">' +
 
-  /* TIMELINE */
-  .tl-item { display: flex; gap: 10px; margin-bottom: 8px; }
-  .tl-dot  { width: 10px; height: 10px; border-radius: 50%; margin-top: 3px; flex-shrink: 0; }
-  .tl-dot.urgencias   { background: #c0392b; }
-  .tl-dot.hematologia { background: #1a5276; }
-  .tl-dot.neurologia  { background: #7d3c98; }
-  .tl-dot.laboratorio { background: #1e8449; }
-  .tl-content { flex: 1; }
-  .tl-date  { font-size: 8px; color: #888; }
-  .tl-title { font-size: 10px; font-weight: 700; margin: 1px 0; }
-  .tl-text  { font-size: 9px; color: #555; }
+    '<div class="report-header"><div><div class="report-logo">Medi<span>Trace</span></div><div class="report-type">' + titleType + '</div></div>' +
+    '<div class="report-meta"><strong>Paciente:</strong> ' + patLabel + '<br><strong>Generado:</strong> ' + now + '<br><strong>Per\u00edodo:</strong> ' + dateRange + '<br><strong>Datos:</strong> ' + data.length + ' fechas \u00b7 ' + events.length + ' eventos<br><strong>Autor:</strong> Pierre-Henri Giraud \u00d7 Claude (Anthropic)<br>DOI: 10.5281/zenodo.19973451<br><strong>\u26a0 Documento informativo \u2014 No diagn\u00f3stico</strong></div></div>' +
 
-  /* FOOTER */
-  .footer { border-top: 1px solid #ccc; margin-top: 20px; padding-top: 8px;
-    font-size: 8px; color: #aaa; display: flex; justify-content: space-between; }
+    '<div class="exec-summary"><div class="exec-title">Resumen Ejecutivo</div><div class="exec-grid">' +
+    '<div class="exec-box"><div class="exec-box-title">\ud83d\udea8 Alertas cr\u00edticas</div><ul><li class="danger">Oclusi\u00f3n completa ACI izquierda (IRM 03/2026)</li><li class="danger">Dabigatr\u00e1n ABANDONADO \u2014 sin anticoagulaci\u00f3n activa</li><li class="danger">ECG pendiente antes de iniciar Donepezilo</li>' + alertListHtml + '</ul></div>' +
+    '<div class="exec-box"><div class="exec-box-title">\ud83d\udcca Datos del informe</div><ul><li>Paciente: ' + patLabel + '</li><li>Per\u00edodo: ' + dateRange + '</li><li>' + data.length + ' fechas de an\u00e1lisis</li><li>' + events.length + ' eventos cl\u00ednicos</li><li>' + Object.keys(lastVals).length + ' par\u00e1metros</li><li>' + alertParams.length + ' fuera de rango</li>' + (bacts.length?'<li>'+bacts.length+' cultivo(s)</li>':'') + '</ul></div></div>' +
+    '<div class="exec-grid"><div class="exec-box"><div class="exec-box-title">\ud83d\udc8a Medicaci\u00f3n actual</div><ul><li class="danger">Dabigatr\u00e1n 150mg \u2014 ABANDONADO (02/2025)</li><li class="warn">Donepezilo \u2014 PRESCRITO, no iniciado</li><li>Haloperidol \u2014 SUSPENDIDO \u2713</li><li>Hidroferol \u2014 EN CURSO \u2713</li><li class="warn">Atorvastatina \u2014 LDL 202 fuera de objetivo</li></ul></div>' +
+    '<div class="exec-box"><div class="exec-box-title">\u2753 Preguntas para el m\u00e9dico</div><ul><li>\u00bfRiesgo tromb\u00f3tico sin anticoagulaci\u00f3n + ACI ocluida?</li><li>\u00bfCu\u00e1ndo se realizar\u00e1 el ECG para Donepezilo?</li><li>\u00bfDeterioro cognitivo vascular vs Alzheimer?</li><li>\u00bfControl eficacia Hidroferol?</li></ul></div></div></div>' +
 
-  @media print {
-    body { font-size: 10px; }
-    .page { padding: 10mm; }
-  }
-</style>
-</head>
-<body>
-<div class="page">
+    (isDetailed ? '<div class="section"><div class="section-title">\ud83e\udde0 An\u00e1lisis Vascular \u2014 S\u00edntesis</div><div class="alert critical"><div class="alert-title">\ud83d\udea8 HALLAZGO CR\u00cdTICO \u2014 IRM Vascular ASCIRES 10/03/2026</div>Obstrucci\u00f3n completa arteria car\u00f3tida interna izquierda. Leucoaraiosis Fazekas II-III.</div><table><thead><tr><th>Fecha</th><th>Exploraci\u00f3n</th><th>Hallazgo clave</th></tr></thead><tbody><tr><td>11/2016</td><td>TEP bilateral</td><td>HTpulmonar PAPs 55-60mmHg</td></tr><tr><td>09/2021</td><td>Ictus VB</td><td class="val-bad">Diagn\u00f3stico tard\u00edo 27h</td></tr><tr><td>12/2021</td><td>PET/CT FDG</td><td class="val-bad">Hipometabolismo frontal IZQ</td></tr><tr><td>01/2022</td><td>2\u00ba TEP agudo</td><td class="val-bad">Troponina 76.68</td></tr><tr><td>03/2026</td><td>IRM Vascular</td><td class="val-bad">Oclusi\u00f3n COMPLETA ACI izq</td></tr></tbody></table><div class="alert warn"><div class="alert-title">\u2753 Preguntas para el m\u00e9dico</div>1. \u00bfFue el ictus de 09/2021 el evento oclusivo inicial?<br>2. \u00bfDeterioro cognitivo vascular (DFT) vs Alzheimer?<br>3. \u00bfRiesgo del abandono anticoagulante con ACI ocluida?</div></div>' +
+    '<div class="section"><div class="section-title">\u26a0 Farmacovigilancia \u2014 CIMA/AEMPS</div><div class="alert critical"><div class="alert-title">\ud83d\udea8 ECG PENDIENTE antes de Donepezilo</div>Haloperidol suspendido (QTc). ECG prescrito 03/2026 a\u00fan no realizado.</div><div class="alert critical"><div class="alert-title">\ud83d\udea8 Dabigatr\u00e1n ABANDONADO</div>Sin anticoagulaci\u00f3n con ACI ocluida. Riesgo tromb\u00f3tico elevado.</div><div class="alert warn"><div class="alert-title">\u26a0 Pantoprazol largo plazo \u2192 D\u00e9ficit B12</div>B12=152 pg/mL (2022). Riesgo hipomagnesemia.</div><div class="alert warn"><div class="alert-title">\u26a0 Tiotropio + Donepezilo \u2192 Antagonismo</div>Revisar necesidad de ambos.</div><div class="alert ok"><div class="alert-title">\u2713 Donepezilo + Memantina \u2014 SEGURO</div>Sin interacciones relevantes.</div></div>' +
+    '<div class="section"><div class="section-title">\ud83d\udc8a Observancia terap\u00e9utica</div><table><thead><tr><th>Medicamento</th><th>Estado</th><th>Observaci\u00f3n</th></tr></thead><tbody><tr><td><strong>Dabigatr\u00e1n</strong></td><td style="color:#c0392b;font-weight:700">ABANDONADO</td><td>Decisi\u00f3n familiar 02/2025</td></tr><tr><td><strong>Donepezilo</strong></td><td style="color:#d68910;font-weight:700">PRESCRITO</td><td>Pendiente ECG</td></tr><tr><td><strong>Haloperidol</strong></td><td style="color:#1e8449;font-weight:700">SUSPENDIDO \u2713</td><td>Correcto (QTc)</td></tr><tr><td><strong>Hidroferol</strong></td><td style="color:#1e8449;font-weight:700">EN CURSO \u2713</td><td>Mensual</td></tr><tr><td><strong>Atorvastatina</strong></td><td style="color:#d68910;font-weight:700">INCIERTO</td><td>LDL 202 mg/dL</td></tr></tbody></table></div>' : '') +
 
-  <!-- HEADER -->
-  <div class="header">
-    <div>
-      <div class="header-logo">Medi<span>Trace</span></div>
-      <div style="font-size:10px;color:#555;margin-top:4px">Informe de Seguimiento Médico Longitudinal</div>
-    </div>
-    <div class="header-meta">
-      <strong>Paciente:</strong> M.E.J. (datos anonimizados)<br>
-      <strong>Generado por:</strong> MediTrace v2026.2<br>
-      <strong>Aplicación:</strong> <a href="https://caracole.github.io/seguimiento-medico/" style="color:#1a5276">caracole.github.io/seguimiento-medico</a><br>
-      <strong>Autor:</strong> Pierre-Henri Giraud × Claude (Anthropic)<br>
-      Generado: ${now}<br>
-      Período: ${dateRange}<br>
-      Documentos: ${data.length} fechas de análisis<br>
-      DOI: 10.5281/zenodo.19973451<br>
-      <strong>⚠ Documento informativo — No diagnóstico</strong>
-    </div>
-  </div>
+    '<div class="section"><div class="section-title">\ud83d\udcca \u00daltimos valores conocidos</div><div class="kpi-grid">' + kpiHtml + '</div></div>' +
 
-  <!-- ANÁLISIS VASCULAR -->
-  <div class="section">
-    <div class="section-title">🧠 Análisis Vascular — Síntesis</div>
+    '<div class="section"><div class="section-title">\ud83d\udccb Tabla de s\u00edntesis cronol\u00f3gica</div><table><thead><tr><th>Fecha</th><th>Fuente</th><th>Hb</th><th>Leuc.</th><th>Gluc.</th><th>Creat.</th><th>FG</th><th>Colest.</th><th>PCR</th><th>TSH</th><th>VitD</th></tr></thead><tbody>' + tableRows + '</tbody></table></div>' +
 
-    <div class="alert critical">
-      <div class="alert-title">🚨 HALLAZGO CRÍTICO — IRM Vascular ASCIRES 10/03/2026</div>
-      Obstrucción completa arteria carótida interna izquierda desde su origen. ACM izquierda vicariada.
-      Leucoaraiosis Fazekas II-III. Lesiones ictales: ganglios basales, tálamos, protuberancia.
-    </div>
+    timelineHtml + bacterioHtml +
 
-    <table style="margin-bottom:10px">
-      <thead><tr><th>Fecha</th><th>Exploración</th><th>Hallazgo clave</th></tr></thead>
-      <tbody>
-        <tr><td>11/2016</td><td>TEP bilateral</td><td>HTpulmonar PAPs 55-60mmHg · Disfunción VD</td></tr>
-        <tr><td>06/2017</td><td>Angio-TAC</td><td>Signos TEP crónico</td></tr>
-        <tr><td>09/2021</td><td>Ictus VB</td><td class="val-bad">Diagnóstico tardío 27h · Enolismo inicial erróneo</td></tr>
-        <tr><td>12/2021</td><td>PET/CT FDG CUN</td><td class="val-bad">Hipometabolismo frontal IZQUIERDO → oclusión carotídea precoz</td></tr>
-        <tr><td>01/2022</td><td>2º TEP agudo</td><td class="val-bad">Troponina 76.68 · NT-ProBNP 11.924 · PCR 66.44</td></tr>
-        <tr><td>03/2024</td><td>TAC craneal</td><td>Leucoaraiosis · Atrofia corticosubcortical</td></tr>
-        <tr><td>03/2026</td><td>IRM Vascular</td><td class="val-bad">Oclusión COMPLETA ACI izquierda · Fazekas II-III</td></tr>
-      </tbody>
-    </table>
+    '<div class="report-footer"><span>MediTrace v2026.3 \u00a9 Pierre-Henri Giraud \u00d7 Claude (Anthropic) \u00b7 DOI: 10.5281/zenodo.19973451</span><span>Documento informativo \u2014 No sustituye el criterio m\u00e9dico profesional.</span></div>' +
+    '</div></body></html>';
 
-    <div class="alert warn">
-      <div class="alert-title">❓ Preguntas para el médico</div>
-      1. ¿Fue el ictus de 09/2021 el evento oclusivo carotídeo inicial?
-      2. ¿El deterioro cognitivo es vascular (DFT) y no Alzheimer? ¿Está el tratamiento adaptado?
-      3. ¿Se realizó eco-doppler carotídeo tras el PET/CT de 2021?
-      4. ¿Qué riesgo representa el abandono del anticoagulante con ACI izquierda ocluida?
-    </div>
-  </div>
-
-  <!-- FARMACOVIGILANCIA -->
-  <div class="section">
-    <div class="section-title">⚠ Farmacovigilancia — Alertas CIMA/AEMPS</div>
-
-    <div class="alert warn">
-      <div class="alert-title">⚠ QTc RESUELTO PARCIALMENTE — Haloperidol suspendido definitivamente</div>
-      Haloperidol arrêté par le neurologue privé. Donepezilo re-prescrit mais AÚN NO INICIADO.
-      Melitraceno/Flupentixol probablemente también suspendido (no encontrado en stock domiciliario).
-      ECG prescrito por neurólogo HGC en 03/2026 — AÚN NO REALIZADO.
-      Realizar ECG ANTES de iniciar Donepezilo.
-    </div>
-    <div class="alert critical">
-      <div class="alert-title">🚨 URGENTE — ECG PENDIENTE</div>
-      ECG prescrito por neurólogo HGC (conociendo informe neurólogo privado) — único paso pendiente
-      para iniciar Donepezilo con seguridad. Buena coordinación entre ambos especialistas confirmada.
-    </div>
-    <div class="alert critical">
-      <div class="alert-title">🚨 CRÍTICO — Dabigatrán + Adiro (AAS)</div>
-      Dobla el riesgo de sangrado mayor según FT Pradaxa (CIMA). Especialmente en ≥75 años.
-      Dabigatrán ABANDONADO por decisión familiar (02/2025) — riesgo trombótico elevado sin anticoagulación
-      con carotídea interna izquierda completamente ocluida.
-    </div>
-    <div class="alert warn">
-      <div class="alert-title">⚠ Dabigatrán + Función renal</div>
-      FG en descenso (83→70 ml/min). Control semestral obligatorio (AEMPS). Contraindicado si FG &lt;30.
-    </div>
-    <div class="alert warn">
-      <div class="alert-title">⚠ Pantoprazol largo plazo → Déficit B12 + Hipomagnesemia</div>
-      FT Pantoprazol (CIMA): reduce absorción B12. B12=152 pg/mL (2022) ⚠️.
-      Riesgo hipomagnesemia → arritmia ventricular. Medir Magnesio sérico.
-    </div>
-    <div class="alert warn">
-      <div class="alert-title">⚠ Tiotropio + Donepezilo → Antagonismo anticolinérgico</div>
-      Tiotropio reduce eficacia del Donepezilo. Revisar necesidad de ambos simultáneamente.
-    </div>
-    <div class="alert warn">
-      <div class="alert-title">⚠ Vitamina D — Hidroferol EN CURSO</div>
-      Hidroferol 0.266mg/mensual confirmado. Stock 6 meses. Verificar eficacia en próxima analítica (objetivo &gt;30 ng/mL).
-    </div>
-    <div class="alert ok">
-      <div class="alert-title">✓ SEGURO — Donepezilo + Memantina</div>
-      Sin interacciones relevantes según FT Domex/TecniGen (CIMA).
-    </div>
-  </div>
-
-  <!-- OBSERVANCIA -->
-  <div class="section">
-    <div class="section-title">Observancia terapéutica — Situación actual</div>
-    <table>
-      <thead><tr><th>Medicamento</th><th>Estado actual</th><th>Observación</th></tr></thead>
-      <tbody>
-        <tr><td><strong>Dabigatrán 150mg</strong></td><td style="color:#c0392b">ABANDONADO</td><td>Decisión familiar 02/2025. Sin anticoagulación activa.</td></tr>
-        <tr><td><strong>Donepezilo</strong></td><td style="color:#d68910">PRESCRITO — no iniciado</td><td>Pendiente ECG. Caja Lixben sin abrir encontrada.</td></tr>
-        <tr><td><strong>Haloperidol</strong></td><td style="color:#1e8449">SUSPENDIDO definitivamente</td><td>Decisión neurólogo privado. Correcto (QTc).</td></tr>
-        <tr><td><strong>Hidroferol 0.266mg</strong></td><td style="color:#1e8449">EN CURSO ✓</td><td>Mensual. Stock 6 meses. Renovar en ~3 meses.</td></tr>
-        <tr><td><strong>Melitraceno/Flupentixol</strong></td><td style="color:#d68910">PROBABLE ABANDONO</td><td>No encontrado en stock domiciliario.</td></tr>
-        <tr><td><strong>Quetiapina</strong></td><td style="color:#1e8449">SUSTITUIDA por Haloperidol</td><td>8 pastillas tomadas. Uso secuencial no simultáneo.</td></tr>
-        <tr><td><strong>Atorvastatina</strong></td><td style="color:#d68910">INCIERTO</td><td>LDL 202 mg/dL ⚠️ a pesar del tratamiento.</td></tr>
-        <tr><td><strong>Adiro + Pantoprazol + Tiotropio</strong></td><td style="color:#d68910">INCIERTO</td><td>Prescritos — observancia desconocida.</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- KPIs -->
-  <div class="section">
-    <div class="section-title">Últimos valores conocidos</div>
-    <div class="kpi-grid">
-      ${Object.entries(lastVals).filter(([k]) => PARAMS[k]).slice(0,16).map(([k, info]) => {
-        const p  = PARAMS[k];
-        const st = getStatus(k, info.v);
-        return `<div class="kpi-card ${st}">
-          <div class="kpi-label">${paramSpan(k)}</div>
-          <div class="kpi-value">${info.v} <span class="kpi-unit">${p.unit}</span></div>
-          <div class="kpi-date">${fmtDate(info.date)}</div>
-          ${st==='bad' ? '<div class="kpi-bad">⚠ Fuera de rango</div>' : ''}
-        </div>`;
-      }).join('')}
-    </div>
-  </div>
-
-  <!-- TABLEAU SYNTHÈSE -->
-  <div class="section">
-    <div class="section-title">Tabla de síntesis cronológica</div>
-    <table>
-      <thead>
-        <tr>
-          <th>Fecha</th><th>Fuente</th>
-          <th>${paramTip('hemoglobina','Hb')}</th><th>${paramTip('leucocitos','Leuc.')}</th><th>${paramTip('glucosa','Gluc.')}</th><th>${paramTip('creatinina','Creat.')}</th><th>${paramTip('filtrado','FG')}</th>
-          <th>${paramTip('colesterol','Colest.')}</th><th>${paramTip('pcr','PCR')}</th><th>${paramTip('fibrinogeno','Fibr.')}</th><th>${paramTip('tsh','TSH')}</th><th>${paramTip('vitamina_d','VitD')}</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${data.map(m => `<tr>
-          <td>${fmtDate(m.date)}</td>
-          <td>${m.src}</td>
-          ${['hemoglobina','leucocitos','glucosa','creatinina','filtrado','colesterol','pcr','fibrinogeno','tsh','vitamina_d'].map(k => {
-            const v = m.vals[k];
-            if (v===undefined) return '<td style="color:#ccc">—</td>';
-            const st = getStatus(k, v);
-            return `<td class="${st==='bad'?'val-bad':'val-ok'}">${v}</td>`;
-          }).join('')}
-        </tr>`).join('')}
-      </tbody>
-    </table>
-  </div>
-
-  <!-- TIMELINE -->
-  ${events.length ? `<div class="section">
-    <div class="section-title">Cronología clínica (${events.length} eventos)</div>
-    ${[...events].reverse().map(ev => `
-      <div class="tl-item">
-        <div class="tl-dot ${ev.type||'laboratorio'}"></div>
-        <div class="tl-content">
-          <div class="tl-date">${ev.date} · ${(ev.type||'').toUpperCase()}</div>
-          <div class="tl-title">${ev.title||''}</div>
-          <div class="tl-text">${ev.text||''}</div>
-        </div>
-      </div>`).join('')}
-  </div>` : ''}
-
-  <!-- FOOTER -->
-  <div class="footer">
-    <span>MediTrace © 2026 Pierre-Henri Giraud × Claude (Anthropic) · GNU GPL v3 · DOI: 10.5281/zenodo.19973451</span>
-    <span>Este informe es informativo y no sustituye el criterio médico profesional.</span>
-  </div>
-
-</div>
-</body>
-</html>`;
-
-  /* Ouvrir dans une nouvelle fenêtre et imprimer */
-  const filename = 'MediTrace_Informe_Medico_MEJ_' + new Date().toISOString().slice(0,10);
-
+  const filename = 'MediTrace_' + (isDetailed ? 'Detallado' : 'Sintetico') + '_' + patLabel.replace(/[^a-zA-Z0-9]/g,'_') + '_' + new Date().toISOString().slice(0,10);
   const win = window.open('', '_blank');
-  win.document.open();
-  win.document.write(html);
-  win.document.close();
-  win.document.title = filename;
-  win.focus();
-
-  alert('📄 El informe se abre en una nueva ventana.\n\nPara guardar como PDF:\n→ Ctrl+P\n→ Destino: "Guardar como PDF"\n→ Nombre sugerido: ' + filename + '.pdf');
-
+  win.document.open(); win.document.write(html); win.document.close();
+  win.document.title = filename; win.focus();
+  alert('\ud83d\udcc4 Informe ' + (isDetailed ? 'DETALLADO' : 'SINT\u00c9TICO') + ' abierto.\n\nPara guardar como PDF:\n\u2192 Ctrl+P \u2192 "Guardar como PDF"\n\u2192 Nombre: ' + filename + '.pdf');
   setTimeout(() => win.print(), 600);
 }
+
 
 /* ================================================================
    RESET
@@ -2821,7 +2666,7 @@ function buildResumen(data) {
       </div>
       <!-- Footer -->
       <div style="padding:8px 20px;border-top:1px solid var(--border);font-family:var(--mono);font-size:9px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px">
-        <span>MediTrace v2026.2 · Pierre-Henri Giraud × Claude (Anthropic)</span>
+        <span>MediTrace v2026.3 · Pierre-Henri Giraud × Claude (Anthropic)</span>
         <span>DOI: <a href="https://doi.org/10.5281/zenodo.19973451" target="_blank" style="color:var(--accent)">10.5281/zenodo.19973451</a></span>
       </div>
     </div>`;
