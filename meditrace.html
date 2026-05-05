@@ -2517,40 +2517,25 @@ function exportPDF(mode) {
     '<a style="display:inline-block;margin:0 8px;padding:6px 16px;border-radius:6px;text-decoration:none;font-size:13px;font-weight:600;color:white;background:#25D366" href="https://wa.me/?text=' + encodeURIComponent('Informe MediTrace ' + window.location.href) + '" target="_blank">WhatsApp</a>' +
     '<a style="display:inline-block;margin:0 8px;padding:6px 16px;border-radius:6px;text-decoration:none;font-size:13px;font-weight:600;color:white;background:#1a5276" href="mailto:?subject=' + encodeURIComponent('Informe MediTrace') + '&body=' + encodeURIComponent('Adjunto informe de seguimiento.\n' + window.location.href) + '">Email</a></div>' +
     '<div class="report-footer"><span>MediTrace v2026.3 \u2014 ' + (isDetailed ? 'INFORME DETALLADO' : 'INFORME SINT\u00c9TICO') + ' \u2014 ' + patLabel + '</span><span>Documento informativo \u2014 No sustituye el criterio m\u00e9dico profesional.</span></div>' +
-    '</div>
-<script>
-// Page numbering for print
-window.addEventListener("load", function() {
-  var tipoInforme = document.title.indexOf("Detallado") >= 0 ? "Informe Detallado" : "Informe Sint\u00e9tico";
-  
-  // Create page footer elements for printing
-  var style = document.createElement("style");
-  style.textContent = "" +
-    ".page-footer-print { display:none }" +
-    "@media print {" +
-    "  .page-footer-print { display:block !important; position:fixed; bottom:0; left:0; right:0;" +
-    "    text-align:center; font-size:10px; color:#666; padding:6px 0;" +
-    "    border-top:1px solid #ddd; background:white; font-family:Arial,sans-serif }" +
-    "  .share-bar { display:none !important }" +
-    "  #page-indicator { display:none !important }" +
-    "}";
-  document.head.appendChild(style);
-  
-  // Fixed footer visible on every printed page
-  var footer = document.createElement("div");
-  footer.className = "page-footer-print";
-  footer.innerHTML = "MediTrace v2026.3 \u2014 " + tipoInforme + " \u2014 Generado: " + new Date().toLocaleDateString("es-ES");
-  document.body.appendChild(footer);
-  
-  // Screen indicator  
-  var ind = document.createElement("div");
-  ind.id = "page-indicator";
-  ind.style.cssText = "position:fixed;bottom:10px;right:16px;font-size:12px;color:#888;font-family:Arial;background:rgba(255,255,255,0.95);padding:4px 12px;border-radius:6px;border:1px solid #ddd";
-  ind.textContent = "MediTrace \u2014 " + tipoInforme;
-  document.body.appendChild(ind);
-});
-</script>
-</body></html>';
+    '</div>' +
+    '<scr' + 'ipt>' +
+    'window.addEventListener("load", function() {' +
+    '  var tipoInforme = document.title.indexOf("Detallado") >= 0 ? "Informe Detallado" : "Informe Sint\\u00e9tico";' +
+    '  var style = document.createElement("style");' +
+    '  style.textContent = ".page-footer-print{display:none} @media print{.page-footer-print{display:block!important;position:fixed;bottom:0;left:0;right:0;text-align:center;font-size:10px;color:#666;padding:6px 0;border-top:1px solid #ddd;background:white;font-family:Arial,sans-serif} .share-bar{display:none!important} #page-indicator{display:none!important}}";' +
+    '  document.head.appendChild(style);' +
+    '  var footer = document.createElement("div");' +
+    '  footer.className = "page-footer-print";' +
+    '  footer.innerHTML = "MediTrace v2026.3 \\u2014 " + tipoInforme + " \\u2014 Generado: " + new Date().toLocaleDateString("es-ES");' +
+    '  document.body.appendChild(footer);' +
+    '  var ind = document.createElement("div");' +
+    '  ind.id = "page-indicator";' +
+    '  ind.style.cssText = "position:fixed;bottom:10px;right:16px;font-size:12px;color:#888;font-family:Arial;background:rgba(255,255,255,0.95);padding:4px 12px;border-radius:6px;border:1px solid #ddd";' +
+    '  ind.textContent = "MediTrace \\u2014 " + tipoInforme;' +
+    '  document.body.appendChild(ind);' +
+    '});' +
+    '<\\/scr' + 'ipt>' +
+    '</body></html>';
 
   const filename = 'MediTrace_' + (isDetailed ? 'Detallado' : 'Sintetico') + '_' + patLabel.replace(/[^a-zA-Z0-9]/g,'_') + '_' + new Date().toISOString().slice(0,10);
   const win = window.open('', '_blank');
