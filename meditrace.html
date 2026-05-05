@@ -403,12 +403,32 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
     <button class="btn-topbar" onclick="toggleTheme()" id="theme-btn" title="Cambiar tema claro/oscuro">☀️ Claro</button>
     <button class="btn-topbar" onclick="exportData()" title="Guardar copia de seguridad">💾 Backup .mt</button>
     <button class="btn-topbar" onclick="document.getElementById('import-json').click()" title="Restaurar desde backup">📂 Restaurar</button>
-    <button class="btn-topbar" onclick="exportPDF('detallado')" title="Informe completo detallado" style="color:#4ae8a4;border-color:#4ae8a4">📄 Informe Detallado</button>
-    <button class="btn-topbar" onclick="exportPDF('sintetico')" title="Resumen ejecutivo 1-2 páginas" style="color:#e8a44a;border-color:#e8a44a">📋 Informe Sintético</button>
+    <button class="btn-topbar" onclick="showInformeChoice()" title="Generar informe médico" style="color:#4ae8a4;border-color:#4ae8a4;font-size:14px;padding:8px 18px">📄 Informe</button>
     <input type="file" id="import-json" accept=".json,.js,.mt,application/json,text/plain" style="display:none" onchange="importData(this)"/>
     <button class="btn-topbar" onclick="showPanel('importar',this)" data-i18n="nav_import">+ Añadir datos</button>
     <button class="btn-topbar" onclick="nuevoPaciente()" title="Cambiar de paciente (guarda y limpia)" style="color:#e8a44a;border-color:#e8a44a">👥 Nuevo paciente</button>
     <button class="btn-topbar danger" onclick="confirmReset()" data-i18n="nav_reset">⟳ Reiniciar</button>
+  </div>
+</div>
+
+<!-- INFORME CHOICE DIALOG -->
+<div id="informe-dialog" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);justify-content:center;align-items:center">
+  <div style="background:var(--surface);border:2px solid var(--accent);border-radius:16px;padding:32px 28px;max-width:500px;width:90%;text-align:center">
+    <div style="font-family:var(--serif);font-size:24px;font-weight:700;color:var(--text);margin-bottom:8px">📄 Generar Informe</div>
+    <div style="font-size:15px;color:var(--muted);margin-bottom:24px">Elija el tipo de informe a generar</div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <button onclick="exportPDF('detallado');closeInformeDialog()" style="background:var(--accent);color:white;border:none;border-radius:10px;padding:18px 24px;font-size:17px;font-weight:600;cursor:pointer;text-align:left;font-family:var(--sans);transition:all .15s">
+        📄 <strong>Informe Detallado</strong>
+        <div style="font-size:13px;font-weight:400;opacity:0.85;margin-top:4px">Anamnesis · Análisis vascular · Farmacovigilancia · Observancia · Valores · Tabla · Cronología · Bacteriología</div>
+      </button>
+      <button onclick="exportPDF('sintetico');closeInformeDialog()" style="background:var(--surface2);color:var(--text);border:2px solid var(--border);border-radius:10px;padding:18px 24px;font-size:17px;font-weight:600;cursor:pointer;text-align:left;font-family:var(--sans);transition:all .15s">
+        📋 <strong>Informe Sintético</strong>
+        <div style="font-size:13px;font-weight:400;color:var(--muted);margin-top:4px">Anamnesis · Valores clave · Tabla de síntesis — 1-2 páginas</div>
+      </button>
+      <button onclick="closeInformeDialog()" style="background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:14px;cursor:pointer;font-family:var(--sans);margin-top:4px">
+        ✕ Cancelar
+      </button>
+    </div>
   </div>
 </div>
 
@@ -2337,6 +2357,17 @@ function importData(input) {
 }
 
 /* ================================================================
+   INFORME — Dialog de choix
+================================================================ */
+function showInformeChoice() {
+  const dlg = document.getElementById('informe-dialog');
+  dlg.style.display = 'flex';
+}
+function closeInformeDialog() {
+  document.getElementById('informe-dialog').style.display = 'none';
+}
+
+/* ================================================================
    EXPORT PDF — Rapport médical
 ================================================================ */
 function exportPDF(mode) {
@@ -2393,7 +2424,19 @@ function exportPDF(mode) {
         (b.commentaire ? '<em>' + b.commentaire + '</em>' : '') + '</div>';
     }).join('') + '</div>' : '';
 
-  const html = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"/>' +
+
+    /* Build sources list */
+    var allSources = new Set();
+    data.forEach(function(m) { if (m.src) allSources.add(m.src); });
+    events.forEach(function(e) { if (e.src) allSources.add(e.src); });
+    var sourcesHtml = isDetailed && allSources.size > 0 ? '<div class="section"><div class="section-title">\ud83c\udfe5 Fuentes documentales</div>' +
+      '<table><thead><tr><th>N\u00ba</th><th>Fuente / Establecimiento</th><th>Documentos</th></tr></thead><tbody>' +
+      Array.from(allSources).sort().map(function(src, i) {
+        var count = data.filter(function(d) { return d.src === src; }).length + events.filter(function(e) { return e.src === src; }).length;
+        return '<tr><td>' + (i+1) + '</td><td><strong>' + src + '</strong></td><td>' + count + '</td></tr>';
+      }).join('') + '</tbody></table></div>' : '';
+
+    const html = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"/>' +
     '<title>MediTrace \u2014 ' + titleType + ' \u2014 ' + patLabel + '</title>' +
     '<style>' +
     '* { box-sizing:border-box;margin:0;padding:0 }' +
@@ -2435,7 +2478,10 @@ function exportPDF(mode) {
     '.tl-dot.neurologia { background:#7d3c98 } .tl-dot.laboratorio { background:#1e8449 } .tl-dot.bacteriologia { background:#e8a44a }' +
     '.tl-content { flex:1 } .tl-date { font-size:12px;color:#888 } .tl-title { font-size:15px;font-weight:700;margin:2px 0 } .tl-text { font-size:13px;color:#444;line-height:1.6 }' +
     '.report-footer { border-top:2px solid #1a5276;margin-top:24px;padding-top:10px;font-size:10px;color:#888;display:flex;justify-content:space-between }' +
-    '@media print { body{font-size:15px} .page{padding:8mm 10mm} .exec-summary{page-break-after:always} .section{page-break-inside:avoid} .share-bar{display:none} @page{size:A4;margin:10mm;@bottom-center{content:counter(page)" / "counter(pages);font-size:10px;color:#888}} }' +
+    '@media print { body{font-size:15px} .page{padding:8mm 10mm} .anamnesis{page-break-after:always} .section{page-break-inside:avoid} .share-bar{display:none} #page-indicator{display:none} @page{size:A4;margin:12mm 10mm 18mm 10mm} }
+    .print-page-footer { display:none }
+    @media print { .print-page-footer { display:block;position:fixed;bottom:0;left:0;right:0;text-align:center;font-size:9px;color:#888;padding:4px } }
+    ' +
     '</style></head><body><div class="page">' +
 
     '<div class="report-header"><div><div class="report-logo">Medi<span>Trace</span></div><div class="report-type">' + titleType + '</div></div>' +
@@ -2464,20 +2510,53 @@ function exportPDF(mode) {
 
     '<div class="section"><div class="section-title">\ud83d\udccb Tabla de s\u00edntesis cronol\u00f3gica</div><table><thead><tr><th>Fecha</th><th>Fuente</th><th>Hb</th><th>Leuc.</th><th>Gluc.</th><th>Creat.</th><th>FG</th><th>Colest.</th><th>PCR</th><th>TSH</th><th>VitD</th></tr></thead><tbody>' + tableRowsDesc + '</tbody></table></div>' +
 
-    timelineHtml + bacterioHtml +
+    timelineHtml + bacterioHtml + sourcesHtml +
 
     '<div style="text-align:center;margin:16px 0;padding:10px;background:#f8f8f8;border-radius:6px" class="share-bar"><strong>Compartir este informe:</strong> ' +
     '<a style="display:inline-block;margin:0 8px;padding:6px 16px;border-radius:6px;text-decoration:none;font-size:13px;font-weight:600;color:white;background:#0088cc" href="https://t.me/share/url?url=' + encodeURIComponent(window.location.href) + '&text=' + encodeURIComponent('Informe MediTrace') + '" target="_blank">Telegram</a>' +
     '<a style="display:inline-block;margin:0 8px;padding:6px 16px;border-radius:6px;text-decoration:none;font-size:13px;font-weight:600;color:white;background:#25D366" href="https://wa.me/?text=' + encodeURIComponent('Informe MediTrace ' + window.location.href) + '" target="_blank">WhatsApp</a>' +
     '<a style="display:inline-block;margin:0 8px;padding:6px 16px;border-radius:6px;text-decoration:none;font-size:13px;font-weight:600;color:white;background:#1a5276" href="mailto:?subject=' + encodeURIComponent('Informe MediTrace') + '&body=' + encodeURIComponent('Adjunto informe de seguimiento.\n' + window.location.href) + '">Email</a></div>' +
-    '<div class="report-footer"><span>MediTrace v2026.3 \u00a9 Pierre-Henri Giraud \u00d7 Claude (Anthropic) \u00b7 DOI: 10.5281/zenodo.19973451</span><span>Documento informativo \u2014 No sustituye el criterio m\u00e9dico profesional.</span></div>' +
-    '</div></body></html>';
+    '<div class="report-footer"><span>MediTrace v2026.3 \u2014 ' + (isDetailed ? 'INFORME DETALLADO' : 'INFORME SINT\u00c9TICO') + ' \u2014 ' + patLabel + '</span><span>Documento informativo \u2014 No sustituye el criterio m\u00e9dico profesional.</span></div>' +
+    '</div>
+<script>
+// Page numbering for print
+window.addEventListener("load", function() {
+  var tipoInforme = document.title.indexOf("Detallado") >= 0 ? "Informe Detallado" : "Informe Sint\u00e9tico";
+  
+  // Create page footer elements for printing
+  var style = document.createElement("style");
+  style.textContent = "" +
+    ".page-footer-print { display:none }" +
+    "@media print {" +
+    "  .page-footer-print { display:block !important; position:fixed; bottom:0; left:0; right:0;" +
+    "    text-align:center; font-size:10px; color:#666; padding:6px 0;" +
+    "    border-top:1px solid #ddd; background:white; font-family:Arial,sans-serif }" +
+    "  .share-bar { display:none !important }" +
+    "  #page-indicator { display:none !important }" +
+    "}";
+  document.head.appendChild(style);
+  
+  // Fixed footer visible on every printed page
+  var footer = document.createElement("div");
+  footer.className = "page-footer-print";
+  footer.innerHTML = "MediTrace v2026.3 \u2014 " + tipoInforme + " \u2014 Generado: " + new Date().toLocaleDateString("es-ES");
+  document.body.appendChild(footer);
+  
+  // Screen indicator  
+  var ind = document.createElement("div");
+  ind.id = "page-indicator";
+  ind.style.cssText = "position:fixed;bottom:10px;right:16px;font-size:12px;color:#888;font-family:Arial;background:rgba(255,255,255,0.95);padding:4px 12px;border-radius:6px;border:1px solid #ddd";
+  ind.textContent = "MediTrace \u2014 " + tipoInforme;
+  document.body.appendChild(ind);
+});
+</script>
+</body></html>';
 
   const filename = 'MediTrace_' + (isDetailed ? 'Detallado' : 'Sintetico') + '_' + patLabel.replace(/[^a-zA-Z0-9]/g,'_') + '_' + new Date().toISOString().slice(0,10);
   const win = window.open('', '_blank');
   win.document.open(); win.document.write(html); win.document.close();
   win.document.title = filename; win.focus();
-  alert('\ud83d\udcc4 Informe ' + (isDetailed ? 'DETALLADO' : 'SINT\u00c9TICO') + ' abierto.\n\nPara guardar como PDF:\n\u2192 Ctrl+P \u2192 "Guardar como PDF"\n\u2192 Nombre: ' + filename + '.pdf');
+  alert('\ud83d\udcc4 Informe ' + (isDetailed ? 'DETALLADO' : 'SINT\u00c9TICO') + ' abierto.\n\nPara guardar como PDF:\n\u2192 Ctrl+P \n\u2192 Destino: "Guardar como PDF"\n\u2192 \u2705 Activar "Encabezados y pies de p\u00e1gina" para numeraci\u00f3n\n\u2192 Nombre: ' + filename + '.pdf');
   setTimeout(() => win.print(), 600);
 }
 
