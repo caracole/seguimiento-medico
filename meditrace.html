@@ -2474,7 +2474,7 @@ function exportPDF(mode) {
     '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">' +
     '<button onclick="window.print()" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#1a5276;border:none;cursor:pointer">Guardar como PDF</button>' +
     '<button onclick="copiarInforme()" id="btn-copiar" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#2ecc71;border:none;cursor:pointer">Copiar informe</button>' +
-    '<a style="display:inline-block;padding:10px 20px;border-radius:6px;text-decoration:none;font-size:14px;font-weight:600;color:white;background:#0088cc" href="mailto:?subject=' + encodeURIComponent(shareSubject) + '&body=Estimado%2Fa%20Doctor%2Fa%2C%0A%0AAdjunto%20el%20informe%20de%20seguimiento%20m%C3%A9dico%20(' + encodeURIComponent(shareType) + ')%20del%20paciente%20' + encodeURIComponent(patLabel) + '.%0A%0AQuedo%20a%20su%20disposici%C3%B3n.%0A%0AAtentamente">Enviar por Email</a>' +
+    '<a style="display:inline-block;padding:10px 20px;border-radius:6px;text-decoration:none;font-size:14px;font-weight:600;color:white;background:#0088cc" href="mailto:?subject=' + encodeURIComponent(shareSubject) + '&body=Estimado%2Fa%20Doctor%2Fa%2C%0D%0A%0D%0AAdjunto%20el%20informe%20de%20seguimiento%20m%C3%A9dico%20(' + encodeURIComponent(shareType) + ')%20del%20paciente%20' + encodeURIComponent(patLabel) + '.%0D%0A%0D%0AQuedo%20a%20su%20disposici%C3%B3n.%0D%0A%0D%0AAtentamente%0D%0APierre-Henri%20Giraud">Enviar por Email</a>' +
     '</div>' +
     '<div id="copiar-feedback" style="font-size:12px;color:#2ecc71;margin-top:8px;min-height:20px"></div>' +
     '</div>';
@@ -2586,8 +2586,6 @@ function exportPDF(mode) {
   const win = window.open('', '_blank');
   win.document.open(); win.document.write(html); win.document.close();
   win.document.title = filename; win.focus();
-  alert('\ud83d\udcc4 Informe ' + (isDetailed ? 'DETALLADO' : 'SINT\u00c9TICO') + ' abierto.\n\nPara guardar como PDF:\n\u2192 Ctrl+P \n\u2192 Destino: "Guardar como PDF"\n\u2192 \u2705 Activar "Encabezados y pies de p\u00e1gina" para numeraci\u00f3n\n\u2192 Nombre: ' + filename + '.pdf');
-  setTimeout(() => win.print(), 600);
 }
 
 
