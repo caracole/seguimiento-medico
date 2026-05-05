@@ -2474,7 +2474,7 @@ function exportPDF(mode) {
     '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">' +
     '<button onclick="window.print()" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#1a5276;border:none;cursor:pointer">Guardar como PDF</button>' +
     '<button onclick="copiarInforme()" id="btn-copiar" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#2ecc71;border:none;cursor:pointer">Copiar informe</button>' +
-    '<a style="display:inline-block;padding:10px 20px;border-radius:6px;text-decoration:none;font-size:14px;font-weight:600;color:white;background:#0088cc" href="mailto:?subject=' + encodeURIComponent(shareSubject) + '&body=' + encodeURIComponent('Estimado/a Doctor/a,\n\nAdjunto el informe de seguimiento m\u00e9dico (' + shareType + ') del paciente ' + patLabel + '.\n\nQuedo a su disposici\u00f3n.\nAtentamente') + '">Enviar por Email</a>' +
+    '<a style="display:inline-block;padding:10px 20px;border-radius:6px;text-decoration:none;font-size:14px;font-weight:600;color:white;background:#0088cc" href="mailto:?subject=' + encodeURIComponent(shareSubject) + '&body=Estimado%2Fa%20Doctor%2Fa%2C%0A%0AAdjunto%20el%20informe%20de%20seguimiento%20m%C3%A9dico%20(' + encodeURIComponent(shareType) + ')%20del%20paciente%20' + encodeURIComponent(patLabel) + '.%0A%0AQuedo%20a%20su%20disposici%C3%B3n.%0A%0AAtentamente">Enviar por Email</a>' +
     '</div>' +
     '<div id="copiar-feedback" style="font-size:12px;color:#2ecc71;margin-top:8px;min-height:20px"></div>' +
     '</div>';
