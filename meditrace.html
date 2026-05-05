@@ -2465,6 +2465,20 @@ function exportPDF(mode) {
         return '<tr><td>' + (i+1) + '</td><td><strong>' + src + '</strong></td><td>' + count + '</td></tr>';
       }).join('') + '</tbody></table></div>' : '';
 
+  /* Share bar HTML */
+  var shareType = isDetailed ? 'Detallado' : 'Sint\u00e9tico';
+  var shareSubject = 'MediTrace \u2014 Informe ' + shareType + ' \u2014 ' + patLabel;
+  var shareBarHtml =
+    '<div style="text-align:center;margin:16px 0;padding:14px;background:#f0f5fa;border:1px solid #cce;border-radius:8px" class="share-bar">' +
+    '<div style="font-size:15px;font-weight:700;color:#1a5276;margin-bottom:10px">Compartir este informe</div>' +
+    '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">' +
+    '<button onclick="window.print()" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#1a5276;border:none;cursor:pointer">Guardar como PDF</button>' +
+    '<button onclick="copiarInforme()" id="btn-copiar" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#2ecc71;border:none;cursor:pointer">Copiar informe</button>' +
+    '<a style="display:inline-block;padding:10px 20px;border-radius:6px;text-decoration:none;font-size:14px;font-weight:600;color:white;background:#0088cc" href="mailto:?subject=' + encodeURIComponent(shareSubject) + '&body=' + encodeURIComponent('Estimado/a Doctor/a,\n\nAdjunto el informe de seguimiento m\u00e9dico (' + shareType + ') del paciente ' + patLabel + '.\n\nQuedo a su disposici\u00f3n.\nAtentamente') + '">Enviar por Email</a>' +
+    '</div>' +
+    '<div id="copiar-feedback" style="font-size:12px;color:#2ecc71;margin-top:8px;min-height:20px"></div>' +
+    '</div>';
+
     const html = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"/>' +
     '<title>MediTrace \u2014 ' + titleType + ' \u2014 ' + patLabel + '</title>' +
     '<style>' +
@@ -2538,20 +2552,7 @@ function exportPDF(mode) {
 
     timelineHtml + bacterioHtml + sourcesHtml + chartsHtml +
 
-            /* Share bar — save PDF + email + copy */
-    var shareType = isDetailed ? 'Detallado' : 'Sint\u00e9tico';
-    var shareSubject = 'MediTrace \u2014 Informe ' + shareType + ' \u2014 ' + patLabel;
-
-    const shareBarHtml =
-    '<div style="text-align:center;margin:16px 0;padding:14px;background:#f0f5fa;border:1px solid #cce;border-radius:8px" class="share-bar">' +
-    '<div style="font-size:15px;font-weight:700;color:#1a5276;margin-bottom:10px">Compartir este informe</div>' +
-    '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">' +
-    '<button onclick="window.print()" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#1a5276;border:none;cursor:pointer">Guardar como PDF</button>' +
-    '<button onclick="copiarInforme()" id="btn-copiar" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#2ecc71;border:none;cursor:pointer">Copiar informe</button>' +
-    '<a style="display:inline-block;padding:10px 20px;border-radius:6px;text-decoration:none;font-size:14px;font-weight:600;color:white;background:#0088cc" href="mailto:?subject=' + encodeURIComponent(shareSubject) + '&body=' + encodeURIComponent('Estimado/a Doctor/a,\n\nAdjunto el informe de seguimiento m\u00e9dico (' + shareType + ') del paciente ' + patLabel + '.\n\nQuedo a su disposici\u00f3n.\nAtentamente') + '">Enviar por Email</a>' +
-    '</div>' +
-    '<div id="copiar-feedback" style="font-size:12px;color:#2ecc71;margin-top:8px;min-height:20px"></div>' +
-    '</div>' +
+    shareBarHtml +
     '<div class="report-footer"><span>MediTrace v2026.4 \u2014 ' + (isDetailed ? 'INFORME DETALLADO' : 'INFORME SINT\u00c9TICO') + ' \u2014 ' + patLabel + '</span><span>Documento informativo \u2014 No sustituye el criterio m\u00e9dico profesional.</span></div>' +
     '</div>' +
     '<scr' + 'ipt>' +
