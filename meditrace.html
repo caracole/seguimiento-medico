@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="MediTrace"/>
 <meta name="application-name" content="MediTrace"/>
-<meta name="description" content="Seguimiento médico longitudinal — MediTrace v2026.3"/>
+<meta name="description" content="Seguimiento médico longitudinal — MediTrace v2026.4"/>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
 :root {
@@ -810,7 +810,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 
   <!-- NOTE FINALE -->
   <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;font-family:var(--mono);font-size:10px;color:var(--muted)">
-    📋 Análisis elaborado por Pierre-Henri Giraud × Claude (Anthropic) · MediTrace v2026.3<br>
+    📋 Análisis elaborado por Pierre-Henri Giraud × Claude (Anthropic) · MediTrace v2026.4<br>
     Fuentes: IRM ASCIRES 10/03/2026 · PET/CT CUN 27/12/2021 · TAC Vithas 18/03/2024 · Analíticas HGC/Vithas 2021-2026<br>
     DOI: <a href="https://doi.org/10.5281/zenodo.19973451" target="_blank" style="color:var(--accent)">10.5281/zenodo.19973451</a>
     · Este análisis es informativo y no sustituye el criterio médico profesional.
@@ -2409,6 +2409,35 @@ function exportPDF(mode) {
       const st = getStatus(k, v); return '<td class="' + (st==='bad'?'val-bad':'val-ok') + '">' + v + '</td>';
     }).join('') + '</tr>').join('');
 
+  /* Capture charts as PNG images for the report */
+  let chartsHtml = '';
+  if (isDetailed) {
+    const significantParams = Object.entries(lastVals)
+      .filter(([k]) => PARAMS[k] && PARAMS[k].ref)
+      .filter(([k]) => getSeriesForParam(data, k).length >= 2)
+      .slice(0, 8);
+
+    significantParams.forEach(([k]) => {
+      const canvasId = 'chart-' + k;
+      const existingCanvas = document.getElementById(canvasId);
+      if (existingCanvas && chartInstances[canvasId]) {
+        try {
+          const imgData = existingCanvas.toDataURL('image/png', 0.9);
+          const p = PARAMS[k];
+          chartsHtml += '<div style="margin-bottom:16px;page-break-inside:avoid">' +
+            '<div style="font-size:13px;font-weight:700;color:#1a5276;margin-bottom:4px">' + p.label + ' (' + p.unit + ')' +
+            (p.ref ? ' — Ref: ' + p.ref.join('-') : '') + '</div>' +
+            '<img src="' + imgData + '" style="width:100%;max-height:200px;object-fit:contain;border:1px solid #ddd;border-radius:4px"/></div>';
+        } catch(e) { /* canvas tainted or not available */ }
+      }
+    });
+
+    if (!chartsHtml) {
+      chartsHtml = '<div style="color:#888;font-style:italic;font-size:13px">Para incluir gráficos, abra primero la pestaña "Curvas" o "Resumen" antes de generar el informe.</div>';
+    }
+    chartsHtml = '<div class="section" style="page-break-before:always"><div class="section-title">\ud83d\udcc8 Curvas de evoluci\u00f3n — Par\u00e1metros significativos</div>' + chartsHtml + '</div>';
+  }
+
   /* Build timeline */
   let timelineHtml = isDetailed && events.length ? '<div class="section"><div class="section-title">\ud83d\udd50 Cronolog\u00eda cl\u00ednica (' + events.length + ' eventos)</div>' +
     [...events].reverse().map(ev => '<div class="tl-item"><div class="tl-dot ' + (ev.type||'laboratorio') + '"></div><div class="tl-content"><div class="tl-date">' + ev.date + ' \u00b7 ' + (ev.type||'').toUpperCase() + '</div><div class="tl-title">' + (ev.title||'') + '</div><div class="tl-text">' + (ev.text||'') + '</div></div></div>').join('') + '</div>' : '';
@@ -2507,28 +2536,46 @@ function exportPDF(mode) {
 
     '<div class="section"><div class="section-title">\ud83d\udccb Tabla de s\u00edntesis cronol\u00f3gica</div><table><thead><tr><th>Fecha</th><th>Fuente</th><th>Hb</th><th>Leuc.</th><th>Gluc.</th><th>Creat.</th><th>FG</th><th>Colest.</th><th>PCR</th><th>TSH</th><th>VitD</th></tr></thead><tbody>' + tableRowsDesc + '</tbody></table></div>' +
 
-    timelineHtml + bacterioHtml + sourcesHtml +
+    timelineHtml + bacterioHtml + sourcesHtml + chartsHtml +
 
-    '<div style="text-align:center;margin:16px 0;padding:10px;background:#f8f8f8;border-radius:6px" class="share-bar"><strong>Compartir este informe:</strong> ' +
-    '<a style="display:inline-block;margin:0 8px;padding:6px 16px;border-radius:6px;text-decoration:none;font-size:13px;font-weight:600;color:white;background:#0088cc" href="https://t.me/share/url?url=' + encodeURIComponent(window.location.href) + '&text=' + encodeURIComponent('Informe MediTrace') + '" target="_blank">Telegram</a>' +
-    '<a style="display:inline-block;margin:0 8px;padding:6px 16px;border-radius:6px;text-decoration:none;font-size:13px;font-weight:600;color:white;background:#25D366" href="https://wa.me/?text=' + encodeURIComponent('Informe MediTrace ' + window.location.href) + '" target="_blank">WhatsApp</a>' +
-    '<a style="display:inline-block;margin:0 8px;padding:6px 16px;border-radius:6px;text-decoration:none;font-size:13px;font-weight:600;color:white;background:#1a5276" href="mailto:?subject=' + encodeURIComponent('Informe MediTrace') + '&body=' + encodeURIComponent('Adjunto informe de seguimiento.\n' + window.location.href) + '">Email</a></div>' +
-    '<div class="report-footer"><span>MediTrace v2026.3 \u2014 ' + (isDetailed ? 'INFORME DETALLADO' : 'INFORME SINT\u00c9TICO') + ' \u2014 ' + patLabel + '</span><span>Documento informativo \u2014 No sustituye el criterio m\u00e9dico profesional.</span></div>' +
+            /* Share bar — save PDF + email + copy */
+    var shareType = isDetailed ? 'Detallado' : 'Sint\u00e9tico';
+    var shareSubject = 'MediTrace \u2014 Informe ' + shareType + ' \u2014 ' + patLabel;
+
+    const shareBarHtml =
+    '<div style="text-align:center;margin:16px 0;padding:14px;background:#f0f5fa;border:1px solid #cce;border-radius:8px" class="share-bar">' +
+    '<div style="font-size:15px;font-weight:700;color:#1a5276;margin-bottom:10px">Compartir este informe</div>' +
+    '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">' +
+    '<button onclick="window.print()" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#1a5276;border:none;cursor:pointer">Guardar como PDF</button>' +
+    '<button onclick="copiarInforme()" id="btn-copiar" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#2ecc71;border:none;cursor:pointer">Copiar informe</button>' +
+    '<a style="display:inline-block;padding:10px 20px;border-radius:6px;text-decoration:none;font-size:14px;font-weight:600;color:white;background:#0088cc" href="mailto:?subject=' + encodeURIComponent(shareSubject) + '&body=' + encodeURIComponent('Estimado/a Doctor/a,\n\nAdjunto el informe de seguimiento m\u00e9dico (' + shareType + ') del paciente ' + patLabel + '.\n\nQuedo a su disposici\u00f3n.\nAtentamente') + '">Enviar por Email</a>' +
+    '</div>' +
+    '<div id="copiar-feedback" style="font-size:12px;color:#2ecc71;margin-top:8px;min-height:20px"></div>' +
+    '</div>' +
+    '<div class="report-footer"><span>MediTrace v2026.4 \u2014 ' + (isDetailed ? 'INFORME DETALLADO' : 'INFORME SINT\u00c9TICO') + ' \u2014 ' + patLabel + '</span><span>Documento informativo \u2014 No sustituye el criterio m\u00e9dico profesional.</span></div>' +
     '</div>' +
     '<scr' + 'ipt>' +
+    'function copiarInforme() {' +'  var c = document.querySelector(".page");' +'  if (c) {' +'    navigator.clipboard.writeText(c.innerText).then(function() {' +'      var btn = document.getElementById("btn-copiar");' +'      btn.textContent = "Copiado!"; btn.style.background = "#27ae60";' +'      var fb = document.getElementById("copiar-feedback");' +'      if (fb) fb.textContent = "Informe copiado al portapapeles";' +'      setTimeout(function() { btn.textContent = "Copiar informe"; btn.style.background = "#2ecc71"; if(fb) fb.textContent=""; }, 3000);' +'    });' +'  }' +'}' +
     'window.addEventListener("load", function() {' +
     '  var tipoInforme = document.title.indexOf("Detallado") >= 0 ? "Informe Detallado" : "Informe Sint\\u00e9tico";' +
-    '  var style = document.createElement("style");' +
-    '  style.textContent = ".page-footer-print{display:none} @media print{.page-footer-print{display:block!important;position:fixed;bottom:0;left:0;right:0;text-align:center;font-size:10px;color:#666;padding:6px 0;border-top:1px solid #ddd;background:white;font-family:Arial,sans-serif} .share-bar{display:none!important} #page-indicator{display:none!important}}";' +
-    '  document.head.appendChild(style);' +
-    '  var footer = document.createElement("div");' +
-    '  footer.className = "page-footer-print";' +
-    '  footer.innerHTML = "MediTrace v2026.3 \\u2014 " + tipoInforme + " \\u2014 Generado: " + new Date().toLocaleDateString("es-ES");' +
-    '  document.body.appendChild(footer);' +
+    '  var patiente = "' + patLabel.replace(/'/g, "\\'") + '";' +
+    '  var fecha = "' + now + '";' +
+    '' +
+    '  /* Add page-break-aware footers */' +
+    '  var sections = document.querySelectorAll(".section, .exec-summary");' +
+    '  var totalSections = sections.length;' +
+    '  sections.forEach(function(sec, i) {' +
+    '    var footer = document.createElement("div");' +
+    '    footer.style.cssText = "border-top:1px solid #ccc;margin-top:12px;padding-top:6px;font-size:9px;color:#888;display:flex;justify-content:space-between;font-family:Arial,sans-serif";' +
+    '    footer.innerHTML = "<span>MediTrace v2026.4 \\u2014 " + tipoInforme + " \\u2014 " + patiente + "</span><span>Secci\\u00f3n " + (i+1) + "/" + totalSections + " \\u2014 " + fecha + "</span>";' +
+    '    sec.appendChild(footer);' +
+    '  });' +
+    '' +
+    '  /* Screen indicator */' +
     '  var ind = document.createElement("div");' +
     '  ind.id = "page-indicator";' +
     '  ind.style.cssText = "position:fixed;bottom:10px;right:16px;font-size:12px;color:#888;font-family:Arial;background:rgba(255,255,255,0.95);padding:4px 12px;border-radius:6px;border:1px solid #ddd";' +
-    '  ind.textContent = "MediTrace \\u2014 " + tipoInforme;' +
+    '  ind.textContent = "MediTrace \\u2014 " + tipoInforme + " \\u2014 " + totalSections + " secciones";' +
     '  document.body.appendChild(ind);' +
     '});' +
     '<\\/scr' + 'ipt>' +
@@ -2740,7 +2787,7 @@ function buildResumen(data) {
       </div>
       <!-- Footer -->
       <div style="padding:8px 20px;border-top:1px solid var(--border);font-family:var(--mono);font-size:9px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px">
-        <span>MediTrace v2026.3 · Pierre-Henri Giraud × Claude (Anthropic)</span>
+        <span>MediTrace v2026.4 · Pierre-Henri Giraud × Claude (Anthropic)</span>
         <span>DOI: <a href="https://doi.org/10.5281/zenodo.19973451" target="_blank" style="color:var(--accent)">10.5281/zenodo.19973451</a></span>
       </div>
     </div>`;
@@ -4214,6 +4261,39 @@ function buildObservancia() {
 }
 
 /* ================================================================
+   DÉDUPLICATION — Supprime les doublons dans events et bacterio
+================================================================ */
+function deduplicateAll() {
+  /* Events : dédoublonner par date seulement (un seul événement par date) */
+  const evts = loadEvents();
+  const seenEvts = new Set();
+  const uniqueEvts = evts.filter(e => {
+    const key = (e.date||'');
+    if (seenEvts.has(key)) return false;
+    seenEvts.add(key);
+    return true;
+  });
+  if (uniqueEvts.length < evts.length) {
+    saveEvents(uniqueEvts);
+    console.log('[MediTrace] Dedup events: ' + evts.length + ' → ' + uniqueEvts.length);
+  }
+
+  /* Bacterio : dédoublonner par date seulement (un seul résultat par date) */
+  const bacts = loadBacterio();
+  const seenBacts = new Set();
+  const uniqueBacts = bacts.filter(b => {
+    const key = (b.date||b.date_prelevement||'');
+    if (seenBacts.has(key)) return false;
+    seenBacts.add(key);
+    return true;
+  });
+  if (uniqueBacts.length < bacts.length) {
+    saveBacterio(uniqueBacts);
+    console.log('[MediTrace] Dedup bacterio: ' + bacts.length + ' → ' + uniqueBacts.length);
+  }
+}
+
+/* ================================================================
    INIT
 ================================================================ */
 
@@ -4251,6 +4331,9 @@ window.addEventListener('load', () => {
   /* Charger les paramètres personnalisés dans PARAMS */
   const customs = loadCustomParams();
   Object.entries(customs).forEach(([k,p]) => { PARAMS[k] = p; });
+
+  /* Dédoublonner les données au chargement */
+  deduplicateAll();
 
   const savedLang = localStorage.getItem('mt_lang') || 'es';
   setLang(savedLang);
