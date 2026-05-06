@@ -1152,6 +1152,11 @@ const LANG = {
     no_key:"⚠ Introduce una clave API Claude para la extracción automática.",
     confirm_reset:"¿Borrar todos los datos? Esta acción no se puede deshacer.",
     no_data:"Sin datos",
+    del_title:"¿Eliminar este evento?", del_cancel:"Cancelar", del_confirm:"✕ Eliminar",
+    edit_label:"Editar:", edit_save:"✓ Guardar", edit_cancel:"Cancelar",
+    edit_hint:"' + (LANG[currentLang].edit_hint||'Haga clic en cualquier celda para editarla.') + '",
+    no_events:"' + (LANG[currentLang].no_events||'No hay eventos importados.') + '",
+    events_count:"evento(s)",
   },
   fr: {
     tab_resumen:"Résumé", tab_curvas:"Courbes", tab_tabla:"Tableau",
@@ -1177,6 +1182,11 @@ const LANG = {
     no_key:"⚠ Entrez une clé API Claude pour l'extraction automatique.",
     confirm_reset:"Effacer toutes les données ? Cette action est irréversible.",
     no_data:"Pas de données",
+    del_title:"Supprimer cet événement ?", del_cancel:"Annuler", del_confirm:"✕ Supprimer",
+    edit_label:"Modifier :", edit_save:"✓ Enregistrer", edit_cancel:"Annuler",
+    edit_hint:"Cliquez sur une cellule pour la modifier.",
+    no_events:"Aucun événement importé.",
+    events_count:"événement(s)",
   },
   en: {
     tab_resumen:"Summary", tab_curvas:"Charts", tab_tabla:"Table",
@@ -1202,6 +1212,11 @@ const LANG = {
     no_key:"⚠ Enter a Claude API key for automatic extraction.",
     confirm_reset:"Delete all data? This action cannot be undone.",
     no_data:"No data",
+    del_title:"Delete this event?", del_cancel:"Cancel", del_confirm:"✕ Delete",
+    edit_label:"Edit:", edit_save:"✓ Save", edit_cancel:"Cancel",
+    edit_hint:"Click on any cell to edit it.",
+    no_events:"No imported events.",
+    events_count:"event(s)",
   }
 };
 let currentLang = 'es';
@@ -2379,11 +2394,11 @@ function buildImportList() {
   if (!el) return;
   const evts = loadEvents();
   if (!evts.length) {
-    el.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:8px">No hay eventos importados.</div>';
+    el.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:8px">' + (LANG[currentLang].no_events||'No hay eventos importados.') + '</div>';
     return;
   }
 
-  let html = '<div style="font-size:11px;color:var(--muted);margin-bottom:6px">Haga clic en cualquier celda para editarla.</div>' +
+  let html = '<div style="font-size:11px;color:var(--muted);margin-bottom:6px">' + (LANG[currentLang].edit_hint||'Haga clic en cualquier celda para editarla.') + '</div>' +
     '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>' +
     '<th style="text-align:left;padding:6px 8px;border-bottom:2px solid var(--border);color:var(--muted);font-size:11px;width:90px">Fecha</th>' +
     '<th style="text-align:left;padding:6px 8px;border-bottom:2px solid var(--border);color:var(--muted);font-size:11px;width:90px">Tipo</th>' +
@@ -2412,7 +2427,7 @@ function buildImportList() {
   }
 
   html += '</tbody></table>';
-  html += '<div style="font-size:11px;color:var(--muted);margin-top:8px">' + evts.length + ' evento(s)</div>';
+  html += '<div style="font-size:11px;color:var(--muted);margin-top:8px">' + evts.length + ' + ' ' + (LANG[currentLang].events_count||'evento(s)') + '</div>';
   el.innerHTML = html;
 }
 
@@ -2467,11 +2482,11 @@ function editCell(idx, field, td) {
     var btnRow = document.createElement('div');
     btnRow.style.cssText = 'display:flex;gap:8px;margin-top:10px;justify-content:flex-end';
     var btnSave = document.createElement('button');
-    btnSave.textContent = '\u2713 Guardar';
+    btnSave.textContent = (LANG[currentLang].edit_save||'\u2713 Guardar');
     btnSave.className = 'btn primary';
     btnSave.style.cssText = 'font-size:13px;padding:8px 18px';
     var btnCancel = document.createElement('button');
-    btnCancel.textContent = 'Cancelar';
+    btnCancel.textContent = (LANG[currentLang].del_cancel||'Cancelar');
     btnCancel.className = 'btn';
     btnCancel.style.cssText = 'font-size:13px;padding:8px 18px';
     btnRow.appendChild(btnCancel);
@@ -2525,7 +2540,7 @@ function deleteEvent(idx) {
   btnCancel.className = 'btn';
   btnCancel.style.cssText = 'font-size:14px;padding:10px 24px';
   var btnDelete = document.createElement('button');
-  btnDelete.textContent = '\u2715 Eliminar';
+  btnDelete.textContent = (LANG[currentLang].del_confirm||'\u2715 Eliminar');
   btnDelete.style.cssText = 'font-size:14px;padding:10px 24px;background:var(--danger);color:white;border:none;border-radius:6px;cursor:pointer;font-family:var(--sans);font-weight:600';
   btnRow.appendChild(btnCancel);
   btnRow.appendChild(btnDelete);
