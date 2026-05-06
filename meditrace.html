@@ -2508,11 +2508,40 @@ function deleteEvent(idx) {
   var evts = loadEvents();
   if (idx < 0 || idx >= evts.length) return;
   var ev = evts[idx];
-  if (!confirm('\u00bfEliminar este evento?\n\n' + fmtDate(ev.date) + ' \u2014 ' + (ev.title||'') + '\n\nEsta acci\u00f3n no se puede deshacer.')) return;
-  evts.splice(idx, 1);
-  saveEvents(evts);
-  buildImportList();
-  updateDataSummary(loadData());
+
+  /* Popup personnalisé au lieu du confirm natif */
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center';
+  var box = document.createElement('div');
+  box.style.cssText = 'background:var(--surface);border:2px solid var(--danger);border-radius:12px;padding:24px;width:90%;max-width:420px;text-align:center';
+  box.innerHTML = '<div style="font-size:32px;margin-bottom:12px">\u26a0\ufe0f</div>' +
+    '<div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px">\u00bfEliminar este evento?</div>' +
+    '<div style="font-size:14px;color:var(--muted);margin-bottom:6px">' + fmtDate(ev.date) + '</div>' +
+    '<div style="font-size:13px;color:var(--text);margin-bottom:20px;padding:10px;background:var(--surface2);border-radius:6px;text-align:left">' + (ev.title||'Sin t\u00edtulo') + '</div>';
+  var btnRow = document.createElement('div');
+  btnRow.style.cssText = 'display:flex;gap:10px;justify-content:center';
+  var btnCancel = document.createElement('button');
+  btnCancel.textContent = 'Cancelar';
+  btnCancel.className = 'btn';
+  btnCancel.style.cssText = 'font-size:14px;padding:10px 24px';
+  var btnDelete = document.createElement('button');
+  btnDelete.textContent = '\u2715 Eliminar';
+  btnDelete.style.cssText = 'font-size:14px;padding:10px 24px;background:var(--danger);color:white;border:none;border-radius:6px;cursor:pointer;font-family:var(--sans);font-weight:600';
+  btnRow.appendChild(btnCancel);
+  btnRow.appendChild(btnDelete);
+  box.appendChild(btnRow);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+
+  btnDelete.onclick = function() {
+    evts.splice(idx, 1);
+    saveEvents(evts);
+    document.body.removeChild(overlay);
+    buildImportList();
+    updateDataSummary(loadData());
+  };
+  btnCancel.onclick = function() { document.body.removeChild(overlay); };
+  overlay.onclick = function(e) { if (e.target === overlay) document.body.removeChild(overlay); };
 }
 
 /* ================================================================
