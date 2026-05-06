@@ -2453,6 +2453,40 @@ function editCell(idx, field, td) {
     return;
   }
 
+  /* Si le texte est long (>40 car) ou champ titre/src, utiliser un popup textarea */
+  if (currentVal.length > 40 || field === 'title' || field === 'text') {
+    var overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center';
+    var box = document.createElement('div');
+    box.style.cssText = 'background:var(--surface);border:2px solid var(--accent);border-radius:12px;padding:20px;width:90%;max-width:500px';
+    box.innerHTML = '<div style="font-family:var(--mono);font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px">Editar: ' + field + '</div>';
+    var ta = document.createElement('textarea');
+    ta.value = currentVal;
+    ta.style.cssText = 'width:100%;height:120px;font-family:var(--mono);font-size:13px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:10px;resize:vertical;line-height:1.6';
+    box.appendChild(ta);
+    var btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:8px;margin-top:10px;justify-content:flex-end';
+    var btnSave = document.createElement('button');
+    btnSave.textContent = '\u2713 Guardar';
+    btnSave.className = 'btn primary';
+    btnSave.style.cssText = 'font-size:13px;padding:8px 18px';
+    var btnCancel = document.createElement('button');
+    btnCancel.textContent = 'Cancelar';
+    btnCancel.className = 'btn';
+    btnCancel.style.cssText = 'font-size:13px;padding:8px 18px';
+    btnRow.appendChild(btnCancel);
+    btnRow.appendChild(btnSave);
+    box.appendChild(btnRow);
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+    ta.focus();
+    ta.select();
+    btnSave.onclick = function() { var nv = ta.value.trim(); if (nv !== currentVal) { evts[idx][field] = nv; saveEvents(evts); } document.body.removeChild(overlay); buildImportList(); };
+    btnCancel.onclick = function() { document.body.removeChild(overlay); };
+    overlay.onclick = function(e) { if (e.target === overlay) document.body.removeChild(overlay); };
+    return;
+  }
+
   var inp2 = document.createElement('input');
   inp2.type = 'text';
   inp2.value = currentVal;
