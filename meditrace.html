@@ -134,18 +134,20 @@ body.light .param-tip { border-bottom-color: #3d3d50; }
 body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 18px; line-height: 1.7; }
 
 /* ── TOP BAR ── */
+.top-fixed-wrapper {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
 .topbar {
   background: #0a0f1a;
   color: white;
-  padding: 10px 24px;
+  padding: 8px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 8px;
-  position: sticky;
-  top: 0;
-  z-index: 200;
   border-bottom: 1px solid var(--border);
 }
 .topbar-logo {
@@ -186,7 +188,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   border-bottom: 1px solid var(--border);
 }
 
-/* ── NAV (sticky) ── */
+/* ── NAV ── */
 .nav {
   background: var(--surface);
   border-bottom: 2px solid var(--border);
@@ -194,9 +196,6 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   flex-wrap: wrap;
   padding: 6px 16px 0;
   gap: 2px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
 }
 .nav-tab {
   font-family: var(--mono); font-size: 12px; letter-spacing: 1px;
@@ -409,6 +408,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 </head>
 <body>
 
+<div class="top-fixed-wrapper">
 <!-- TOP BAR — Ligne 1: Logo + Patient + Mode couleur + Langues -->
 <div class="topbar">
   <div style="display:flex;align-items:center;gap:12px">
@@ -423,6 +423,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   </div>
 </div>
 
+<div class="top-fixed-wrapper">
 <!-- TOP BAR — Ligne 2: Actions -->
 <div class="topbar-actions">
   <button class="btn-topbar" onclick="nuevoPaciente()" title="Cambiar de paciente" style="color:#e8a44a;border-color:#e8a44a">👥 Nuevo Paciente</button>
@@ -432,6 +433,8 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <button class="btn-topbar" onclick="exportData()" title="Guardar copia de seguridad">💾 Guardar</button>
   <button class="btn-topbar" onclick="showInformeChoice()" title="Generar informe médico" style="color:#4ae8a4;border-color:#4ae8a4">📄 Informe</button>
   <button class="btn-topbar danger" onclick="confirmReset()" data-i18n="nav_reset">⟳ Reset</button>
+</div>
+
 </div>
 
 <!-- INFORME CHOICE DIALOG -->
