@@ -2372,46 +2372,109 @@ function importData(input) {
 }
 
 /* ================================================================
-   IMPORT LIST — Liste des événements avec suppression
+   IMPORT LIST — Tableau éditable des événements
 ================================================================ */
 function buildImportList() {
   const el = document.getElementById('import-list');
   if (!el) return;
   const evts = loadEvents();
-  const bacts = loadBacterio();
-  if (!evts.length && !bacts.length) {
+  if (!evts.length) {
     el.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:8px">No hay eventos importados.</div>';
     return;
   }
 
-  let html = '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>' +
-    '<th style="text-align:left;padding:6px 8px;border-bottom:2px solid var(--border);color:var(--muted);font-size:11px">Fecha</th>' +
-    '<th style="text-align:left;padding:6px 8px;border-bottom:2px solid var(--border);color:var(--muted);font-size:11px">Tipo</th>' +
-    '<th style="text-align:left;padding:6px 8px;border-bottom:2px solid var(--border);color:var(--muted);font-size:11px">Título / Fuente</th>' +
-    '<th style="text-align:center;padding:6px 8px;border-bottom:2px solid var(--border);color:var(--muted);font-size:11px">Acción</th>' +
+  let html = '<div style="font-size:11px;color:var(--muted);margin-bottom:6px">Haga clic en cualquier celda para editarla.</div>' +
+    '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>' +
+    '<th style="text-align:left;padding:6px 8px;border-bottom:2px solid var(--border);color:var(--muted);font-size:11px;width:90px">Fecha</th>' +
+    '<th style="text-align:left;padding:6px 8px;border-bottom:2px solid var(--border);color:var(--muted);font-size:11px;width:90px">Tipo</th>' +
+    '<th style="text-align:left;padding:6px 8px;border-bottom:2px solid var(--border);color:var(--muted);font-size:11px">T\u00edtulo</th>' +
+    '<th style="text-align:left;padding:6px 8px;border-bottom:2px solid var(--border);color:var(--muted);font-size:11px;width:120px">Fuente</th>' +
+    '<th style="text-align:center;padding:6px 8px;border-bottom:2px solid var(--border);color:var(--muted);font-size:11px;width:40px">\u2715</th>' +
     '</tr></thead><tbody>';
 
-  [...evts].reverse().forEach((ev, i) => {
-    const realIdx = evts.length - 1 - i;
-    const typeColors = {urgencias:'#e84a4a',neurologia:'#7d3c98',imagen:'#4a8fe8',laboratorio:'#4ae8a4',bacteriologia:'#e8a44a',consulta:'#4a8fe8'};
-    const color = typeColors[ev.type] || 'var(--muted)';
+  var reversed = evts.slice().reverse();
+  for (var i = 0; i < reversed.length; i++) {
+    var ev = reversed[i];
+    var realIdx = evts.length - 1 - i;
+    var typeColors = {urgencias:'#e84a4a',neurologia:'#7d3c98',imagen:'#4a8fe8',laboratorio:'#4ae8a4',bacteriologia:'#e8a44a',consulta:'#4a8fe8'};
+    var color = typeColors[ev.type] || 'var(--muted)';
+    var dateDisplay = ev.date ? fmtDate(ev.date) : '\u26a0 sin fecha';
+    var titleShort = (ev.title||'').length > 50 ? (ev.title||'').substring(0,50) + '...' : (ev.title||'');
     html += '<tr style="border-bottom:1px solid var(--border)">' +
-      '<td style="padding:5px 8px;font-family:var(--mono);font-size:11px;white-space:nowrap">' + fmtDate(ev.date) + '</td>' +
-      '<td style="padding:5px 8px"><span style="background:' + color + '20;color:' + color + ';padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;text-transform:uppercase">' + (ev.type||'?') + '</span></td>' +
-      '<td style="padding:5px 8px;font-size:12px">' + (ev.title||'').substring(0,60) + '</td>' +
-      '<td style="padding:5px 8px;text-align:center"><button onclick="deleteEvent(' + realIdx + ')" style="background:transparent;border:1px solid var(--danger);color:var(--danger);border-radius:4px;padding:2px 8px;font-size:10px;cursor:pointer;font-family:var(--mono)">✕</button></td>' +
+      '<td style="padding:4px 8px;cursor:pointer" onclick="editCell(' + realIdx + ',\'date\',this)">' +
+        '<span style="font-family:var(--mono);font-size:11px">' + dateDisplay + '</span></td>' +
+      '<td style="padding:4px 8px;cursor:pointer" onclick="editCell(' + realIdx + ',\'type\',this)">' +
+        '<span style="background:' + color + '20;color:' + color + ';padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;text-transform:uppercase">' + (ev.type||'?') + '</span></td>' +
+      '<td style="padding:4px 8px;cursor:pointer;font-size:12px" onclick="editCell(' + realIdx + ',\'title\',this)" title="' + (ev.title||'').replace(/"/g,'') + '">' + titleShort + '</td>' +
+      '<td style="padding:4px 8px;cursor:pointer;font-size:11px;color:var(--muted)" onclick="editCell(' + realIdx + ',\'src\',this)">' + (ev.src||ev.source||'\u2014') + '</td>' +
+      '<td style="padding:4px 8px;text-align:center"><button onclick="deleteEvent(' + realIdx + ')" style="background:transparent;border:1px solid var(--danger);color:var(--danger);border-radius:4px;padding:2px 8px;font-size:10px;cursor:pointer;font-family:var(--mono)">\u2715</button></td>' +
       '</tr>';
-  });
+  }
 
   html += '</tbody></table>';
+  html += '<div style="font-size:11px;color:var(--muted);margin-top:8px">' + evts.length + ' evento(s)</div>';
   el.innerHTML = html;
 }
 
-function deleteEvent(idx) {
-  const evts = loadEvents();
+function editCell(idx, field, td) {
+  var evts = loadEvents();
   if (idx < 0 || idx >= evts.length) return;
-  const ev = evts[idx];
-  if (!confirm('¿Eliminar este evento?\n\n' + ev.date + ' — ' + (ev.title||'') + '\n\nEsta acción no se puede deshacer.')) return;
+  var ev = evts[idx];
+  var currentVal = ev[field] || '';
+
+  if (field === 'type') {
+    var types = ['laboratorio','urgencias','hematologia','neurologia','cardiologia','neumologia','consulta','imagen','bacteriologia'];
+    var sel = document.createElement('select');
+    sel.style.cssText = 'font-family:var(--mono);font-size:11px;padding:2px;background:var(--surface2);color:var(--text);border:1px solid var(--accent);border-radius:4px;width:100%';
+    types.forEach(function(t) {
+      var opt = document.createElement('option');
+      opt.value = t; opt.textContent = t;
+      if (t === currentVal) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    td.innerHTML = '';
+    td.appendChild(sel);
+    sel.focus();
+    sel.onchange = function() { evts[idx][field] = sel.value; saveEvents(evts); buildImportList(); };
+    sel.onblur = function() { buildImportList(); };
+    return;
+  }
+
+  if (field === 'date') {
+    var inp = document.createElement('input');
+    inp.type = 'date';
+    inp.value = currentVal;
+    inp.style.cssText = 'font-family:var(--mono);font-size:11px;padding:2px;background:var(--surface2);color:var(--text);border:1px solid var(--accent);border-radius:4px;width:100%';
+    td.innerHTML = '';
+    td.appendChild(inp);
+    inp.focus();
+    inp.onchange = function() { if (inp.value) { evts[idx][field] = inp.value; saveEvents(evts); } buildImportList(); };
+    inp.onblur = function() { buildImportList(); };
+    return;
+  }
+
+  var inp2 = document.createElement('input');
+  inp2.type = 'text';
+  inp2.value = currentVal;
+  inp2.style.cssText = 'font-family:var(--mono);font-size:11px;padding:2px;background:var(--surface2);color:var(--text);border:1px solid var(--accent);border-radius:4px;width:100%';
+  td.innerHTML = '';
+  td.appendChild(inp2);
+  inp2.focus();
+  inp2.select();
+  function saveCell() {
+    var newVal = inp2.value.trim();
+    if (newVal !== currentVal) { evts[idx][field] = newVal; saveEvents(evts); }
+    buildImportList();
+  }
+  inp2.onblur = saveCell;
+  inp2.onkeydown = function(e) { if (e.key === 'Enter') saveCell(); if (e.key === 'Escape') buildImportList(); };
+}
+
+function deleteEvent(idx) {
+  var evts = loadEvents();
+  if (idx < 0 || idx >= evts.length) return;
+  var ev = evts[idx];
+  if (!confirm('\u00bfEliminar este evento?\n\n' + fmtDate(ev.date) + ' \u2014 ' + (ev.title||'') + '\n\nEsta acci\u00f3n no se puede deshacer.')) return;
   evts.splice(idx, 1);
   saveEvents(evts);
   buildImportList();
