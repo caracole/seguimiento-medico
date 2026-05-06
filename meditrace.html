@@ -50,6 +50,9 @@ body.light {
 body.light .topbar {
   background: #1a2a3a;
 }
+body.light .topbar-actions {
+  background: #223344;
+}
 body.light .nav {
   background: #fffdf7;
   border-bottom-color: #c4b89e;
@@ -172,7 +175,18 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 .btn-topbar.danger { border-color: #ff8a80; color: #ff8a80; }
 .btn-topbar.danger:hover { background: rgba(255,100,80,0.2); }
 
-/* ── NAV ── */
+/* ── TOPBAR ACTIONS (2ème ligne) ── */
+.topbar-actions {
+  background: #0d1220;
+  padding: 6px 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── NAV (sticky) ── */
 .nav {
   background: var(--surface);
   border-bottom: 2px solid var(--border);
@@ -180,6 +194,9 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   flex-wrap: wrap;
   padding: 6px 16px 0;
   gap: 2px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 .nav-tab {
   font-family: var(--mono); font-size: 12px; letter-spacing: 1px;
@@ -392,23 +409,29 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 </head>
 <body>
 
-<!-- TOP BAR -->
+<!-- TOP BAR — Ligne 1: Logo + Mode couleur + Langues -->
 <div class="topbar">
-  <a href="index.html" class="topbar-logo">Medi<span>Trace</span></a>
-  <div class="topbar-right">
-    <span id="patient-badge" style="display:none; padding:4px 10px; background:rgba(74,143,232,0.2); border:1px solid var(--accent); border-radius:6px; font-size:13px; margin-right:8px"></span>
+  <div style="display:flex;align-items:center;gap:12px">
+    <a href="index.html" class="topbar-logo">Medi<span>Trace</span></a>
+    <span id="patient-badge" style="display:none;padding:4px 10px;background:rgba(74,143,232,0.2);border:1px solid var(--accent);border-radius:6px;font-size:13px"></span>
+  </div>
+  <div style="display:flex;align-items:center;gap:6px">
+    <button class="btn-topbar" onclick="toggleTheme()" id="theme-btn" title="Cambiar tema">☀️</button>
     <button class="lang-btn active" onclick="setLang('es')">ES</button>
     <button class="lang-btn" onclick="setLang('fr')">FR</button>
     <button class="lang-btn" onclick="setLang('en')">EN</button>
-    <button class="btn-topbar" onclick="toggleTheme()" id="theme-btn" title="Cambiar tema claro/oscuro">☀️ Claro</button>
-    <button class="btn-topbar" onclick="exportData()" title="Guardar copia de seguridad">💾 Backup .mt</button>
-    <button class="btn-topbar" onclick="document.getElementById('import-json').click()" title="Restaurar desde backup">📂 Restaurar</button>
-    <button class="btn-topbar" onclick="showInformeChoice()" title="Generar informe médico" style="color:#4ae8a4;border-color:#4ae8a4;font-size:14px;padding:8px 18px">📄 Informe</button>
-    <input type="file" id="import-json" accept=".json,.js,.mt,application/json,text/plain" style="display:none" onchange="importData(this)"/>
-    <button class="btn-topbar" onclick="showPanel('importar',this)" data-i18n="nav_import">+ Añadir datos</button>
-    <button class="btn-topbar" onclick="nuevoPaciente()" title="Cambiar de paciente (guarda y limpia)" style="color:#e8a44a;border-color:#e8a44a">👥 Nuevo paciente</button>
-    <button class="btn-topbar danger" onclick="confirmReset()" data-i18n="nav_reset">⟳ Reiniciar</button>
   </div>
+</div>
+
+<!-- TOP BAR — Ligne 2: Actions -->
+<div class="topbar-actions">
+  <button class="btn-topbar" onclick="nuevoPaciente()" title="Cambiar de paciente" style="color:#e8a44a;border-color:#e8a44a">👥 Paciente</button>
+  <button class="btn-topbar" onclick="showPanel('importar',this)" data-i18n="nav_import">+ Datos</button>
+  <button class="btn-topbar" onclick="document.getElementById('import-json').click()" title="Restaurar desde backup">📂 Restaurar</button>
+  <input type="file" id="import-json" accept=".json,.js,.mt,application/json,text/plain" style="display:none" onchange="importData(this)"/>
+  <button class="btn-topbar" onclick="exportData()" title="Guardar copia de seguridad">💾 Guardar</button>
+  <button class="btn-topbar" onclick="showInformeChoice()" title="Generar informe médico" style="color:#4ae8a4;border-color:#4ae8a4">📄 Informe</button>
+  <button class="btn-topbar danger" onclick="confirmReset()" data-i18n="nav_reset">⟳ Reset</button>
 </div>
 
 <!-- INFORME CHOICE DIALOG -->
