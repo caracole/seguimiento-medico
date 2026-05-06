@@ -908,172 +908,172 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 
 <!-- ===== PANEL IMPORTAR ===== -->
 <div id="panel-importar" class="panel">
-  <div class="section-label" data-i18n="import_title">Importar documentos médicos</div>
 
-  <!-- Clé API -->
-  <div class="api-key-box">
-    <div class="api-key-label">🔑 <span data-i18n="api_key_label">Clave API Claude (Anthropic) — para extracción automática</span></div>
-    <div class="api-key-row">
-      <input type="password" id="api-key-input" class="api-key-input"
-             placeholder="sk-ant-api03-..." oninput="saveApiKey()"/>
-      <button class="btn" onclick="toggleApiKey()" data-i18n="btn_show">Mostrar</button>
+  <!-- ══════ RÉSUMÉ DES DONNÉES EN MÉMOIRE ══════ -->
+  <div style="background:var(--surface);border:2px solid var(--accent);border-radius:var(--radius);padding:16px 20px;margin-bottom:24px">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent);letter-spacing:2px;text-transform:uppercase">📊 DATOS EN MEMORIA</div>
+      <button class="btn primary" onclick="exportData()" style="font-size:13px;padding:8px 16px">💾 Guardar backup (.mt)</button>
     </div>
-    <div class="api-key-note" data-i18n="api_key_note">
-      La clave se guarda en localStorage de este navegador. No se envía a ningún servidor externo excepto api.anthropic.com para la extracción.
-      Obtenga su clave en <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a>
-    </div>
+    <div id="data-summary" style="font-family:var(--mono);font-size:14px;color:var(--text);margin-top:10px;line-height:2"></div>
   </div>
 
-  <!-- Upload PDF -->
-  <div class="import-hero" id="drop-zone"
-       onclick="document.getElementById('pdf-input').click()"
-       ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
-       ondragleave="this.style.borderColor=''"
-       ondrop="handleDrop(event)">
-    <div class="import-hero-icon">📄</div>
-    <div class="import-hero-title" data-i18n="drop_title">Arrastra un PDF aquí o haz clic para seleccionar</div>
-    <div class="import-hero-sub" data-i18n="drop_sub">Informes de laboratorio · Notas de evolución · Informes de urgencias<br>PDF, imágenes (JPG, PNG, TIFF) — OCR automático via Tesseract.js para documentos escaneados</div>
+  <!-- ══════ HISTORIQUE DES IMPORTATIONS ══════ -->
+  <div id="import-history-box" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 20px;margin-bottom:24px;display:none">
+    <div style="font-family:var(--mono);font-size:12px;font-weight:600;color:var(--accent2);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">📜 ÚLTIMA IMPORTACIÓN</div>
+    <div id="import-history" style="font-family:var(--mono);font-size:13px;color:var(--text);line-height:1.8"></div>
   </div>
-  <input type="file" id="pdf-input" accept=".pdf,.jpg,.jpeg,.png,.tiff,.tif,.bmp,.webp" multiple style="display:none" onchange="handleFiles(this.files)"/>
 
-  <!-- OCR Only -->
-  <div style="display:flex;gap:8px;margin-top:12px;margin-bottom:12px;align-items:center;flex-wrap:wrap">
-    <button class="btn" onclick="document.getElementById('ocr-input').click()" style="border-color:var(--warn);color:var(--warn)">
-      🔍 OCR sólo — ver texto extraído
-    </button>
-    <span style="font-family:var(--mono);font-size:10px;color:var(--muted)">Sin clave API · Tesseract.js local · Sólo lectura</span>
+  <!-- ══════ ONGLETS DES 3 VOLETS ══════ -->
+  <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+    <button class="btn primary" id="tab-clipboard" onclick="showImportTab('clipboard')" style="font-size:14px;padding:10px 20px">📋 Desde portapapeles</button>
+    <button class="btn" id="tab-auto" onclick="showImportTab('auto')" style="font-size:14px;padding:10px 20px">🤖 Automático (API/OCR)</button>
+    <button class="btn" id="tab-manual" onclick="showImportTab('manual')" style="font-size:14px;padding:10px 20px">✏️ Entrada manual</button>
   </div>
-  <input type="file" id="ocr-input" accept=".jpg,.jpeg,.png,.tiff,.tif,.bmp,.webp,.pdf" style="display:none" onchange="ocrOnly(this.files[0])"/>
 
-  <!-- OCR Result preview -->
-  <div id="ocr-result-box" style="display:none;background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--warn);border-radius:var(--radius);padding:16px 20px;margin-bottom:16px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-      <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--warn)">🔍 TEXTO EXTRAÍDO POR OCR</div>
-      <div style="display:flex;gap:6px">
-        <button class="btn" onclick="copyOcrText()" style="font-size:10px;padding:4px 10px">📋 Copiar texto</button>
-        <button class="btn" onclick="document.getElementById('ocr-result-box').style.display='none'" style="font-size:10px;padding:4px 10px">✕</button>
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- VOLET 1 : IMPORT DEPUIS PRESSE-PAPIERS     -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div id="volet-clipboard" class="import-volet">
+    <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent2);border-radius:var(--radius);padding:20px 24px">
+      <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent2);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">📋 IMPORTAR JSON DESDE PORTAPAPELES</div>
+      <div style="font-size:15px;color:var(--muted);margin-bottom:16px;line-height:1.7">
+        Copie el JSON generado por Claude (desde claude.ai o esta conversación), luego pulse el botón.
       </div>
-    </div>
-    <div id="ocr-meta" style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:10px"></div>
-    <pre id="ocr-text" style="font-family:var(--mono);font-size:12px;color:var(--text);white-space:pre-wrap;word-break:break-word;max-height:300px;overflow-y:auto;background:var(--surface2);border-radius:6px;padding:14px;line-height:1.7"></pre>
-
-    <!-- Workflow Claude : copier prompt + coller JSON -->
-    <div style="border-top:1px solid var(--border);margin-top:14px;padding-top:14px">
-      <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:10px">🔄 EXTRAER DATOS VÍA CLAUDE.AI (sin clave API)</div>
-      <div style="font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.7">
-        <strong style="color:var(--text)">Paso 1</strong> — Copia el texto + instrucciones para Claude<br>
-        <strong style="color:var(--text)">Paso 2</strong> — Pégalo en <a href="https://claude.ai" target="_blank" style="color:var(--accent)">claude.ai</a> (tu cuenta Max)<br>
-        <strong style="color:var(--text)">Paso 3</strong> — Copia el JSON que devuelve Claude<br>
-        <strong style="color:var(--text)">Paso 4</strong> — Pégalo aquí abajo
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-        <button class="btn primary" onclick="copyForClaude()" id="btn-copy-claude" style="font-size:12px;padding:8px 16px">
-          📋 Paso 1 — Copiar para Claude
-        </button>
-        <button class="btn" onclick="document.getElementById('json-paste-area').style.display='block';document.getElementById('json-input').focus()" style="font-size:12px;padding:8px 16px;border-color:var(--accent2);color:var(--accent2)">
-          📥 Paso 4 — Pegar JSON de Claude
+      <div style="display:flex;gap:10px;margin-bottom:12px;align-items:center;flex-wrap:wrap">
+        <button class="btn primary" onclick="pasteAndImport()" style="font-size:16px;padding:14px 28px">
+          📋 Pegar e importar
         </button>
       </div>
-      <div id="json-paste-area" style="display:none">
-        <textarea id="json-input" placeholder="Pega aquí el JSON que devolvió Claude..." style="width:100%;height:150px;font-family:var(--mono);font-size:11px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:12px;resize:vertical"></textarea>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <button class="btn primary" onclick="importClaudeJson()" style="font-size:12px;padding:8px 16px">
-            ✓ Importar datos
-          </button>
-          <button class="btn" onclick="document.getElementById('json-paste-area').style.display='none'" style="font-size:11px;padding:6px 12px">Cancelar</button>
+      <div id="json-import-result-global" style="font-family:var(--mono);font-size:13px;margin-top:8px"></div>
+      <button id="btn-clear-result" class="btn" onclick="document.getElementById('json-import-result-global').innerHTML='';this.style.display='none'" style="display:none;font-size:11px;padding:5px 12px;margin-top:6px">✕ Cerrar</button>
+
+      <!-- Fallback manuel -->
+      <details style="margin-top:16px">
+        <summary style="font-family:var(--mono);font-size:12px;color:var(--muted);cursor:pointer">Si el botón no funciona, pegue manualmente aquí ▼</summary>
+        <div style="margin-top:10px">
+          <textarea id="json-input-global" placeholder="Pegue el JSON aquí..." style="width:100%;height:120px;font-family:var(--mono);font-size:13px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:12px;resize:vertical"></textarea>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn primary" onclick="importClaudeJsonGlobal()" style="font-size:13px;padding:8px 18px">✓ Importar</button>
+            <button class="btn" onclick="document.getElementById('json-input-global').value=''" style="font-size:12px;padding:6px 12px">Limpiar</button>
+          </div>
         </div>
-        <div id="json-import-result" style="font-family:var(--mono);font-size:11px;margin-top:8px"></div>
+      </details>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- VOLET 2 : IMPORT AUTOMATIQUE (API + OCR)    -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div id="volet-auto" class="import-volet" style="display:none">
+    <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:var(--radius);padding:20px 24px">
+      <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">🤖 IMPORTACIÓN AUTOMÁTICA</div>
+
+      <!-- Clé API -->
+      <div class="api-key-box" style="margin-bottom:16px">
+        <div class="api-key-label" style="font-size:13px">🔑 <span data-i18n="api_key_label">Clave API Claude (opcional — para extracción directa)</span></div>
+        <div class="api-key-row" style="margin-top:6px">
+          <input type="password" id="api-key-input" class="api-key-input"
+                 placeholder="sk-ant-api03-..." oninput="saveApiKey()"/>
+          <button class="btn" onclick="toggleApiKey()" data-i18n="btn_show">Mostrar</button>
+        </div>
+        <div class="api-key-note" style="font-size:12px;margin-top:4px" data-i18n="api_key_note">
+          <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a> — o use el método portapapeles (Volet 1) con su cuenta Claude.ai
+        </div>
+      </div>
+
+      <!-- Drop zone PDF/images -->
+      <div class="import-hero" id="drop-zone"
+           onclick="document.getElementById('pdf-input').click()"
+           ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+           ondragleave="this.style.borderColor=''"
+           ondrop="handleDrop(event)">
+        <div class="import-hero-icon">📄</div>
+        <div class="import-hero-title">Arrastra PDF o imagen aquí</div>
+        <div class="import-hero-sub">PDF, JPG, PNG, TIFF — requiere clave API para extracción automática</div>
+      </div>
+      <input type="file" id="pdf-input" accept=".pdf,.jpg,.jpeg,.png,.tiff,.tif,.bmp,.webp" multiple style="display:none" onchange="handleFiles(this.files)"/>
+
+      <!-- OCR Only -->
+      <div style="display:flex;gap:8px;margin-top:14px;align-items:center;flex-wrap:wrap">
+        <button class="btn" onclick="document.getElementById('ocr-input').click()" style="border-color:var(--warn);color:var(--warn);font-size:13px;padding:8px 16px">
+          🔍 OCR sólo — ver texto
+        </button>
+        <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">Sin clave API · Tesseract.js local</span>
+      </div>
+      <input type="file" id="ocr-input" accept=".jpg,.jpeg,.png,.tiff,.tif,.bmp,.webp,.pdf" style="display:none" onchange="ocrOnly(this.files[0])"/>
+
+      <!-- OCR Result preview -->
+      <div id="ocr-result-box" style="display:none;background:var(--surface2);border:1px solid var(--border);border-left:4px solid var(--warn);border-radius:var(--radius);padding:16px 20px;margin-top:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div style="font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--warn)">🔍 TEXTO OCR</div>
+          <div style="display:flex;gap:6px">
+            <button class="btn" onclick="copyOcrText()" style="font-size:10px;padding:4px 10px">📋 Copiar</button>
+            <button class="btn" onclick="document.getElementById('ocr-result-box').style.display='none'" style="font-size:10px;padding:4px 10px">✕</button>
+          </div>
+        </div>
+        <div id="ocr-meta" style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:10px"></div>
+        <pre id="ocr-text" style="font-family:var(--mono);font-size:12px;color:var(--text);white-space:pre-wrap;word-break:break-word;max-height:200px;overflow-y:auto;background:var(--surface);border-radius:6px;padding:14px;line-height:1.7"></pre>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <button class="btn primary" onclick="copyForClaude()" id="btn-copy-claude" style="font-size:12px;padding:8px 16px">📋 Copiar para Claude.ai</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Progress -->
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- VOLET 3 : SAISIE MANUELLE                   -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div id="volet-manual" class="import-volet" style="display:none">
+    <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--warn);border-radius:var(--radius);padding:20px 24px">
+      <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--warn);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">✏️ ENTRADA MANUAL DE VALORES</div>
+      <div class="manual-form">
+        <div class="form-grid">
+          <div class="form-field">
+            <label data-i18n="lbl_date">Fecha</label>
+            <input type="date" id="m-date"/>
+          </div>
+          <div class="form-field">
+            <label data-i18n="lbl_source">Fuente</label>
+            <select id="m-source-select" onchange="onSourceChange()" style="margin-bottom:4px">
+              <option value="">— Seleccionar fuente —</option>
+            </select>
+            <input type="text" id="m-source-new" placeholder="Nombre del hospital / laboratorio..." style="display:none"/>
+          </div>
+          <div class="form-field">
+            <label data-i18n="lbl_param">Parámetro</label>
+            <select id="m-param" onchange="onParamChange()">
+              <option value="">— Seleccionar —</option>
+            </select>
+          </div>
+          <div class="form-field" id="custom-param-box" style="display:none">
+            <label style="color:var(--accent)">Nuevo parámetro</label>
+            <input type="text" id="cp-label" placeholder="Nombre (ej: Procalcitonina)" style="margin-bottom:4px"/>
+            <div style="display:flex;gap:6px">
+              <input type="text" id="cp-unit" placeholder="Unidad (ej: ng/mL)" style="flex:1"/>
+              <input type="text" id="cp-ref" placeholder="Ref min-max (ej: 0-0.5)" style="flex:1"/>
+            </div>
+          </div>
+          <div class="form-field">
+            <label data-i18n="lbl_value">Valor</label>
+            <input type="number" id="m-value" step="0.01" placeholder="0.00"/>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+          <button class="btn primary" onclick="addManual()" data-i18n="btn_add">+ Añadir valor</button>
+          <button class="btn" onclick="addEvent()" data-i18n="btn_add_event">+ Evento clínico</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress bar (partagée entre tous les volets) -->
   <div class="progress-box" id="progress-box">
     <div class="progress-title" id="progress-title">Extrayendo datos...</div>
     <div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar" style="width:0%"></div></div>
     <div class="progress-log" id="progress-log"></div>
   </div>
 
-  <!-- IMPORT JSON — toujours visible -->
-  <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent2);border-radius:var(--radius);padding:18px 22px;margin-bottom:20px">
-    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
-      <div style="font-family:var(--mono);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--accent2)">📥 IMPORTAR JSON</div>
-    </div>
-    <div style="font-size:15px;color:var(--muted);margin-bottom:14px;line-height:1.7">
-      Copia el JSON de Claude, luego pulsa el botón — se pega e importa automáticamente.
-    </div>
-    <div style="display:flex;gap:10px;margin-bottom:10px;align-items:center;flex-wrap:wrap">
-      <button class="btn primary" onclick="pasteAndImport()" style="font-size:15px;padding:12px 24px">
-        📋 Pegar e importar desde portapapeles
-      </button>
-      <button class="btn" onclick="document.getElementById('json-manual-area').style.display=document.getElementById('json-manual-area').style.display==='none'?'block':'none'" style="font-size:12px;padding:8px 14px">
-        ✏️ Pegar manualmente
-      </button>
-    </div>
-    <div id="json-import-result-global" style="font-family:var(--mono);font-size:13px;margin-top:4px"></div>
-    <button id="btn-clear-result" class="btn" onclick="document.getElementById('json-import-result-global').innerHTML='';this.style.display='none'" style="display:none;font-size:11px;padding:5px 12px;margin-top:6px">✕ Cerrar mensaje</button>
-    <!-- Fallback: textarea pour coller manuellement si le navigateur bloque le presse-papiers -->
-    <div id="json-manual-area" style="display:none;margin-top:12px">
-      <textarea id="json-input-global" placeholder="Si el botón no funciona, pega el JSON aquí manualmente..." style="width:100%;height:120px;font-family:var(--mono);font-size:13px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:12px;resize:vertical"></textarea>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button class="btn primary" onclick="importClaudeJsonGlobal()" style="font-size:13px;padding:8px 18px">
-          ✓ Importar
-        </button>
-        <button class="btn" onclick="document.getElementById('json-input-global').value=''" style="font-size:12px;padding:6px 12px">Limpiar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Saisie manuelle -->
-  <div style="margin: 24px 0 12px">
-    <div class="section-label" data-i18n="manual_entry">Añadir valor manualmente</div>
-  </div>
-  <div class="manual-form">
-    <div class="form-grid">
-      <div class="form-field">
-        <label data-i18n="lbl_date">Fecha</label>
-        <input type="date" id="m-date"/>
-      </div>
-      <div class="form-field">
-        <label data-i18n="lbl_source">Fuente</label>
-        <select id="m-source-select" onchange="onSourceChange()" style="margin-bottom:4px">
-          <option value="">— Seleccionar fuente —</option>
-        </select>
-        <input type="text" id="m-source-new" placeholder="Nombre del hospital / laboratorio..." style="display:none"/>
-      </div>
-      <div class="form-field">
-        <label data-i18n="lbl_param">Parámetro</label>
-        <select id="m-param" onchange="onParamChange()">
-          <option value="">— Seleccionar —</option>
-        </select>
-      </div>
-      <div class="form-field" id="custom-param-box" style="display:none">
-        <label style="color:var(--accent)">Nuevo parámetro</label>
-        <input type="text" id="cp-label" placeholder="Nombre (ej: Procalcitonina)" style="margin-bottom:4px"/>
-        <div style="display:flex;gap:6px">
-          <input type="text" id="cp-unit" placeholder="Unidad (ej: ng/mL)" style="flex:1"/>
-          <input type="text" id="cp-ref" placeholder="Ref min-max (ej: 0-0.5)" style="flex:1"/>
-        </div>
-        <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:4px">
-          Se guardará y estará disponible para futuras entradas.
-        </div>
-      </div>
-      <div class="form-field">
-        <label data-i18n="lbl_value">Valor</label>
-        <input type="number" id="m-value" step="0.01" placeholder="0.00"/>
-      </div>
-    </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn primary" onclick="addManual()" data-i18n="btn_add">+ Añadir</button>
-      <button class="btn" onclick="addEvent()" data-i18n="btn_add_event">+ Evento clínico</button>
-    </div>
-  </div>
-
-  <!-- Données actuelles -->
-  <div style="margin: 24px 0 12px">
-    <div class="section-label" data-i18n="current_data">Datos actuales en memoria</div>
-  </div>
-  <div id="data-summary" style="font-family:var(--mono);font-size:12px;color:var(--muted)"></div>
 </div>
 
 </div><!-- /main -->
@@ -2354,6 +2354,18 @@ function importData(input) {
   };
   reader.readAsText(file);
   input.value = '';
+}
+
+/* ================================================================
+   IMPORT TABS — switch between 3 volets
+================================================================ */
+function showImportTab(tab) {
+  ['clipboard', 'auto', 'manual'].forEach(t => {
+    const volet = document.getElementById('volet-' + t);
+    const btn = document.getElementById('tab-' + t);
+    if (volet) volet.style.display = t === tab ? 'block' : 'none';
+    if (btn) { btn.classList.toggle('primary', t === tab); }
+  });
 }
 
 /* ================================================================
