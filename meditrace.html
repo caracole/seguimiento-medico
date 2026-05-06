@@ -413,9 +413,9 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 <div class="topbar">
   <div style="display:flex;align-items:center;gap:12px">
     <a href="index.html" class="topbar-logo">Medi<span>Trace</span></a>
-    <span id="patient-badge" style="display:none;padding:4px 10px;background:rgba(74,143,232,0.2);border:1px solid var(--accent);border-radius:6px;font-size:13px"></span>
   </div>
   <div style="display:flex;align-items:center;gap:6px">
+    <span id="patient-badge" style="display:none;padding:4px 10px;background:rgba(74,143,232,0.2);border:1px solid var(--accent);border-radius:6px;font-size:13px"></span>
     <button class="btn-topbar" onclick="toggleTheme()" id="theme-btn" title="Cambiar tema">☀️</button>
     <button class="lang-btn active" onclick="setLang('es')">ES</button>
     <button class="lang-btn" onclick="setLang('fr')">FR</button>
@@ -425,7 +425,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 
 <!-- TOP BAR — Ligne 2: Actions -->
 <div class="topbar-actions">
-  <button class="btn-topbar" onclick="nuevoPaciente()" title="Cambiar de paciente" style="color:#e8a44a;border-color:#e8a44a">👥 Paciente</button>
+  <button class="btn-topbar" onclick="nuevoPaciente()" title="Cambiar de paciente" style="color:#e8a44a;border-color:#e8a44a">👥 Nuevo Paciente</button>
   <button class="btn-topbar" onclick="showPanel('importar',this)" data-i18n="nav_import">+ Datos</button>
   <button class="btn-topbar" onclick="document.getElementById('import-json').click()" title="Restaurar desde backup">📂 Restaurar</button>
   <input type="file" id="import-json" accept=".json,.js,.mt,application/json,text/plain" style="display:none" onchange="importData(this)"/>
@@ -943,7 +943,26 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
     <!-- Liste dépliante des événements importés -->
     <details style="margin-top:12px">
       <summary style="font-family:var(--mono);font-size:13px;color:var(--accent);cursor:pointer;font-weight:600">📜 Ver / gestionar eventos importados ▼</summary>
-      <div id="import-list" style="margin-top:10px;max-height:300px;overflow-y:auto"></div>
+      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;align-items:center">
+        <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">Filtrar:</span>
+        <select id="event-filter" onchange="buildImportList()" style="font-family:var(--mono);font-size:12px;padding:4px 8px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:4px">
+          <option value="todos">Todos</option>
+          <option value="laboratorio">Laboratorio</option>
+          <option value="urgencias">Urgencias</option>
+          <option value="neurologia">Neurología</option>
+          <option value="cardiologia">Cardiología</option>
+          <option value="imagen">Imagen</option>
+          <option value="consulta">Consulta</option>
+          <option value="bacteriologia">Bacteriología</option>
+        </select>
+      </div>
+      <div id="import-list" style="margin-top:10px;max-height:400px;overflow-y:auto"></div>
+    </details>
+
+    <!-- Liste dépliante des mesures avec correction de date -->
+    <details style="margin-top:8px">
+      <summary style="font-family:var(--mono);font-size:13px;color:var(--warn);cursor:pointer;font-weight:600">📊 Ver / corregir fechas de mediciones ▼</summary>
+      <div id="mesures-list" style="margin-top:10px;max-height:300px;overflow-y:auto"></div>
     </details>
   </div>
 
@@ -1564,7 +1583,7 @@ function showPanel(name, tabEl) {
   if (name === 'medicamentos') buildMedicamentos();
   if (name === 'bacterio')     buildBacterio();
   if (name === 'farma')         buildFarma();
-  if (name === 'importar') { updateDataSummary(data); buildImportList(); }
+  if (name === 'importar') { updateDataSummary(data); buildImportList(); buildMesuresList(); }
 }
 
 function goImport() {
@@ -2415,8 +2434,11 @@ function importData(input) {
 function buildImportList() {
   const el = document.getElementById('import-list');
   if (!el) return;
-  const evts = loadEvents();
-  if (!evts.length) {
+  const allEvts = loadEvents();
+  const filterEl = document.getElementById('event-filter');
+  const filterType = filterEl ? filterEl.value : 'todos';
+  const evts = filterType === 'todos' ? allEvts : allEvts.filter(function(e) { return e.type === filterType; });
+  if (!allEvts.length) {
     el.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:8px">' + (LANG[currentLang].no_events||'No hay eventos importados.') + '</div>';
     return;
   }
@@ -2433,7 +2455,7 @@ function buildImportList() {
   var reversed = evts.slice().reverse();
   for (var i = 0; i < reversed.length; i++) {
     var ev = reversed[i];
-    var realIdx = evts.length - 1 - i;
+    var realIdx = allEvts.indexOf(ev);
     var typeColors = {urgencias:'#e84a4a',neurologia:'#7d3c98',imagen:'#4a8fe8',laboratorio:'#4ae8a4',bacteriologia:'#e8a44a',consulta:'#4a8fe8'};
     var color = typeColors[ev.type] || 'var(--muted)';
     var dateDisplay = ev.date ? fmtDate(ev.date) : '\u26a0 sin fecha';
@@ -2450,7 +2472,7 @@ function buildImportList() {
   }
 
   html += '</tbody></table>';
-  html += '<div style="font-size:11px;color:var(--muted);margin-top:8px">' + evts.length + ' ' + (LANG[currentLang].events_count||'evento(s)') + '</div>';
+  html += '<div style="font-size:11px;color:var(--muted);margin-top:8px">' + (filterType !== 'todos' ? evts.length + '/' : '') + allEvts.length + ' ' + (LANG[currentLang].events_count||'evento(s)') + (filterType !== 'todos' ? ' (' + filterType + ')' : '') + '</div>';
   el.innerHTML = html;
 }
 
@@ -2581,6 +2603,83 @@ function deleteEvent(idx) {
   btnCancel.onclick = function() { document.body.removeChild(overlay); };
   overlay.onclick = function(e) { if (e.target === overlay) document.body.removeChild(overlay); };
 }
+
+
+/* ================================================================
+   MESURES LIST — Correction de dates des mesures
+================================================================ */
+function buildMesuresList() {
+  var el = document.getElementById('mesures-list');
+  if (!el) return;
+  var data = loadData();
+  if (!data.length) { el.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:8px">No hay mediciones.</div>'; return; }
+
+  var html = '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>' +
+    '<th style="text-align:left;padding:6px 8px;border-bottom:2px solid var(--border);color:var(--muted);font-size:11px;width:100px">Fecha</th>' +
+    '<th style="text-align:left;padding:6px 8px;border-bottom:2px solid var(--border);color:var(--muted);font-size:11px">Fuente</th>' +
+    '<th style="text-align:left;padding:6px 8px;border-bottom:2px solid var(--border);color:var(--muted);font-size:11px">Par\u00e1metros</th>' +
+    '<th style="text-align:center;padding:6px 8px;border-bottom:2px solid var(--border);color:var(--muted);font-size:11px;width:40px">\u2715</th>' +
+    '</tr></thead><tbody>';
+
+  data.slice().reverse().forEach(function(m, i) {
+    var realIdx = data.length - 1 - i;
+    var paramCount = Object.keys(m.vals||{}).length;
+    var dateDisplay = m.date ? fmtDate(m.date) : '\u26a0 sin fecha';
+    html += '<tr style="border-bottom:1px solid var(--border)">' +
+      '<td style="padding:4px 8px;cursor:pointer;font-family:var(--mono);font-size:11px" onclick="editMesureDate(' + realIdx + ',this)">' + dateDisplay + '</td>' +
+      '<td style="padding:4px 8px;cursor:pointer;font-size:12px" onclick="editMesureSrc(' + realIdx + ',this)">' + (m.src||'\u2014') + '</td>' +
+      '<td style="padding:4px 8px;font-size:11px;color:var(--muted)">' + paramCount + ' valor(es)</td>' +
+      '<td style="padding:4px 8px;text-align:center"><button onclick="deleteMesure(' + realIdx + ')" style="background:transparent;border:1px solid var(--danger);color:var(--danger);border-radius:4px;padding:2px 8px;font-size:10px;cursor:pointer">\u2715</button></td>' +
+      '</tr>';
+  });
+  html += '</tbody></table>';
+  html += '<div style="font-size:11px;color:var(--muted);margin-top:6px">' + data.length + ' medici\u00f3n(es)</div>';
+  el.innerHTML = html;
+}
+
+function editMesureDate(idx, td) {
+  var data = loadData();
+  if (idx < 0 || idx >= data.length) return;
+  var inp = document.createElement('input');
+  inp.type = 'date'; inp.value = data[idx].date || '';
+  inp.style.cssText = 'font-family:var(--mono);font-size:11px;padding:2px;background:var(--surface2);color:var(--text);border:1px solid var(--accent);border-radius:4px;width:100%';
+  td.innerHTML = ''; td.appendChild(inp); inp.focus();
+  inp.onchange = function() { if (inp.value) { data[idx].date = inp.value; data.sort(function(a,b){return a.date.localeCompare(b.date)}); saveData(data); } buildMesuresList(); };
+  inp.onblur = function() { buildMesuresList(); };
+}
+
+function editMesureSrc(idx, td) {
+  var data = loadData();
+  if (idx < 0 || idx >= data.length) return;
+  var inp = document.createElement('input');
+  inp.type = 'text'; inp.value = data[idx].src || '';
+  inp.style.cssText = 'font-family:var(--mono);font-size:11px;padding:2px;background:var(--surface2);color:var(--text);border:1px solid var(--accent);border-radius:4px;width:100%';
+  td.innerHTML = ''; td.appendChild(inp); inp.focus(); inp.select();
+  function save() { var nv = inp.value.trim(); if (nv) { data[idx].src = nv; saveData(data); } buildMesuresList(); }
+  inp.onblur = save;
+  inp.onkeydown = function(e) { if (e.key==='Enter') save(); if (e.key==='Escape') buildMesuresList(); };
+}
+
+function deleteMesure(idx) {
+  var data = loadData();
+  if (idx < 0 || idx >= data.length) return;
+  var m = data[idx];
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center';
+  var box = document.createElement('div');
+  box.style.cssText = 'background:var(--surface);border:2px solid var(--danger);border-radius:12px;padding:24px;width:90%;max-width:420px;text-align:center';
+  box.innerHTML = '<div style="font-size:32px;margin-bottom:12px">\u26a0\ufe0f</div>' +
+    '<div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:20px">' + fmtDate(m.date) + ' \u2014 ' + (m.src||'') + ' \u2014 ' + Object.keys(m.vals||{}).length + ' valor(es)</div>';
+  var btnRow = document.createElement('div');
+  btnRow.style.cssText = 'display:flex;gap:10px;justify-content:center';
+  var btnC = document.createElement('button'); btnC.textContent = (LANG[currentLang].del_cancel||'Cancelar'); btnC.className = 'btn'; btnC.style.cssText = 'font-size:14px;padding:10px 24px';
+  var btnD = document.createElement('button'); btnD.textContent = (LANG[currentLang].del_confirm||'\u2715 Eliminar'); btnD.style.cssText = 'font-size:14px;padding:10px 24px;background:var(--danger);color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600';
+  btnRow.appendChild(btnC); btnRow.appendChild(btnD); box.appendChild(btnRow); overlay.appendChild(box); document.body.appendChild(overlay);
+  btnD.onclick = function() { data.splice(idx, 1); saveData(data); document.body.removeChild(overlay); buildMesuresList(); updateDataSummary(data); };
+  btnC.onclick = function() { document.body.removeChild(overlay); };
+  overlay.onclick = function(e) { if (e.target === overlay) document.body.removeChild(overlay); };
+}
+
 
 /* ================================================================
    IMPORT TABS — switch between 3 volets
