@@ -135,11 +135,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 
 /* ── TOP BAR ── */
 .top-fixed-wrapper {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 200;
+  /* normal flow - no sticky/fixed for now */
 }
 .topbar {
   background: #0a0f1a;
@@ -212,7 +208,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 .nav-tab.alert { color: var(--danger); }
 
 /* ── MAIN ── */
-.main { max-width: 1200px; margin: 0 auto; padding: 24px 20px; padding-top: 8px; }
+.main { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
 .panel { display: none; }
 .panel.active { display: block; }
 .section-label {
