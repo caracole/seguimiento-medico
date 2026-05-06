@@ -409,13 +409,13 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 </head>
 <body>
 
-<!-- TOP BAR — Ligne 1: Logo + Mode couleur + Langues -->
+<!-- TOP BAR — Ligne 1: Logo + Patient + Mode couleur + Langues -->
 <div class="topbar">
   <div style="display:flex;align-items:center;gap:12px">
     <a href="index.html" class="topbar-logo">Medi<span>Trace</span></a>
+    <span id="patient-badge" style="display:none;padding:4px 10px;background:rgba(74,143,232,0.2);border:1px solid var(--accent);border-radius:6px;font-size:13px"></span>
   </div>
   <div style="display:flex;align-items:center;gap:6px">
-    <span id="patient-badge" style="display:none;padding:4px 10px;background:rgba(74,143,232,0.2);border:1px solid var(--accent);border-radius:6px;font-size:13px"></span>
     <button class="btn-topbar" onclick="toggleTheme()" id="theme-btn" title="Cambiar tema">☀️</button>
     <button class="lang-btn active" onclick="setLang('es')">ES</button>
     <button class="lang-btn" onclick="setLang('fr')">FR</button>
@@ -2504,10 +2504,12 @@ function editCell(idx, field, td) {
     var inp = document.createElement('input');
     inp.type = 'date';
     inp.value = currentVal;
-    inp.style.cssText = 'font-family:var(--mono);font-size:11px;padding:2px;background:var(--surface2);color:var(--text);border:1px solid var(--accent);border-radius:4px;width:100%';
+    inp.style.cssText = 'font-family:var(--mono);font-size:14px;padding:6px 8px;background:var(--surface2);color:var(--text);border:2px solid var(--accent);border-radius:6px;width:100%;cursor:pointer';
+    inp.min = '2015-01-01'; inp.max = '2030-12-31';
     td.innerHTML = '';
     td.appendChild(inp);
     inp.focus();
+    try { inp.showPicker(); } catch(e) {}
     inp.onchange = function() { if (inp.value) { evts[idx][field] = inp.value; saveEvents(evts); } buildImportList(); };
     inp.onblur = function() { buildImportList(); };
     return;
@@ -2642,8 +2644,9 @@ function editMesureDate(idx, td) {
   if (idx < 0 || idx >= data.length) return;
   var inp = document.createElement('input');
   inp.type = 'date'; inp.value = data[idx].date || '';
-  inp.style.cssText = 'font-family:var(--mono);font-size:11px;padding:2px;background:var(--surface2);color:var(--text);border:1px solid var(--accent);border-radius:4px;width:100%';
-  td.innerHTML = ''; td.appendChild(inp); inp.focus();
+  inp.style.cssText = 'font-family:var(--mono);font-size:14px;padding:6px 8px;background:var(--surface2);color:var(--text);border:2px solid var(--accent);border-radius:6px;width:100%;cursor:pointer';
+  inp.min = '2015-01-01'; inp.max = '2030-12-31';
+  td.innerHTML = ''; td.appendChild(inp); inp.focus(); try { inp.showPicker(); } catch(e) {}
   inp.onchange = function() { if (inp.value) { data[idx].date = inp.value; data.sort(function(a,b){return a.date.localeCompare(b.date)}); saveData(data); } buildMesuresList(); };
   inp.onblur = function() { buildMesuresList(); };
 }
