@@ -2427,7 +2427,7 @@ function buildImportList() {
   }
 
   html += '</tbody></table>';
-  html += '<div style="font-size:11px;color:var(--muted);margin-top:8px">' + evts.length + ' + ' ' + (LANG[currentLang].events_count||'evento(s)') + '</div>';
+  html += '<div style="font-size:11px;color:var(--muted);margin-top:8px">' + evts.length + ' ' + (LANG[currentLang].events_count||'evento(s)') + '</div>';
   el.innerHTML = html;
 }
 
@@ -2486,7 +2486,7 @@ function editCell(idx, field, td) {
     btnSave.className = 'btn primary';
     btnSave.style.cssText = 'font-size:13px;padding:8px 18px';
     var btnCancel = document.createElement('button');
-    btnCancel.textContent = (LANG[currentLang].del_cancel||'Cancelar');
+    btnCancel.textContent = (LANG[currentLang].edit_cancel||'Cancelar');
     btnCancel.className = 'btn';
     btnCancel.style.cssText = 'font-size:13px;padding:8px 18px';
     btnRow.appendChild(btnCancel);
