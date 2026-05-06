@@ -135,8 +135,10 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 
 /* ── TOP BAR ── */
 .top-fixed-wrapper {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 200;
 }
 .topbar {
@@ -210,7 +212,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 .nav-tab.alert { color: var(--danger); }
 
 /* ── MAIN ── */
-.main { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
+.main { max-width: 1200px; margin: 0 auto; padding: 24px 20px; padding-top: 8px; }
 .panel { display: none; }
 .panel.active { display: block; }
 .section-label {
@@ -409,6 +411,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 <body>
 
 <div class="top-fixed-wrapper">
+
 <!-- TOP BAR — Ligne 1: Logo + Patient + Mode couleur + Langues -->
 <div class="topbar">
   <div style="display:flex;align-items:center;gap:12px">
@@ -423,7 +426,6 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   </div>
 </div>
 
-<div class="top-fixed-wrapper">
 <!-- TOP BAR — Ligne 2: Actions -->
 <div class="topbar-actions">
   <button class="btn-topbar" onclick="nuevoPaciente()" title="Cambiar de paciente" style="color:#e8a44a;border-color:#e8a44a">👥 Nuevo Paciente</button>
@@ -433,29 +435,6 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <button class="btn-topbar" onclick="exportData()" title="Guardar copia de seguridad">💾 Guardar</button>
   <button class="btn-topbar" onclick="showInformeChoice()" title="Generar informe médico" style="color:#4ae8a4;border-color:#4ae8a4">📄 Informe</button>
   <button class="btn-topbar danger" onclick="confirmReset()" data-i18n="nav_reset">⟳ Reset</button>
-</div>
-
-</div>
-
-<!-- INFORME CHOICE DIALOG -->
-<div id="informe-dialog" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);justify-content:center;align-items:center">
-  <div style="background:var(--surface);border:2px solid var(--accent);border-radius:16px;padding:32px 28px;max-width:500px;width:90%;text-align:center">
-    <div style="font-family:var(--serif);font-size:24px;font-weight:700;color:var(--text);margin-bottom:8px">📄 Generar Informe</div>
-    <div style="font-size:15px;color:var(--muted);margin-bottom:24px">Elija el tipo de informe a generar</div>
-    <div style="display:flex;flex-direction:column;gap:12px">
-      <button onclick="exportPDF('detallado');closeInformeDialog()" style="background:var(--accent);color:white;border:none;border-radius:10px;padding:18px 24px;font-size:17px;font-weight:600;cursor:pointer;text-align:left;font-family:var(--sans);transition:all .15s">
-        📄 <strong>Informe Detallado</strong>
-        <div style="font-size:13px;font-weight:400;opacity:0.85;margin-top:4px">Anamnesis · Análisis vascular · Farmacovigilancia · Observancia · Valores · Tabla · Cronología · Bacteriología</div>
-      </button>
-      <button onclick="exportPDF('sintetico');closeInformeDialog()" style="background:var(--surface2);color:var(--text);border:2px solid var(--border);border-radius:10px;padding:18px 24px;font-size:17px;font-weight:600;cursor:pointer;text-align:left;font-family:var(--sans);transition:all .15s">
-        📋 <strong>Informe Sintético</strong>
-        <div style="font-size:13px;font-weight:400;color:var(--muted);margin-top:4px">Anamnesis · Valores clave · Tabla de síntesis — 1-2 páginas</div>
-      </button>
-      <button onclick="closeInformeDialog()" style="background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:14px;cursor:pointer;font-family:var(--sans);margin-top:4px">
-        ✕ Cancelar
-      </button>
-    </div>
-  </div>
 </div>
 
 <!-- NAV -->
@@ -474,6 +453,8 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <div class="nav-tab alert" onclick="showPanel('farma',this)"        data-i18n="tab_farma">⚠ Farmacovigilancia</div>
   <div class="nav-tab" onclick="showPanel('importar',this)"           data-i18n="tab_import">+ Datos</div>
 </div>
+
+</div><!-- fin top-fixed-wrapper -->
 
 <div class="main">
 
