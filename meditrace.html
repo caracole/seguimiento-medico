@@ -452,6 +452,27 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 
 </div><!-- fin top-fixed-wrapper -->
 
+<!-- INFORME CHOICE DIALOG -->
+<div id="informe-dialog" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);justify-content:center;align-items:center">
+  <div style="background:var(--surface);border:2px solid var(--accent);border-radius:16px;padding:32px 28px;max-width:500px;width:90%;text-align:center">
+    <div style="font-family:var(--serif);font-size:24px;font-weight:700;color:var(--text);margin-bottom:8px">📄 Generar Informe</div>
+    <div style="font-size:15px;color:var(--muted);margin-bottom:24px">Elija el tipo de informe a generar</div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <button onclick="exportPDF('detallado');closeInformeDialog()" style="background:var(--accent);color:white;border:none;border-radius:10px;padding:18px 24px;font-size:17px;font-weight:600;cursor:pointer;text-align:left;font-family:var(--sans);transition:all .15s">
+        📄 <strong>Informe Detallado</strong>
+        <div style="font-size:13px;font-weight:400;opacity:0.85;margin-top:4px">Anamnesis · Análisis vascular · Farmacovigilancia · Observancia · Valores · Tabla · Cronología · Bacteriología</div>
+      </button>
+      <button onclick="exportPDF('sintetico');closeInformeDialog()" style="background:var(--surface2);color:var(--text);border:2px solid var(--border);border-radius:10px;padding:18px 24px;font-size:17px;font-weight:600;cursor:pointer;text-align:left;font-family:var(--sans);transition:all .15s">
+        📋 <strong>Informe Sintético</strong>
+        <div style="font-size:13px;font-weight:400;color:var(--muted);margin-top:4px">Anamnesis · Valores clave · Tabla de síntesis — 1-2 páginas</div>
+      </button>
+      <button onclick="closeInformeDialog()" style="background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:14px;cursor:pointer;font-family:var(--sans);margin-top:4px">
+        ✕ Cancelar
+      </button>
+    </div>
+  </div>
+</div>
+
 <div class="main">
 
 <!-- ===== PANEL BIENVENIDA (sin datos) ===== -->
