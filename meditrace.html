@@ -426,7 +426,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 <!-- TOP BAR — Ligne 2: Actions -->
 <div class="topbar-actions">
   <button class="btn-topbar" onclick="nuevoPaciente()" title="Cambiar de paciente" style="color:#e8a44a;border-color:#e8a44a">👥 Nuevo Paciente</button>
-  <button class="btn-topbar" onclick="showPanel('importar',this)" data-i18n="nav_import">+ Datos</button>
+  <button class="btn-topbar" onclick="showPanel('importar',this)" data-i18n="nav_import">📥 Datos</button>
   <button class="btn-topbar" onclick="document.getElementById('import-json').click()" title="Restaurar desde backup">📂 Restaurar</button>
   <input type="file" id="import-json" accept=".json,.js,.mt,application/json,text/plain" style="display:none" onchange="importData(this)"/>
   <button class="btn-topbar" onclick="exportData()" title="Guardar copia de seguridad">💾 Guardar</button>
@@ -434,7 +434,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <button class="btn-topbar danger" onclick="confirmReset()" data-i18n="nav_reset">⟳ Reset</button>
 </div>
 
-<!-- NAV -->
+<!-- NAV — barre horizontale (desktop) -->
 <div class="nav" id="main-nav" style="display:none">
   <div class="nav-tab active" onclick="showPanel('resumen',this)"     data-i18n="tab_resumen">Resumen</div>
   <div class="nav-tab" onclick="showPanel('curvas',this)"             data-i18n="tab_curvas">Curvas</div>
@@ -448,7 +448,18 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <div class="nav-tab" onclick="showPanel('medicamentos',this)"      data-i18n="tab_meds">💊 Medicamentos</div>
   <div class="nav-tab" onclick="showPanel('bacterio',this)"          data-i18n="tab_bacterio">🦠 Bacteriología</div>
   <div class="nav-tab alert" onclick="showPanel('farma',this)"        data-i18n="tab_farma">⚠ Farmacovigilancia</div>
-  <div class="nav-tab" onclick="showPanel('importar',this)"           data-i18n="tab_import">+ Datos</div>
+  <div class="nav-tab" onclick="showPanel('importar',this)"           data-i18n="tab_import">📥 Datos</div>
+  <div class="nav-tab" onclick="toggleSidebar()" style="margin-left:auto;font-size:18px;padding:4px 10px" title="Menú lateral">☰</div>
+</div>
+
+<!-- SIDEBAR — volet latéral -->
+<div id="sidebar-overlay" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.4)" onclick="toggleSidebar()"></div>
+<div id="sidebar" style="display:none;position:fixed;top:0;left:0;bottom:0;width:260px;z-index:310;background:var(--surface);border-right:2px solid var(--border);overflow-y:auto;padding:20px 0;box-shadow:4px 0 20px rgba(0,0,0,0.3)">
+  <div style="padding:10px 20px;font-family:var(--serif);font-size:20px;font-weight:700;color:var(--accent);border-bottom:1px solid var(--border);margin-bottom:10px">
+    Medi<span style="font-style:italic;color:var(--accent2)">Trace</span>
+    <span style="float:right;cursor:pointer;font-size:22px;color:var(--muted)" onclick="toggleSidebar()">✕</span>
+  </div>
+  <div id="sidebar-items" style="display:flex;flex-direction:column;gap:2px;padding:0 8px"></div>
 </div>
 
 </div><!-- fin top-fixed-wrapper -->
@@ -1194,8 +1205,8 @@ if (typeof pdfjsLib !== 'undefined') {
 const LANG = {
   es: {
     tab_resumen:"Resumen", tab_curvas:"Curvas", tab_tabla:"Tabla",
-    tab_timeline:"Cronología", tab_farma:"⚠ Farmacovigilancia", tab_import:"+ Datos",
-    nav_import:"+ Añadir datos", nav_reset:"⟳ Reiniciar",
+    tab_timeline:"Cronología", tab_farma:"⚠ Farmacovigilancia", tab_import:"📥 Datos",
+    nav_import:"📥 Datos", nav_reset:"⟳ Reiniciar",
     welcome_title:"Bienvenido a MediTrace",
     welcome_sub:"Ningún dato médico cargado todavía.\nEmpiece importando un PDF o añadiendo datos manualmente.",
     welcome_btn:"→ Importar mi primer documento",
@@ -1224,8 +1235,8 @@ const LANG = {
   },
   fr: {
     tab_resumen:"Résumé", tab_curvas:"Courbes", tab_tabla:"Tableau",
-    tab_timeline:"Chronologie", tab_farma:"⚠ Pharmacovigilance", tab_import:"+ Données",
-    nav_import:"+ Ajouter données", nav_reset:"⟳ Réinitialiser",
+    tab_timeline:"Chronologie", tab_farma:"⚠ Pharmacovigilance", tab_import:"📥 Données",
+    nav_import:"📥 Données", nav_reset:"⟳ Réinitialiser",
     welcome_title:"Bienvenue dans MediTrace",
     welcome_sub:"Aucune donnée médicale chargée.\nCommencez par importer un PDF ou saisir des données manuellement.",
     welcome_btn:"→ Importer mon premier document",
@@ -1254,8 +1265,8 @@ const LANG = {
   },
   en: {
     tab_resumen:"Summary", tab_curvas:"Charts", tab_tabla:"Table",
-    tab_timeline:"Timeline", tab_farma:"⚠ Pharmacovigilance", tab_import:"+ Data",
-    nav_import:"+ Add data", nav_reset:"⟳ Reset",
+    tab_timeline:"Timeline", tab_farma:"⚠ Pharmacovigilance", tab_import:"📥 Data",
+    nav_import:"📥 Data", nav_reset:"⟳ Reset",
     welcome_title:"Welcome to MediTrace",
     welcome_sub:"No medical data loaded yet.\nStart by importing a PDF or entering data manually.",
     welcome_btn:"→ Import my first document",
@@ -2773,6 +2784,38 @@ function deleteMesure(idx) {
   overlay.onclick = function(e) { if (e.target === overlay) document.body.removeChild(overlay); };
 }
 
+
+/* ================================================================
+   SIDEBAR — volet latéral
+================================================================ */
+function toggleSidebar() {
+  var sb = document.getElementById('sidebar');
+  var ov = document.getElementById('sidebar-overlay');
+  var isOpen = sb.style.display !== 'none';
+  sb.style.display = isOpen ? 'none' : 'block';
+  ov.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) buildSidebarItems();
+}
+
+function buildSidebarItems() {
+  var el = document.getElementById('sidebar-items');
+  if (!el) return;
+  var tabs = document.querySelectorAll('#main-nav .nav-tab[data-i18n]');
+  el.innerHTML = '';
+  tabs.forEach(function(tab) {
+    var item = document.createElement('div');
+    var isActive = tab.classList.contains('active');
+    item.style.cssText = 'padding:12px 16px;font-family:var(--mono);font-size:14px;cursor:pointer;border-radius:8px;color:var(--text);' + (isActive ? 'background:var(--accent);color:white;font-weight:600' : '');
+    item.textContent = tab.textContent;
+    item.onmouseover = function() { if (!isActive) this.style.background = 'var(--surface2)'; };
+    item.onmouseout = function() { if (!isActive) this.style.background = ''; };
+    item.onclick = function() {
+      showPanel(tab.onclick.toString().match(/'([^']+)'/)[1], tab);
+      toggleSidebar();
+    };
+    el.appendChild(item);
+  });
+}
 
 /* ================================================================
    IMPORT TABS — switch between 3 volets
@@ -4710,7 +4753,14 @@ function editMedStatut(medName) {
   setTimeout(function() {
     document.getElementById('med-edit-statut').value = last.statut || 'en_cours';
     document.getElementById('med-edit-debut').value = last.date_debut || entries[0].date || '';
-    document.getElementById('med-edit-fin').value = last.date_fin || '';
+    /* Calculer date fin par défaut si on a une durée */
+    var dateFin = last.date_fin || '';
+    if (!dateFin && last.duree_jours && (last.date_debut || entries[0].date)) {
+      var start = new Date(last.date_debut || entries[0].date);
+      start.setDate(start.getDate() + parseInt(last.duree_jours));
+      dateFin = start.toISOString().slice(0, 10);
+    }
+    document.getElementById('med-edit-fin').value = dateFin;
     document.getElementById('med-edit-motif').value = last.motif || '';
     document.getElementById('med-edit-remp').value = last.remplace_par || '';
   }, 50);
