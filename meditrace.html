@@ -4617,6 +4617,9 @@ function buildMedicamentos() {
         <div>
           <div style="font-family:var(--mono);font-weight:600;font-size:14px;color:var(--text)">${name}</div>
           <div style="font-family:var(--mono);font-size:11px;color:var(--muted)">${lastEntry.dose}${lastEntry.frequence ? ' · ' + lastEntry.frequence : ''}</div>
+          ${lastEntry.date_debut ? '<div style="font-family:var(--mono);font-size:10px;color:var(--muted)">Inicio: ' + fmtDate(lastEntry.date_debut) + (lastEntry.date_fin ? ' → Fin: ' + fmtDate(lastEntry.date_fin) : '') + '</div>' : ''}
+          ${lastEntry.motif ? '<div style="font-family:var(--mono);font-size:10px;color:var(--danger)">Motivo: ' + lastEntry.motif + '</div>' : ''}
+          ${lastEntry.remplace_par ? '<div style="font-family:var(--mono);font-size:10px;color:var(--accent)">→ Reemplazado por: ' + lastEntry.remplace_par + '</div>' : ''}
         </div>
       </div>
       <div style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;background:${lastStat.bg};border:1px solid ${lastStat.border};color:var(--text)">
@@ -4636,14 +4639,107 @@ function buildMedicamentos() {
           <span style="color:${st.border};font-size:12px">${i === entries.length-1 ? '●' : '│'}</span>
           <span style="color:var(--muted);min-width:80px">${fmtDate(entry.date)}</span>
           <span style="color:var(--text)">${entry.dose}${entry.frequence ? ' · ' + entry.frequence : ''}</span>
-          <span style="color:var(--muted);font-size:10px">— ${entry.source || ''}</span>`;
+          <span style="color:var(--muted);font-size:10px">— ${entry.source || ''}</span>
+          ${entry.motif ? '<span style="color:var(--danger);font-size:10px">(' + entry.motif + ')</span>' : ''}`;
         timeline.appendChild(row);
       });
       card.appendChild(timeline);
     }
 
+    /* Bouton éditer le statut */
+    const editBar = document.createElement('div');
+    editBar.style.cssText = 'display:flex;gap:6px;margin-top:10px;flex-wrap:wrap';
+    const btnEdit = document.createElement('button');
+    btnEdit.textContent = 'Editar';
+    btnEdit.className = 'btn';
+    btnEdit.style.cssText = 'font-size:11px;padding:4px 12px';
+    btnEdit.onclick = function() { editMedStatut(name); };
+    editBar.appendChild(btnEdit);
+    card.appendChild(editBar);
+
     el.appendChild(card);
   });
+}
+
+function editMedStatut(medName) {
+  var ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center';
+  var bx = document.createElement('div');
+  bx.style.cssText = 'background:var(--surface);border:2px solid var(--accent);border-radius:12px;padding:24px;width:90%;max-width:480px';
+  bx.innerHTML = '<div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:16px">Editar: ' + medName + '</div>';
+
+  var form = document.createElement('div');
+  form.style.cssText = 'display:flex;flex-direction:column;gap:12px';
+
+  /* Statut */
+  form.innerHTML += '<div><label style="font-size:13px;font-weight:600;color:var(--muted)">Estatuto actual</label>' +
+    '<select id="med-edit-statut" style="width:100%;font-size:14px;padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);margin-top:4px">' +
+    '<option value="en_cours">En curso</option><option value="nouveau">Nuevo</option><option value="suspendu">Suspendido</option><option value="abandonne">Abandonado</option></select></div>';
+
+  /* Date debut */
+  form.innerHTML += '<div><label style="font-size:13px;font-weight:600;color:var(--muted)">Fecha inicio</label>' +
+    '<input type="date" id="med-edit-debut" style="width:100%;font-size:14px;padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);margin-top:4px"/></div>';
+
+  /* Date fin */
+  form.innerHTML += '<div><label style="font-size:13px;font-weight:600;color:var(--muted)">Fecha fin (si abandonado/suspendido)</label>' +
+    '<input type="date" id="med-edit-fin" style="width:100%;font-size:14px;padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);margin-top:4px"/></div>';
+
+  /* Motif */
+  form.innerHTML += '<div><label style="font-size:13px;font-weight:600;color:var(--muted)">Motivo (si abandonado/suspendido)</label>' +
+    '<input type="text" id="med-edit-motif" placeholder="Ej: parkinsonismo farmacológico, intolerancia..." style="width:100%;font-size:14px;padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);margin-top:4px"/></div>';
+
+  /* Remplacé par */
+  form.innerHTML += '<div><label style="font-size:13px;font-weight:600;color:var(--muted)">Reemplazado por (opcional)</label>' +
+    '<input type="text" id="med-edit-remp" placeholder="Ej: Rivaroxabán" style="width:100%;font-size:14px;padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);margin-top:4px"/></div>';
+
+  bx.appendChild(form);
+
+  /* Pré-remplir avec les données existantes */
+  var meds = loadMeds();
+  var entries = meds.filter(function(m) { return m.nom === medName; });
+  var last = entries.length ? entries[entries.length - 1] : {};
+
+  var btnRow = document.createElement('div');
+  btnRow.style.cssText = 'display:flex;gap:10px;justify-content:flex-end;margin-top:16px';
+  var bc = document.createElement('button'); bc.textContent = 'Cancelar'; bc.className = 'btn'; bc.style.cssText = 'font-size:14px;padding:10px 20px';
+  var bo = document.createElement('button'); bo.textContent = 'Guardar'; bo.className = 'btn primary'; bo.style.cssText = 'font-size:14px;padding:10px 24px';
+  btnRow.appendChild(bc); btnRow.appendChild(bo);
+  bx.appendChild(btnRow); ov.appendChild(bx); document.body.appendChild(ov);
+
+  /* Pré-remplir */
+  setTimeout(function() {
+    document.getElementById('med-edit-statut').value = last.statut || 'en_cours';
+    document.getElementById('med-edit-debut').value = last.date_debut || entries[0].date || '';
+    document.getElementById('med-edit-fin').value = last.date_fin || '';
+    document.getElementById('med-edit-motif').value = last.motif || '';
+    document.getElementById('med-edit-remp').value = last.remplace_par || '';
+  }, 50);
+
+  bo.onclick = function() {
+    var statut = document.getElementById('med-edit-statut').value;
+    var debut = document.getElementById('med-edit-debut').value;
+    var fin = document.getElementById('med-edit-fin').value;
+    var motif = document.getElementById('med-edit-motif').value.trim();
+    var remp = document.getElementById('med-edit-remp').value.trim();
+
+    /* Mettre à jour la dernière entrée du médicament */
+    var allMeds = loadMeds();
+    for (var i = allMeds.length - 1; i >= 0; i--) {
+      if (allMeds[i].nom === medName) {
+        allMeds[i].statut = statut;
+        if (debut) allMeds[i].date_debut = debut;
+        if (fin) allMeds[i].date_fin = fin;
+        if (motif) allMeds[i].motif = motif;
+        if (remp) allMeds[i].remplace_par = remp;
+        break;
+      }
+    }
+    saveMeds(allMeds);
+    document.body.removeChild(ov);
+    buildMedicamentos();
+  };
+  bc.onclick = function() { document.body.removeChild(ov); };
+  ov.onclick = function(e) { if (e.target === ov) document.body.removeChild(ov); };
 }
 
 function buildObservancia() {
