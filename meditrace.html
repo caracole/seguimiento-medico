@@ -970,7 +970,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <!-- ══════ ONGLETS DES 3 VOLETS ══════ -->
   <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
     <button class="btn primary" id="tab-clipboard" onclick="showImportTab('clipboard')" style="font-size:14px;padding:10px 20px">📋 Desde portapapeles</button>
-    <button class="btn" id="tab-auto" onclick="showImportTab('auto')" style="font-size:14px;padding:10px 20px">🤖 Automático (API/OCR)</button>
+    <button class="btn" id="tab-auto" onclick="showImportTab('auto')" style="font-size:14px;padding:10px 20px">📷 Leer documento</button>
     <button class="btn" id="tab-manual" onclick="showImportTab('manual')" style="font-size:14px;padding:10px 20px">✏️ Entrada manual</button>
   </div>
 
@@ -979,9 +979,9 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <!-- ═══════════════════════════════════════════ -->
   <div id="volet-clipboard" class="import-volet">
     <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent2);border-radius:var(--radius);padding:20px 24px">
-      <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent2);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">📋 IMPORTAR JSON DESDE PORTAPAPELES</div>
+      <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent2);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">📋 IMPORTAR DATOS</div>
       <div style="font-size:15px;color:var(--muted);margin-bottom:16px;line-height:1.7">
-        Copie el JSON generado por Claude (desde claude.ai o esta conversación), luego pulse el botón.
+        Copie los datos generados por Claude y pulse el botón para importarlos.
       </div>
       <div style="display:flex;gap:10px;margin-bottom:12px;align-items:center;flex-wrap:wrap">
         <button class="btn primary" onclick="pasteAndImport()" style="font-size:16px;padding:14px 28px">
@@ -1010,46 +1010,36 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <!-- ═══════════════════════════════════════════ -->
   <div id="volet-auto" class="import-volet" style="display:none">
     <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:var(--radius);padding:20px 24px">
-      <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">🤖 IMPORTACIÓN AUTOMÁTICA</div>
+      <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">🤖 LECTURA DE DOCUMENTOS</div>
 
-      <!-- Clé API -->
-      <div class="api-key-box" style="margin-bottom:16px">
-        <div class="api-key-label" style="font-size:13px">🔑 <span data-i18n="api_key_label">Clave API Claude (opcional — para extracción directa)</span></div>
-        <div class="api-key-row" style="margin-top:6px">
-          <input type="password" id="api-key-input" class="api-key-input"
-                 placeholder="sk-ant-api03-..." oninput="saveApiKey()"/>
-          <button class="btn" onclick="toggleApiKey()" data-i18n="btn_show">Mostrar</button>
-        </div>
-        <div class="api-key-note" style="font-size:12px;margin-top:4px" data-i18n="api_key_note">
-          <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a> — o use el método portapapeles (Volet 1) con su cuenta Claude.ai
-        </div>
+      <div style="font-size:15px;color:var(--muted);margin-bottom:16px;line-height:1.7">
+        Seleccione una imagen o un PDF escaneado. MediTrace extraerá el texto automáticamente.
       </div>
 
-      <!-- Drop zone PDF/images -->
-      <div class="import-hero" id="drop-zone"
-           onclick="document.getElementById('pdf-input').click()"
-           ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
-           ondragleave="this.style.borderColor=''"
-           ondrop="handleDrop(event)">
-        <div class="import-hero-icon">📄</div>
-        <div class="import-hero-title">Arrastra PDF o imagen aquí</div>
-        <div class="import-hero-sub">PDF, JPG, PNG, TIFF — requiere clave API para extracción automática</div>
-      </div>
-      <input type="file" id="pdf-input" accept=".pdf,.jpg,.jpeg,.png,.tiff,.tif,.bmp,.webp" multiple style="display:none" onchange="handleFiles(this.files)"/>
-
-      <!-- OCR Only -->
-      <div style="display:flex;gap:8px;margin-top:14px;align-items:center;flex-wrap:wrap">
-        <button class="btn" onclick="document.getElementById('ocr-input').click()" style="border-color:var(--warn);color:var(--warn);font-size:13px;padding:8px 16px">
-          🔍 OCR sólo — ver texto
+      <!-- OCR — principal et visible -->
+      <div style="display:flex;gap:10px;margin-bottom:16px;align-items:center;flex-wrap:wrap">
+        <button class="btn primary" onclick="document.getElementById('ocr-input').click()" style="font-size:16px;padding:14px 28px">
+          📷 Leer documento (OCR)
         </button>
-        <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">Sin clave API · Tesseract.js local</span>
+        <span style="font-family:var(--mono);font-size:12px;color:var(--muted)">JPG · PNG · PDF escaneado</span>
       </div>
       <input type="file" id="ocr-input" accept=".jpg,.jpeg,.png,.tiff,.tif,.bmp,.webp,.pdf" style="display:none" onchange="ocrOnly(this.files[0])"/>
 
+      <!-- Workflow Claude.ai — expliqué simplement -->
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:16px">
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px">📝 Después de la lectura:</div>
+        <div style="font-size:14px;color:var(--muted);line-height:1.8">
+          <strong>1.</strong> Pulse "Copiar para Claude" para copiar el texto extraído<br>
+          <strong>2.</strong> Péguelo en su conversación con Claude (<a href="https://claude.ai" target="_blank" style="color:var(--accent)">claude.ai</a>)<br>
+          <strong>3.</strong> Claude le devolverá los datos en formato importable<br>
+          <strong>4.</strong> Cópielos y use el botón <strong>📋 Pegar e importar</strong> (primer volet)
+        </div>
+      </div>
+
       <!-- OCR Result preview -->
-      <div id="ocr-result-box" style="display:none;background:var(--surface2);border:1px solid var(--border);border-left:4px solid var(--warn);border-radius:var(--radius);padding:16px 20px;margin-top:16px">
+      <div id="ocr-result-box" style="display:none;background:var(--surface2);border:1px solid var(--border);border-left:4px solid var(--warn);border-radius:var(--radius);padding:16px 20px;margin-bottom:16px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-          <div style="font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--warn)">🔍 TEXTO OCR</div>
+          <div style="font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--warn)">🔍 TEXTO EXTRAÍDO</div>
           <div style="display:flex;gap:6px">
             <button class="btn" onclick="copyOcrText()" style="font-size:10px;padding:4px 10px">📋 Copiar</button>
             <button class="btn" onclick="document.getElementById('ocr-result-box').style.display='none'" style="font-size:10px;padding:4px 10px">✕</button>
@@ -1058,9 +1048,39 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
         <div id="ocr-meta" style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:10px"></div>
         <pre id="ocr-text" style="font-family:var(--mono);font-size:12px;color:var(--text);white-space:pre-wrap;word-break:break-word;max-height:200px;overflow-y:auto;background:var(--surface);border-radius:6px;padding:14px;line-height:1.7"></pre>
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-          <button class="btn primary" onclick="copyForClaude()" id="btn-copy-claude" style="font-size:12px;padding:8px 16px">📋 Copiar para Claude.ai</button>
+          <button class="btn primary" onclick="copyForClaude()" id="btn-copy-claude" style="font-size:14px;padding:10px 20px">📋 Copiar para Claude</button>
         </div>
       </div>
+
+      <!-- Avancé : API + drop zone (caché par défaut) -->
+      <details style="margin-top:12px">
+        <summary style="font-family:var(--mono);font-size:12px;color:var(--muted);cursor:pointer">⚙️ Avanzado: extracción directa con clave API ▼</summary>
+        <div style="margin-top:12px;padding:16px;background:var(--surface2);border-radius:var(--radius)">
+          <div style="font-size:13px;color:var(--muted);margin-bottom:10px">
+            Si dispone de una clave API de Anthropic, puede extraer datos directamente sin pasar por claude.ai.
+          </div>
+          <div class="api-key-box" style="margin-bottom:12px">
+            <div class="api-key-row">
+              <input type="password" id="api-key-input" class="api-key-input"
+                     placeholder="sk-ant-api03-..." oninput="saveApiKey()"/>
+              <button class="btn" onclick="toggleApiKey()" data-i18n="btn_show">Mostrar</button>
+            </div>
+            <div style="font-size:11px;color:var(--muted);margin-top:4px">
+              Obtenga su clave en <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a>
+            </div>
+          </div>
+          <div class="import-hero" id="drop-zone"
+               onclick="document.getElementById('pdf-input').click()"
+               ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+               ondragleave="this.style.borderColor=''"
+               ondrop="handleDrop(event)">
+            <div class="import-hero-icon">📄</div>
+            <div class="import-hero-title">Arrastra PDF o imagen aquí</div>
+            <div class="import-hero-sub">Requiere clave API</div>
+          </div>
+          <input type="file" id="pdf-input" accept=".pdf,.jpg,.jpeg,.png,.tiff,.tif,.bmp,.webp" multiple style="display:none" onchange="handleFiles(this.files)"/>
+        </div>
+      </details>
     </div>
   </div>
 
