@@ -4622,17 +4622,22 @@ function buildMedicamentos() {
     return;
   }
 
-  /* Regrouper par nom de médicament */
+  /* Normaliser les noms: supprimer accents, lowercase, trim */
+  function normMedName(s) { return (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim(); }
+
+  /* Regrouper par nom de médicament (normalisé) */
   const byName = {};
   meds.forEach(m => {
-    const key = m.nom;
-    if (!byName[key]) byName[key] = [];
-    byName[key].push(m);
+    const key = normMedName(m.nom);
+    if (!byName[key]) byName[key] = { displayName: m.nom, entries: [] };
+    byName[key].entries.push(m);
+    /* Garder le nom avec accent comme nom d'affichage (le plus long gagne) */
+    if (m.nom.length > byName[key].displayName.length) byName[key].displayName = m.nom;
   });
 
-  const names = Object.keys(byName).sort();
+  const keys = Object.keys(byName).sort();
   const uniqueDates = [...new Set(meds.map(m => m.date))].sort();
-  summary.innerHTML = `💊 ${names.length} médicaments distincts · ${meds.length} entrées · ` +
+  summary.innerHTML = `💊 ${keys.length} médicaments distincts · ${meds.length} entrées · ` +
     `${uniqueDates.length} dates · ${uniqueDates[0]} → ${uniqueDates[uniqueDates.length-1]}`;
 
   /* Statut → style */
@@ -4645,8 +4650,9 @@ function buildMedicamentos() {
     terminado:  { bg: 'rgba(150,150,150,0.12)', border: 'var(--muted)',   icon: '✅', label: 'Terminado' }
   };
 
-  names.forEach(name => {
-    const entries = byName[name];
+  keys.forEach(key => {
+    const entries = byName[key].entries;
+    const name = byName[key].displayName;
     const lastEntry = entries[entries.length - 1];
     const firstEntry = entries[0];
     const lastStat = STAT[lastEntry.statut] || STAT.en_cours;
@@ -4921,14 +4927,15 @@ function deduplicateAll() {
   const meds = loadMeds();
   const seenMeds = new Set();
   const uniqueMeds = [];
+  function _normMed(s) { return (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim(); }
   meds.forEach(function(m) {
-    var key = (m.nom||'') + '|' + (m.date||'') + '|' + (m.dose||'');
+    var key = _normMed(m.nom) + '|' + (m.date||'') + '|' + _normMed(m.dose);
     if (!seenMeds.has(key)) {
       seenMeds.add(key);
       uniqueMeds.push(m);
     } else {
       /* Si doublon, mettre à jour l'existant avec les champs supplémentaires */
-      var existing = uniqueMeds.find(function(u) { return (u.nom||'') + '|' + (u.date||'') + '|' + (u.dose||'') === key; });
+      var existing = uniqueMeds.find(function(u) { return _normMed(u.nom) + '|' + (u.date||'') + '|' + _normMed(u.dose) === key; });
       if (existing) {
         if (m.motif && !existing.motif) existing.motif = m.motif;
         if (m.date_fin && !existing.date_fin) existing.date_fin = m.date_fin;
