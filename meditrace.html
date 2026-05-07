@@ -3022,40 +3022,58 @@ function exportPDF(mode) {
 /* ================================================================
    RESET
 ================================================================ */
+function customConfirm(title, message, onOk) {
+  var ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center';
+  var bx = document.createElement('div');
+  bx.style.cssText = 'background:var(--surface);border:2px solid var(--accent);border-radius:12px;padding:24px;width:90%;max-width:440px;text-align:center';
+  bx.innerHTML = '<div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:12px">' + title + '</div><div style="font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.7;text-align:left">' + message + '</div>';
+  var br = document.createElement('div'); br.style.cssText = 'display:flex;gap:10px;justify-content:center';
+  var bc = document.createElement('button'); bc.textContent = (LANG[currentLang].del_cancel||'Cancelar'); bc.className = 'btn'; bc.style.cssText = 'font-size:14px;padding:10px 24px';
+  var bo = document.createElement('button'); bo.textContent = 'Confirmar'; bo.className = 'btn primary'; bo.style.cssText = 'font-size:14px;padding:10px 24px';
+  br.appendChild(bc); br.appendChild(bo); bx.appendChild(br); ov.appendChild(bx); document.body.appendChild(ov);
+  bo.onclick = function() { document.body.removeChild(ov); if (onOk) onOk(); };
+  bc.onclick = function() { document.body.removeChild(ov); };
+  ov.onclick = function(e) { if (e.target === ov) document.body.removeChild(ov); };
+}
+
 function confirmReset() {
-  if (confirm(LANG[currentLang].confirm_reset)) {
-    localStorage.removeItem(STORE_KEY);
-    localStorage.removeItem(EVENT_KEY);
-    localStorage.removeItem(MED_KEY);
-    localStorage.removeItem(PATIENT_LABEL_KEY);
-    location.reload();
-  }
+  customConfirm('Reiniciar MediTrace',
+    'Esta acción eliminará <strong>todos los datos</strong> del paciente actual.<br><br>Se recomienda hacer un <strong>Backup .mt</strong> antes.',
+    function() { localStorage.removeItem(STORE_KEY); localStorage.removeItem(EVENT_KEY); localStorage.removeItem(MED_KEY); localStorage.removeItem(PATIENT_LABEL_KEY); location.reload(); }
+  );
 }
 
 /* ================================================================
    NOUVEAU PATIENT — workflow sauvegarde → reset → label
 ================================================================ */
-async function nuevoPaciente() {
-  const hasData = loadData().length || loadEvents().length || loadMeds().length;
+function nuevoPaciente() {
+  var hasData = loadData().length || loadEvents().length || loadMeds().length;
   if (hasData) {
-    const choice = confirm(
-      '⚠️ Antes de cambiar de paciente:\n\n' +
-      '✓ OK = descargar backup .mt del paciente actual, luego limpiar\n' +
-      '✗ Cancelar = abortar (los datos NO se perderán)'
+    customConfirm('Cambiar de paciente',
+      'Los datos del paciente actual se guardarán como backup antes de limpiar.<br><br><strong>Confirmar</strong> = descargar backup, luego limpiar<br><strong>Cancelar</strong> = no hacer nada',
+      function() { exportData(); setTimeout(_npLabel, 800); }
     );
-    if (!choice) return;
-    exportData();
-    // laisser le temps au download de partir
-    await new Promise(r => setTimeout(r, 800));
-  }
-  const label = prompt('Etiqueta del nuevo paciente (ej. "Joaquina M." o "Paciente B"):', '');
-  if (label === null) return; // annulé
-  localStorage.removeItem(STORE_KEY);
-  localStorage.removeItem(EVENT_KEY);
-  localStorage.removeItem(MED_KEY);
-  if (label.trim()) setPatientLabel(label.trim());
-  else localStorage.removeItem(PATIENT_LABEL_KEY);
-  location.reload();
+  } else { _npLabel(); }
+}
+function _npLabel() {
+  var ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center';
+  var bx = document.createElement('div');
+  bx.style.cssText = 'background:var(--surface);border:2px solid var(--accent);border-radius:12px;padding:24px;width:90%;max-width:440px';
+  bx.innerHTML = '<div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:12px">Nuevo paciente</div><div style="font-size:14px;color:var(--muted);margin-bottom:12px">Etiqueta del nuevo paciente:</div>';
+  var inp = document.createElement('input'); inp.type = 'text'; inp.placeholder = 'Ej: Joaquina M.';
+  inp.style.cssText = 'width:100%;font-size:16px;padding:10px 14px;border:2px solid var(--accent);border-radius:8px;background:var(--surface2);color:var(--text);margin-bottom:16px';
+  bx.appendChild(inp);
+  var br = document.createElement('div'); br.style.cssText = 'display:flex;gap:10px;justify-content:flex-end';
+  var bc = document.createElement('button'); bc.textContent = 'Cancelar'; bc.className = 'btn'; bc.style.cssText = 'font-size:14px;padding:10px 20px';
+  var bo = document.createElement('button'); bo.textContent = 'Crear'; bo.className = 'btn primary'; bo.style.cssText = 'font-size:14px;padding:10px 24px';
+  br.appendChild(bc); br.appendChild(bo); bx.appendChild(br); ov.appendChild(bx); document.body.appendChild(ov);
+  inp.focus();
+  bo.onclick = function() { var l = inp.value.trim(); document.body.removeChild(ov); localStorage.removeItem(STORE_KEY); localStorage.removeItem(EVENT_KEY); localStorage.removeItem(MED_KEY); localStorage.removeItem(PATIENT_LABEL_KEY); if (l) setPatientLabel(l); location.reload(); };
+  bc.onclick = function() { document.body.removeChild(ov); };
+  inp.onkeydown = function(e) { if (e.key==='Enter') bo.onclick(); if (e.key==='Escape') bc.onclick(); };
+  ov.onclick = function(e) { if (e.target === ov) document.body.removeChild(ov); };
 }
 
 /* ================================================================
