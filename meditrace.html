@@ -412,6 +412,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 <div class="topbar">
   <div style="display:flex;align-items:center;gap:12px">
     <a href="index.html" class="topbar-logo">Medi<span>Trace</span></a>
+    <span style="font-size:10px;color:rgba(255,255,255,0.5);margin-left:4px" id="version-label">v2026.4</span>
     <span id="patient-badge" style="display:none;padding:4px 10px;background:rgba(74,143,232,0.2);border:1px solid var(--accent);border-radius:6px;font-size:13px"></span>
   </div>
   <div style="display:flex;align-items:center;gap:6px">
@@ -969,15 +970,15 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 
   <!-- ══════ ONGLETS DES 3 VOLETS ══════ -->
   <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
-    <button class="btn primary" id="tab-clipboard" onclick="showImportTab('clipboard')" style="font-size:14px;padding:10px 20px">📋 Desde portapapeles</button>
-    <button class="btn" id="tab-auto" onclick="showImportTab('auto')" style="font-size:14px;padding:10px 20px">📷 Leer documento</button>
+    <button class="btn primary" id="tab-auto" onclick="showImportTab('auto')" style="font-size:14px;padding:10px 20px">📷 Leer documento</button>
+    <button class="btn" id="tab-clipboard" onclick="showImportTab('clipboard')" style="font-size:14px;padding:10px 20px">📋 Desde portapapeles</button>
     <button class="btn" id="tab-manual" onclick="showImportTab('manual')" style="font-size:14px;padding:10px 20px">✏️ Entrada manual</button>
   </div>
 
   <!-- ═══════════════════════════════════════════ -->
   <!-- VOLET 1 : IMPORT DEPUIS PRESSE-PAPIERS     -->
   <!-- ═══════════════════════════════════════════ -->
-  <div id="volet-clipboard" class="import-volet">
+  <div id="volet-clipboard" class="import-volet" style="display:none">
     <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent2);border-radius:var(--radius);padding:20px 24px">
       <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent2);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">📋 IMPORTAR DATOS</div>
       <div style="font-size:15px;color:var(--muted);margin-bottom:16px;line-height:1.7">
@@ -1008,7 +1009,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <!-- ═══════════════════════════════════════════ -->
   <!-- VOLET 2 : IMPORT AUTOMATIQUE (API + OCR)    -->
   <!-- ═══════════════════════════════════════════ -->
-  <div id="volet-auto" class="import-volet" style="display:none">
+  <div id="volet-auto" class="import-volet">
     <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:var(--radius);padding:20px 24px">
       <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">🤖 LECTURA DE DOCUMENTOS</div>
 
@@ -2462,8 +2463,10 @@ function exportData() {
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
   const safeLabel = (label || 'patient').replace(/[^a-zA-Z0-9_-]/g, '_');
+  var d = new Date();
+  var ts = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + '-' + String(d.getHours()).padStart(2,'0') + String(d.getMinutes()).padStart(2,'0');
   a.href     = url;
-  a.download = `meditrace_${safeLabel}_${new Date().toISOString().slice(0,10)}.mt`;
+  a.download = safeLabel + '_' + ts + '.mt';
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -4796,6 +4799,13 @@ window.addEventListener('load', () => {
   }
   updateDataSummary(data);
   updatePatientBadge();
+
+  /* Version avec date/heure */
+  var vl = document.getElementById('version-label');
+  if (vl) {
+    var d = new Date();
+    vl.textContent = 'v2026.4 — ' + d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+  }
 });
 </script>
 </body>
