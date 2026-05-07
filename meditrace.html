@@ -1937,6 +1937,57 @@ function _doImportJson(raw, resultEl, textareaId) {
 
     let summary = [];
 
+    /* Construire un aperçu de ce qu'on va importer */
+    var previewParts = [];
+    previewParts.push('<strong>📅 Fecha:</strong> ' + parsed.date);
+    if (parsed.source) previewParts.push('<strong>🏥 Fuente:</strong> ' + parsed.source);
+    if (parsed.evenement) previewParts.push('<strong>📋 Evento:</strong> ' + (parsed.evenement.titre || parsed.evenement.type || ''));
+    if (parsed.valeurs) previewParts.push('<strong>📊 Valores:</strong> ' + Object.keys(parsed.valeurs).length + ' parámetros');
+    if (parsed.medicaments) previewParts.push('<strong>💊 Medicamentos:</strong> ' + parsed.medicaments.length);
+    if (parsed.diagnostics) previewParts.push('<strong>🔍 Diagnósticos:</strong> ' + parsed.diagnostics.length);
+    if (parsed.alertes) previewParts.push('<strong>⚠️ Alertas:</strong> ' + parsed.alertes.length);
+
+    /* Afficher l'aperçu dans un popup et attendre confirmation */
+    var overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center';
+    var box = document.createElement('div');
+    box.style.cssText = 'background:var(--surface);border:2px solid var(--accent2);border-radius:12px;padding:24px;width:90%;max-width:480px';
+    box.innerHTML = '<div style="font-size:18px;font-weight:700;color:var(--accent2);margin-bottom:12px">📋 Importar este documento?</div>' +
+      '<div style="font-size:14px;color:var(--text);line-height:2;padding:12px;background:var(--surface2);border-radius:8px;margin-bottom:16px">' +
+      previewParts.join('<br>') + '</div>';
+    var btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:10px;justify-content:flex-end';
+    var btnCancel = document.createElement('button');
+    btnCancel.textContent = (LANG[currentLang].del_cancel || 'Cancelar');
+    btnCancel.className = 'btn';
+    btnCancel.style.cssText = 'font-size:14px;padding:10px 20px';
+    var btnImport = document.createElement('button');
+    btnImport.textContent = '✓ Importar';
+    btnImport.className = 'btn primary';
+    btnImport.style.cssText = 'font-size:14px;padding:10px 24px';
+    btnRow.appendChild(btnCancel);
+    btnRow.appendChild(btnImport);
+    box.appendChild(btnRow);
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
+    btnCancel.onclick = function() { document.body.removeChild(overlay); resultEl.innerHTML = '<span style="color:var(--muted)">Importación cancelada.</span>'; showClearBtn(); };
+    overlay.onclick = function(e) { if (e.target === overlay) { document.body.removeChild(overlay); } };
+
+    btnImport.onclick = function() {
+      document.body.removeChild(overlay);
+      _executeImport(parsed, summary, resultEl, textareaId);
+    };
+
+  } catch (e) {
+    resultEl.innerHTML = '<span style="color:var(--danger)">✗ Error al parsear: ' + e.message + '<br>Asegúrate de copiar sólo los datos (sin texto adicional).</span>';
+    showClearBtn();
+  }
+}
+
+function _executeImport(parsed, summary, resultEl, textareaId) {
+  try {
+
     /* Sauvegarder mesures */
     if (parsed.valeurs && Object.keys(parsed.valeurs).length) {
       const data = loadData();
@@ -2014,15 +2065,18 @@ function _doImportJson(raw, resultEl, textareaId) {
     updateDataSummary(loadData());
     fillSourceList();
 
-    resultEl.innerHTML = `<span style="color:var(--accent2)">✅ Importado con éxito — ${parsed.date} · ${parsed.source || 'OCR'}<br>${summary.join(' · ')}</span>`;
+    resultEl.innerHTML = '<span style="color:var(--accent2)">✅ Importado con éxito — ' + parsed.date + ' · ' + (parsed.source || 'OCR') + '<br>' + summary.join(' · ') + '</span>';
     showClearBtn();
     buildImportList();
+
+    /* Enregistrer la dernière importation */
+    localStorage.setItem('mt_last_import', parsed.date + ' — ' + (parsed.source || 'OCR') + ' — ' + new Date().toLocaleDateString());
 
     /* Nettoyer le textarea */
     if (textareaId) document.getElementById(textareaId).value = '';
 
   } catch (e) {
-    resultEl.innerHTML = `<span style="color:var(--danger)">✗ Error al parsear JSON: ${e.message}<br>Asegúrate de copiar sólo el JSON (sin texto adicional).</span>`;
+    resultEl.innerHTML = '<span style="color:var(--danger)">✗ Error: ' + e.message + '</span>';
     showClearBtn();
   }
 }
@@ -2365,10 +2419,22 @@ function addEvent() {
 
 function updateDataSummary(data) {
   const el = document.getElementById('data-summary');
-  if (!data.length) { el.textContent = LANG[currentLang].no_data; return; }
+  if (!data.length) { el.textContent = LANG[currentLang].no_data || 'Sin datos'; return; }
   const paramCount = new Set(data.flatMap(d => Object.keys(d.vals))).size;
-  el.innerHTML = `📊 ${data.length} fechas · ${paramCount} parámetros distintos · ` +
-    `${data[0].date} → ${data[data.length-1].date}`;
+  const evts = loadEvents();
+  const meds = loadMeds();
+  const bacts = loadBacterio();
+  const lastImport = localStorage.getItem('mt_last_import') || '';
+
+  el.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center">' +
+    '<span>📊 <strong>' + data.length + '</strong> mediciones</span>' +
+    '<span>📋 <strong>' + evts.length + '</strong> eventos</span>' +
+    '<span>🔬 <strong>' + paramCount + '</strong> parámetros</span>' +
+    (meds.length ? '<span>💊 <strong>' + meds.length + '</strong> medicamentos</span>' : '') +
+    (bacts.length ? '<span>🦠 <strong>' + bacts.length + '</strong> cultivos</span>' : '') +
+    '<span>📅 ' + data[0].date + ' → ' + data[data.length-1].date + '</span>' +
+    '</div>' +
+    (lastImport ? '<div style="font-size:12px;color:var(--muted);margin-top:6px">Última importación: ' + lastImport + '</div>' : '');
 }
 
 /* ================================================================
