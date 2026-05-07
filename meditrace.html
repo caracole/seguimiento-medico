@@ -4639,14 +4639,21 @@ function buildMedicamentos() {
   const STAT = {
     en_cours:   { bg: 'rgba(74,232,164,0.12)', border: 'var(--accent2)', icon: '🟢', label: 'En curso' },
     nouveau:    { bg: 'rgba(74,143,232,0.12)',  border: 'var(--accent)',  icon: '🆕', label: 'Nuevo' },
+    a_demanda:  { bg: 'rgba(164,74,232,0.12)',  border: '#a44ae8',       icon: '💜', label: 'Si necesario' },
     suspendu:   { bg: 'rgba(232,164,74,0.12)',  border: 'var(--warn)',    icon: '⏸️', label: 'Suspendido' },
-    abandonne:  { bg: 'rgba(232,74,74,0.12)',   border: 'var(--danger)',  icon: '🔴', label: 'Abandonado' }
+    abandonne:  { bg: 'rgba(232,74,74,0.12)',   border: 'var(--danger)',  icon: '🔴', label: 'Abandonado' },
+    terminado:  { bg: 'rgba(150,150,150,0.12)', border: 'var(--muted)',   icon: '✅', label: 'Terminado' }
   };
 
   names.forEach(name => {
     const entries = byName[name];
     const lastEntry = entries[entries.length - 1];
+    const firstEntry = entries[0];
     const lastStat = STAT[lastEntry.statut] || STAT.en_cours;
+
+    /* Dates début/fin : utiliser date_debut si édité, sinon date de la première/dernière entrée */
+    const dateDebut = lastEntry.date_debut || firstEntry.date || '';
+    const dateFin = lastEntry.date_fin || '';
 
     const card = document.createElement('div');
     card.style.cssText = `background:var(--surface);border:1px solid var(--border);border-left:4px solid ${lastStat.border};border-radius:var(--radius);padding:18px 22px;margin-bottom:12px`;
@@ -4660,7 +4667,7 @@ function buildMedicamentos() {
         <div>
           <div style="font-family:var(--mono);font-weight:600;font-size:14px;color:var(--text)">${name}</div>
           <div style="font-family:var(--mono);font-size:11px;color:var(--muted)">${lastEntry.dose}${lastEntry.frequence ? ' · ' + lastEntry.frequence : ''}</div>
-          ${lastEntry.date_debut ? '<div style="font-family:var(--mono);font-size:10px;color:var(--muted)">Inicio: ' + fmtDate(lastEntry.date_debut) + (lastEntry.date_fin ? ' → Fin: ' + fmtDate(lastEntry.date_fin) : '') + '</div>' : ''}
+          ${dateDebut ? '<div style="font-family:var(--mono);font-size:10px;color:var(--muted)">Inicio: ' + fmtDate(dateDebut) + (dateFin ? ' → Fin: ' + fmtDate(dateFin) : '') + '</div>' : ''}
           ${lastEntry.motif ? '<div style="font-family:var(--mono);font-size:10px;color:var(--danger)">Motivo: ' + lastEntry.motif + '</div>' : ''}
           ${lastEntry.remplace_par ? '<div style="font-family:var(--mono);font-size:10px;color:var(--accent)">→ Reemplazado por: ' + lastEntry.remplace_par + '</div>' : ''}
         </div>
@@ -4717,7 +4724,7 @@ function editMedStatut(medName) {
   /* Statut */
   form.innerHTML += '<div><label style="font-size:13px;font-weight:600;color:var(--muted)">Estatuto actual</label>' +
     '<select id="med-edit-statut" style="width:100%;font-size:14px;padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);margin-top:4px">' +
-    '<option value="en_cours">En curso</option><option value="nouveau">Nuevo</option><option value="suspendu">Suspendido</option><option value="abandonne">Abandonado</option></select></div>';
+    '<option value="en_cours">En curso</option><option value="nouveau">Nuevo</option><option value="a_demanda">Si necesario (PRN)</option><option value="suspendu">Suspendido</option><option value="abandonne">Abandonado</option><option value="terminado">Terminado</option></select></div>';
 
   /* Date debut */
   form.innerHTML += '<div><label style="font-size:13px;font-weight:600;color:var(--muted)">Fecha inicio</label>' +
@@ -4886,6 +4893,32 @@ function deduplicateAll() {
   if (uniqueBacts.length < bacts.length) {
     saveBacterio(uniqueBacts);
     console.log('[MediTrace] Dedup bacterio: ' + bacts.length + ' → ' + uniqueBacts.length);
+  }
+
+  /* Meds : dédoublonner par nom+date+dose (garder la dernière entrée avec le plus d'infos) */
+  const meds = loadMeds();
+  const seenMeds = new Set();
+  const uniqueMeds = [];
+  meds.forEach(function(m) {
+    var key = (m.nom||'') + '|' + (m.date||'') + '|' + (m.dose||'');
+    if (!seenMeds.has(key)) {
+      seenMeds.add(key);
+      uniqueMeds.push(m);
+    } else {
+      /* Si doublon, mettre à jour l'existant avec les champs supplémentaires */
+      var existing = uniqueMeds.find(function(u) { return (u.nom||'') + '|' + (u.date||'') + '|' + (u.dose||'') === key; });
+      if (existing) {
+        if (m.motif && !existing.motif) existing.motif = m.motif;
+        if (m.date_fin && !existing.date_fin) existing.date_fin = m.date_fin;
+        if (m.date_debut && !existing.date_debut) existing.date_debut = m.date_debut;
+        if (m.remplace_par && !existing.remplace_par) existing.remplace_par = m.remplace_par;
+        if (m.source && !existing.source) existing.source = m.source;
+      }
+    }
+  });
+  if (uniqueMeds.length < meds.length) {
+    saveMeds(uniqueMeds);
+    console.log('[MediTrace] Dedup meds: ' + meds.length + ' → ' + uniqueMeds.length);
   }
 }
 
