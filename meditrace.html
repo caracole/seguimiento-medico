@@ -4670,6 +4670,8 @@ function buildMedicamentos() {
           ${dateDebut ? '<div style="font-family:var(--mono);font-size:10px;color:var(--muted)">Inicio: ' + fmtDate(dateDebut) + (dateFin ? ' → Fin: ' + fmtDate(dateFin) : '') + '</div>' : ''}
           ${lastEntry.motif ? '<div style="font-family:var(--mono);font-size:10px;color:var(--danger)">Motivo: ' + lastEntry.motif + '</div>' : ''}
           ${lastEntry.remplace_par ? '<div style="font-family:var(--mono);font-size:10px;color:var(--accent)">→ Reemplazado por: ' + lastEntry.remplace_par + '</div>' : ''}
+          ${lastEntry.prescriptor ? '<div style="font-family:var(--mono);font-size:10px;color:var(--muted)">👨‍⚕️ ' + lastEntry.prescriptor + '</div>' : ''}
+          ${lastEntry.receta ? '<div style="font-family:var(--mono);font-size:10px;color:var(--accent2)">📋 ' + ({receta_publica:'Receta pública',receta_privada:'Receta privada',no_financiado:'No financiado',hospital:'Dispensación hospitalaria'}[lastEntry.receta] || lastEntry.receta) + '</div>' : ''}
         </div>
       </div>
       <div style="font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;background:${lastStat.bg};border:1px solid ${lastStat.border};color:var(--text)">
@@ -4742,6 +4744,20 @@ function editMedStatut(medName) {
   form.innerHTML += '<div><label style="font-size:13px;font-weight:600;color:var(--muted)">Reemplazado por (opcional)</label>' +
     '<input type="text" id="med-edit-remp" placeholder="Ej: Rivaroxabán" style="width:100%;font-size:14px;padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);margin-top:4px"/></div>';
 
+  /* Prescriptor */
+  form.innerHTML += '<div><label style="font-size:13px;font-weight:600;color:var(--muted)">Prescrito por</label>' +
+    '<input type="text" id="med-edit-prescriptor" placeholder="Ej: Dr. Cervera Ygual, Neurología" style="width:100%;font-size:14px;padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);margin-top:4px"/></div>';
+
+  /* Receta */
+  form.innerHTML += '<div><label style="font-size:13px;font-weight:600;color:var(--muted)">Receta / Ordonnance</label>' +
+    '<select id="med-edit-receta" style="width:100%;font-size:14px;padding:8px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);margin-top:4px">' +
+    '<option value="">— No especificado —</option>' +
+    '<option value="receta_publica">Receta pública (financiada)</option>' +
+    '<option value="receta_privada">Receta privada</option>' +
+    '<option value="no_financiado">No financiado (paciente paga)</option>' +
+    '<option value="hospital">Dispensación hospitalaria</option>' +
+    '</select></div>';
+
   bx.appendChild(form);
 
   /* Pré-remplir avec les données existantes */
@@ -4770,6 +4786,8 @@ function editMedStatut(medName) {
     document.getElementById('med-edit-fin').value = dateFin;
     document.getElementById('med-edit-motif').value = last.motif || '';
     document.getElementById('med-edit-remp').value = last.remplace_par || '';
+    document.getElementById('med-edit-prescriptor').value = last.prescriptor || '';
+    document.getElementById('med-edit-receta').value = last.receta || '';
   }, 50);
 
   bo.onclick = function() {
@@ -4778,6 +4796,8 @@ function editMedStatut(medName) {
     var fin = document.getElementById('med-edit-fin').value;
     var motif = document.getElementById('med-edit-motif').value.trim();
     var remp = document.getElementById('med-edit-remp').value.trim();
+    var prescriptor = document.getElementById('med-edit-prescriptor').value.trim();
+    var receta = document.getElementById('med-edit-receta').value;
 
     /* Mettre à jour la dernière entrée du médicament */
     var allMeds = loadMeds();
@@ -4788,6 +4808,8 @@ function editMedStatut(medName) {
         if (fin) allMeds[i].date_fin = fin;
         if (motif) allMeds[i].motif = motif;
         if (remp) allMeds[i].remplace_par = remp;
+        if (prescriptor) allMeds[i].prescriptor = prescriptor;
+        if (receta) allMeds[i].receta = receta;
         break;
       }
     }
