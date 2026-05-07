@@ -912,6 +912,15 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   </div>
 
   <div id="meds-summary" style="margin-bottom:16px;font-family:var(--mono);font-size:12px;color:var(--muted)"></div>
+
+  <!-- Navigation rapide -->
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+    <label style="font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap">Ir a:</label>
+    <select id="meds-quicknav" onchange="jumpToMed(this.value)" style="flex:1;font-family:var(--mono);font-size:14px;padding:8px 12px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:6px;cursor:pointer">
+      <option value="">— Seleccionar medicamento —</option>
+    </select>
+  </div>
+
   <div id="meds-content"></div>
 </div>
 
@@ -4622,8 +4631,8 @@ function buildMedicamentos() {
     return;
   }
 
-  /* Normaliser les noms: supprimer accents, lowercase, trim */
-  function normMedName(s) { return (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim(); }
+  /* Normaliser les noms: supprimer accents, parenthèses, lowercase, trim */
+  function normMedName(s) { return (s||'').replace(/\s*\(.*?\)/g,'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim(); }
 
   /* Regrouper par nom de médicament (normalisé) */
   const byName = {};
@@ -4662,6 +4671,7 @@ function buildMedicamentos() {
     const dateFin = lastEntry.date_fin || '';
 
     const card = document.createElement('div');
+    card.id = 'med-card-' + key;
     card.style.cssText = `background:var(--surface);border:1px solid var(--border);border-left:4px solid ${lastStat.border};border-radius:var(--radius);padding:18px 22px;margin-bottom:12px`;
 
     /* Header: nom + dernier statut */
@@ -4717,6 +4727,30 @@ function buildMedicamentos() {
 
     el.appendChild(card);
   });
+
+  /* Remplir la listbox de navigation rapide */
+  var nav = document.getElementById('meds-quicknav');
+  if (nav) {
+    nav.innerHTML = '<option value="">— Seleccionar medicamento —</option>';
+    keys.forEach(function(key) {
+      var opt = document.createElement('option');
+      opt.value = 'med-card-' + key;
+      var info = byName[key];
+      var lastSt = STAT[info.entries[info.entries.length-1].statut] || STAT.en_cours;
+      opt.textContent = lastSt.icon + ' ' + info.displayName;
+      nav.appendChild(opt);
+    });
+  }
+}
+
+function jumpToMed(id) {
+  if (!id) return;
+  var el = document.getElementById(id);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.style.outline = '3px solid var(--accent)';
+    setTimeout(function() { el.style.outline = ''; }, 2000);
+  }
 }
 
 function editMedStatut(medName) {
@@ -4927,7 +4961,7 @@ function deduplicateAll() {
   const meds = loadMeds();
   const seenMeds = new Set();
   const uniqueMeds = [];
-  function _normMed(s) { return (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim(); }
+  function _normMed(s) { return (s||'').replace(/\s*\(.*?\)/g,'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim(); }
   meds.forEach(function(m) {
     var key = _normMed(m.nom) + '|' + (m.date||'') + '|' + _normMed(m.dose);
     if (!seenMeds.has(key)) {
