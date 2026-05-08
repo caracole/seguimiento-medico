@@ -917,7 +917,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <div style="position:sticky;top:0;z-index:50;background:var(--bg);padding:8px 0;margin-bottom:16px;border-bottom:1px solid var(--border)">
     <div style="display:flex;align-items:center;gap:10px">
       <label style="font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap">Ir a:</label>
-      <select id="meds-quicknav" onchange="jumpToMed(this.value)" style="flex:1;font-family:var(--mono);font-size:14px;padding:8px 12px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:6px;cursor:pointer">
+      <select id="meds-quicknav" onchange="jumpToMed(this.value)" style="flex:1;max-width:350px;font-family:var(--mono);font-size:14px;padding:8px 12px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:6px;cursor:pointer">
         <option value="">— Seleccionar medicamento —</option>
       </select>
     </div>
@@ -959,14 +959,14 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <!-- ══════ RÉSUMÉ DES DONNÉES EN MÉMOIRE ══════ -->
   <div style="background:var(--surface);border:2px solid var(--accent);border-radius:var(--radius);padding:16px 20px;margin-bottom:24px">
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
-      <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent);letter-spacing:2px;text-transform:uppercase">📊 DATOS EN MEMORIA</div>
-      <button class="btn primary" onclick="exportData()" style="font-size:13px;padding:8px 16px">💾 Guardar backup (.mt)</button>
+      <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent);letter-spacing:2px;text-transform:uppercase">" id="lbl-datos-memoria">📊 DATOS EN MEMORIA</div>
+      <button class="btn primary" onclick="exportData()" style="font-size:13px;padding:8px 16px">" id="lbl-guardar-backup">💾 Guardar backup (.mt)</button>
     </div>
     <div id="data-summary" style="font-family:var(--mono);font-size:14px;color:var(--text);margin-top:10px;line-height:2"></div>
 
     <!-- Liste dépliante des événements importés -->
     <details style="margin-top:12px">
-      <summary style="font-family:var(--mono);font-size:13px;color:var(--accent);cursor:pointer;font-weight:600">📜 Ver / gestionar eventos importados ▼</summary>
+      <summary style="font-family:var(--mono);font-size:13px;color:var(--accent);cursor:pointer;font-weight:600">" id="lbl-ver-eventos">📜 Ver / gestionar eventos importados ▼</summary>
       <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;align-items:center">
         <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">Filtrar:</span>
         <select id="event-filter" onchange="buildImportList()" style="font-family:var(--mono);font-size:12px;padding:4px 8px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:4px">
@@ -985,16 +985,16 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 
     <!-- Liste dépliante des mesures avec correction de date -->
     <details style="margin-top:8px">
-      <summary style="font-family:var(--mono);font-size:13px;color:var(--warn);cursor:pointer;font-weight:600">📊 Ver / corregir fechas de mediciones ▼</summary>
+      <summary style="font-family:var(--mono);font-size:13px;color:var(--warn);cursor:pointer;font-weight:600">" id="lbl-ver-mediciones">📊 Ver / corregir fechas de mediciones ▼</summary>
       <div id="mesures-list" style="margin-top:10px;max-height:300px;overflow-y:auto"></div>
     </details>
   </div>
 
   <!-- ══════ ONGLETS DES 3 VOLETS ══════ -->
   <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
-    <button class="btn primary" id="tab-auto" onclick="showImportTab('auto')" style="font-size:14px;padding:10px 20px">📷 Leer documento</button>
-    <button class="btn" id="tab-clipboard" onclick="showImportTab('clipboard')" style="font-size:14px;padding:10px 20px">📋 Desde portapapeles</button>
-    <button class="btn" id="tab-manual" onclick="showImportTab('manual')" style="font-size:14px;padding:10px 20px">✏️ Entrada manual</button>
+    <button class="btn primary" id="tab-auto" onclick="showImportTab('auto')" style="font-size:14px;padding:10px 20px" id="lbl-tab-leer">📷 Leer documento</button>
+    <button class="btn" id="tab-clipboard" onclick="showImportTab('clipboard')" style="font-size:14px;padding:10px 20px" id="lbl-tab-portapapeles">📋 Desde portapapeles</button>
+    <button class="btn" id="tab-manual" onclick="showImportTab('manual')" style="font-size:14px;padding:10px 20px" id="lbl-tab-manual">✏️ Entrada manual</button>
   </div>
 
   <!-- ═══════════════════════════════════════════ -->
@@ -1002,7 +1002,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <!-- ═══════════════════════════════════════════ -->
   <div id="volet-clipboard" class="import-volet" style="display:none">
     <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent2);border-radius:var(--radius);padding:20px 24px">
-      <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent2);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">📋 IMPORTAR DATOS</div>
+      <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent2);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">" id="lbl-importar-datos">📋 IMPORTAR DATOS</div>
       <div style="font-size:15px;color:var(--muted);margin-bottom:16px;line-height:1.7">
         Copie los datos generados por Claude y pulse el botón para importarlos.
       </div>
@@ -1033,7 +1033,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <!-- ═══════════════════════════════════════════ -->
   <div id="volet-auto" class="import-volet">
     <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:var(--radius);padding:20px 24px">
-      <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">🤖 LECTURA DE DOCUMENTOS</div>
+      <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">" id="lbl-lectura-docs">🤖 LECTURA DE DOCUMENTOS</div>
 
       <div style="font-size:15px;color:var(--muted);margin-bottom:16px;line-height:1.7">
         Seleccione una imagen o un PDF escaneado. MediTrace extraerá el texto automáticamente.
@@ -1112,7 +1112,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <!-- ═══════════════════════════════════════════ -->
   <div id="volet-manual" class="import-volet" style="display:none">
     <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--warn);border-radius:var(--radius);padding:20px 24px">
-      <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--warn);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">✏️ ENTRADA MANUAL DE VALORES</div>
+      <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--warn);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">" id="lbl-entrada-manual">✏️ ENTRADA MANUAL DE VALORES</div>
       <div class="manual-form">
         <div class="form-grid">
           <div class="form-field">
@@ -1243,6 +1243,30 @@ const LANG = {
     edit_hint:"' + (LANG[currentLang].edit_hint||'Haga clic en cualquier celda para editarla.') + '",
     no_events:"' + (LANG[currentLang].no_events||'No hay eventos importados.') + '",
     events_count:"evento(s)",
+    datos_memoria:"DATOS EN MEMORIA", guardar_backup:"Guardar backup (.mt)",
+    ver_eventos:"Ver / gestionar eventos importados", ver_mediciones:"Ver / corregir fechas de mediciones",
+    filtrar:"Filtrar:", todos:"Todos", ultima_import:"Última importación:",
+    tab_leer:"📷 Leer documento", tab_portapapeles:"📋 Desde portapapeles", tab_manual:"✏️ Entrada manual",
+    importar_datos:"IMPORTAR DATOS", copiar_importar:"Pegar e importar",
+    lectura_docs:"LECTURA DE DOCUMENTOS", leer_ocr:"📷 Leer documento (OCR)",
+    entrada_manual:"ENTRADA MANUAL DE VALORES",
+    selec_med:"— Seleccionar medicamento —", ir_a:"Ir a:",
+    btn_editar:"Editar", importar_este:"Importar este documento?",
+    paso1:"Pulse \"Copiar para Claude\" para copiar el texto extraído",
+    paso2:"Péguelo en su conversación con Claude",
+    paso3:"Claude le devolverá los datos en formato importable",
+    paso4:"Cópielos y use el botón Pegar e importar",
+    copiar_claude:"Copiar para Claude", texto_extraido:"TEXTO EXTRAÍDO",
+    avanzado:"Avanzado: extracción directa con clave API",
+    desc_leer:"Seleccione una imagen o un PDF escaneado. MediTrace extraerá el texto automáticamente.",
+    desc_pegar:"Copie los datos generados por Claude y pulse el botón para importarlos.",
+    despues_lectura:"Después de la lectura:",
+    med_prescriptor:"Prescrito por", med_receta:"Receta / Ordonnance",
+    med_motivo:"Motivo", med_reemplazo:"Reemplazado por", med_inicio:"Fecha inicio", med_fin:"Fecha fin",
+    med_estatuto:"Estatuto actual", med_en_curso:"En curso", med_nuevo:"Nuevo", med_prn:"Si necesario (PRN)",
+    med_suspendido:"Suspendido", med_abandonado:"Abandonado", med_terminado:"Terminado",
+    receta_publica:"Receta pública (financiada)", receta_privada:"Receta privada",
+    receta_no_fin:"No financiado (paciente paga)", receta_hospital:"Dispensación hospitalaria",
   },
   fr: {
     tab_resumen:"Résumé", tab_curvas:"Courbes", tab_tabla:"Tableau",
@@ -1273,6 +1297,30 @@ const LANG = {
     edit_hint:"Cliquez sur une cellule pour la modifier.",
     no_events:"Aucun événement importé.",
     events_count:"événement(s)",
+    datos_memoria:"DONNÉES EN MÉMOIRE", guardar_backup:"Sauvegarder (.mt)",
+    ver_eventos:"Voir / gérer les événements importés", ver_mediciones:"Voir / corriger les dates de mesures",
+    filtrar:"Filtrer :", todos:"Tous", ultima_import:"Dernière importation :",
+    tab_leer:"📷 Lire un document", tab_portapapeles:"📋 Depuis presse-papiers", tab_manual:"✏️ Saisie manuelle",
+    importar_datos:"IMPORTER DES DONNÉES", copiar_importar:"Coller et importer",
+    lectura_docs:"LECTURE DE DOCUMENTS", leer_ocr:"📷 Lire un document (OCR)",
+    entrada_manual:"SAISIE MANUELLE DE VALEURS",
+    selec_med:"— Sélectionner un médicament —", ir_a:"Aller à :",
+    btn_editar:"Modifier", importar_este:"Importer ce document ?",
+    paso1:"Appuyez sur \"Copier pour Claude\" pour copier le texte extrait",
+    paso2:"Collez-le dans votre conversation avec Claude",
+    paso3:"Claude vous renverra les données en format importable",
+    paso4:"Copiez-les et utilisez le bouton Coller et importer",
+    copiar_claude:"Copier pour Claude", texto_extraido:"TEXTE EXTRAIT",
+    avanzado:"Avancé : extraction directe avec clé API",
+    desc_leer:"Sélectionnez une image ou un PDF scanné. MediTrace extraira le texte automatiquement.",
+    desc_pegar:"Copiez les données générées par Claude et appuyez sur le bouton pour les importer.",
+    despues_lectura:"Après la lecture :",
+    med_prescriptor:"Prescrit par", med_receta:"Ordonnance",
+    med_motivo:"Motif", med_reemplazo:"Remplacé par", med_inicio:"Date début", med_fin:"Date fin",
+    med_estatuto:"Statut actuel", med_en_curso:"En cours", med_nuevo:"Nouveau", med_prn:"Si nécessaire (PRN)",
+    med_suspendido:"Suspendu", med_abandonado:"Abandonné", med_terminado:"Terminé",
+    receta_publica:"Ordonnance publique (remboursée)", receta_privada:"Ordonnance privée",
+    receta_no_fin:"Non remboursé (patient paie)", receta_hospital:"Dispensation hospitalière",
   },
   en: {
     tab_resumen:"Summary", tab_curvas:"Charts", tab_tabla:"Table",
@@ -1303,6 +1351,30 @@ const LANG = {
     edit_hint:"Click on any cell to edit it.",
     no_events:"No imported events.",
     events_count:"event(s)",
+    datos_memoria:"DATA IN MEMORY", guardar_backup:"Save backup (.mt)",
+    ver_eventos:"View / manage imported events", ver_mediciones:"View / correct measurement dates",
+    filtrar:"Filter:", todos:"All", ultima_import:"Last import:",
+    tab_leer:"📷 Read document", tab_portapapeles:"📋 From clipboard", tab_manual:"✏️ Manual entry",
+    importar_datos:"IMPORT DATA", copiar_importar:"Paste and import",
+    lectura_docs:"DOCUMENT READER", leer_ocr:"📷 Read document (OCR)",
+    entrada_manual:"MANUAL VALUE ENTRY",
+    selec_med:"— Select medication —", ir_a:"Go to:",
+    btn_editar:"Edit", importar_este:"Import this document?",
+    paso1:"Press \"Copy for Claude\" to copy the extracted text",
+    paso2:"Paste it in your conversation with Claude",
+    paso3:"Claude will return the data in importable format",
+    paso4:"Copy them and use the Paste and import button",
+    copiar_claude:"Copy for Claude", texto_extraido:"EXTRACTED TEXT",
+    avanzado:"Advanced: direct extraction with API key",
+    desc_leer:"Select an image or scanned PDF. MediTrace will extract the text automatically.",
+    desc_pegar:"Copy the data generated by Claude and press the button to import them.",
+    despues_lectura:"After reading:",
+    med_prescriptor:"Prescribed by", med_receta:"Prescription",
+    med_motivo:"Reason", med_reemplazo:"Replaced by", med_inicio:"Start date", med_fin:"End date",
+    med_estatuto:"Current status", med_en_curso:"Active", med_nuevo:"New", med_prn:"As needed (PRN)",
+    med_suspendido:"Suspended", med_abandonado:"Discontinued", med_terminado:"Completed",
+    receta_publica:"Public prescription (covered)", receta_privada:"Private prescription",
+    receta_no_fin:"Not covered (patient pays)", receta_hospital:"Hospital dispensation",
   }
 };
 let currentLang = 'es';
@@ -1317,6 +1389,26 @@ function setLang(l) {
   document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`).classList.add('active');
   localStorage.setItem('mt_lang', l);
   fillParamSelect();
+  translatePanel(t);
+}
+
+function translatePanel(t) {
+  var map = {
+    'lbl-datos-memoria': '📊 ' + t.datos_memoria,
+    'lbl-guardar-backup': '💾 ' + t.guardar_backup,
+    'lbl-ver-eventos': '📜 ' + t.ver_eventos + ' ▼',
+    'lbl-ver-mediciones': '📊 ' + t.ver_mediciones + ' ▼',
+    'lbl-tab-leer': t.tab_leer,
+    'lbl-tab-portapapeles': t.tab_portapapeles,
+    'lbl-tab-manual': t.tab_manual,
+    'lbl-importar-datos': '📋 ' + t.importar_datos,
+    'lbl-lectura-docs': '🤖 ' + t.lectura_docs,
+    'lbl-entrada-manual': '✏️ ' + t.entrada_manual,
+  };
+  Object.keys(map).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = map[id];
+  });
 }
 
 /* ================================================================
