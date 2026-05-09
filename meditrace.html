@@ -1786,7 +1786,7 @@ const T = {
 };
 
 /* ── FONCTION UNIFIÉE ── */
-let currentLang = localStorage.getItem('mt_lang') || 'es';
+let currentLang = localStorage.getItem('mt_lang') || localStorage.getItem('mt_landing_lang') || 'es';
 
 function updateTips() {
   document.querySelectorAll('[data-tip-key]').forEach(el => {
@@ -5800,7 +5800,7 @@ window.addEventListener('load', () => {
   /* Dédoublonner les données au chargement */
   deduplicateAll();
 
-  const savedLang = localStorage.getItem('mt_lang') || 'es';
+  const savedLang = localStorage.getItem('mt_lang') || localStorage.getItem('mt_landing_lang') || 'es';
   setLang(savedLang);
   fillParamSelect();
 
@@ -5816,7 +5816,7 @@ window.addEventListener('load', () => {
   updatePatientBadge();
   initProfile();
   initTips();
-  setLang(localStorage.getItem('mt_lang') || 'es');
+  setLang(localStorage.getItem('mt_lang') || localStorage.getItem('mt_landing_lang') || 'es');
   updateTips();
 
   /* Version avec date/heure */
