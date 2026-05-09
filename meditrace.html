@@ -480,9 +480,9 @@ body.no-tips [data-tip]::before { display: none !important; }
     <span id="patient-badge" style="display:none;padding:4px 10px;background:rgba(74,143,232,0.2);border:1px solid var(--accent);border-radius:6px;font-size:13px"></span>
   </div>
   <div style="display:flex;align-items:center;gap:6px">
-    <button id="profile-badge-btn" class="profile-badge" onclick="showStartupModal()" data-tip="👤 Cambiar perfil (Médico / Paciente / Familia) o seleccionar paciente" title="Cambiar perfil">👤 —</button>
-    <button class="btn-topbar" onclick="toggleTheme()" data-tip="☀️ Cambiar entre tema claro y oscuro" id="theme-btn" title="Cambiar tema">☀️</button>
-    <button class="lang-btn active" onclick="setLang('es')" data-tip="Cambiar idioma a Español">ES</button>
+    <button id="profile-badge-btn" class="profile-badge" onclick="showStartupModal()" data-tip-key="tip_profile" title="Cambiar perfil">👤 —</button>
+    <button class="btn-topbar" onclick="toggleTheme()" data-tip-key="tip_theme" id="theme-btn" title="Cambiar tema">☀️</button>
+    <button class="lang-btn active" onclick="setLang('es')" data-tip-key="tip_lang_es">ES</button>
     <button class="lang-btn" onclick="setLang('fr')">FR</button>
     <button class="lang-btn" onclick="setLang('en')">EN</button>
   </div>
@@ -490,30 +490,30 @@ body.no-tips [data-tip]::before { display: none !important; }
 
 <!-- TOP BAR — Ligne 2: Actions -->
 <div class="topbar-actions">
-  <button class="btn-topbar" onclick="nuevoPaciente()" data-tip="👤 Guardar el paciente actual y crear uno nuevo" title="Cambiar de paciente" style="color:#e8a44a;border-color:#e8a44a">👥 Nuevo Paciente</button>
+  <button class="btn-topbar" onclick="nuevoPaciente()" data-tip-key="tip_nuevo" title="Cambiar de paciente" style="color:#e8a44a;border-color:#e8a44a">👥 Nuevo Paciente</button>
   <button class="btn-topbar" onclick="showPanel('importar',this)" data-i18n="nav_import">📥 Datos</button>
-  <button class="btn-topbar" onclick="document.getElementById('import-json').click()" data-tip="📂 Restaurar datos desde un archivo backup .mt o .json" title="Restaurar desde backup">📂 Restaurar</button>
+  <button class="btn-topbar" onclick="document.getElementById('import-json').click()" data-tip-key="tip_restaurar" title="Restaurar desde backup">📂 Restaurar</button>
   <input type="file" id="import-json" accept=".json,.js,.mt,application/json,text/plain" style="display:none" onchange="importData(this)"/>
-  <button class="btn-topbar" onclick="exportData()" data-tip="💾 Guardar copia de seguridad (.mt) — Descarga todos los datos del paciente actual" title="Guardar copia de seguridad">💾 Guardar</button>
-  <button class="btn-topbar" onclick="showInformeChoice()" data-tip="📄 Generar informe PDF médico completo o sintético" title="Generar informe médico" style="color:#4ae8a4;border-color:#4ae8a4">📄 Informe</button>
-  <button class="btn-topbar danger" onclick="confirmReset()" data-tip="⟳ Borrar todos los datos actuales (se pedirá confirmación)" data-i18n="nav_reset">⟳ Reset</button>
+  <button class="btn-topbar" onclick="exportData()" data-tip-key="tip_guardar" title="Guardar copia de seguridad">💾 Guardar</button>
+  <button class="btn-topbar" onclick="showInformeChoice()" data-tip-key="tip_informe" title="Generar informe médico" style="color:#4ae8a4;border-color:#4ae8a4">📄 Informe</button>
+  <button class="btn-topbar danger" onclick="confirmReset()" data-tip-key="tip_reset" data-i18n="nav_reset">⟳ Reset</button>
 </div>
 
 <!-- NAV — barre horizontale (desktop) -->
 <div class="nav" id="main-nav" style="display:none">
-  <div class="nav-tab active" onclick="showPanel('resumen',this)"     data-i18n="tab_resumen" data-tip="📊 Vista general: KPIs, situación actual y alertas urgentes">Resumen</div>
-  <div class="nav-tab" onclick="showPanel('curvas',this)"             data-i18n="tab_curvas" data-tip="📈 Evolución gráfica de 25+ parámetros biológicos en el tiempo">Curvas</div>
+  <div class="nav-tab active" onclick="showPanel('resumen',this)"     data-i18n="tab_resumen" data-tip-key="tip_resumen">Resumen</div>
+  <div class="nav-tab" onclick="showPanel('curvas',this)"             data-i18n="tab_curvas" data-tip-key="tip_curvas">Curvas</div>
   <div class="nav-tab" onclick="showPanel('radar',this)"              data-i18n="tab_radar">🕸️ Radar</div>
-  <div class="nav-tab" onclick="showPanel('tabla',this)"              data-i18n="tab_tabla" data-tip="📋 Tabla cronológica de todos los análisis · Botón Glosario para entender cada parámetro">Tabla</div>
-  <div class="nav-tab" onclick="showPanel('timeline',this)"           data-i18n="tab_timeline" data-tip="🕐 Cronología clínica completa con situación actual fijada en cabeza">Cronología</div>
-  <div class="nav-tab" onclick="showPanel('antecedentes',this)"      data-i18n="tab_ant" data-tip="📋 Antecedentes médicos estructurados en 6 categorías clínicas">Antecedentes</div>
-  <div class="nav-tab" onclick="showPanel('vascular',this)"           data-i18n="tab_vasc" data-tip="🧠 Cronología vascular 2016→2026 · Hallazgos y preguntas para el médico">🧠 Análisis Vascular</div>
-  <div class="nav-tab" onclick="showPanel('correlaciones',this)"      data-i18n="tab_corr" data-tip="🔗 Correlaciones entre parámetros biológicos y períodos de medicación">📊 Correlaciones</div>
-  <div class="nav-tab" onclick="showPanel('observancia',this)"        data-i18n="tab_obs" data-tip="💊 Observancia terapéutica: períodos de toma documentados para 13 medicamentos">Observancia</div>
+  <div class="nav-tab" onclick="showPanel('tabla',this)"              data-i18n="tab_tabla" data-tip-key="tip_tabla">Tabla</div>
+  <div class="nav-tab" onclick="showPanel('timeline',this)"           data-i18n="tab_timeline" data-tip-key="tip_timeline">Cronología</div>
+  <div class="nav-tab" onclick="showPanel('antecedentes',this)"      data-i18n="tab_ant" data-tip-key="tip_ant">Antecedentes</div>
+  <div class="nav-tab" onclick="showPanel('vascular',this)"           data-i18n="tab_vasc" data-tip-key="tip_vasc">🧠 Análisis Vascular</div>
+  <div class="nav-tab" onclick="showPanel('correlaciones',this)"      data-i18n="tab_corr" data-tip-key="tip_corr">📊 Correlaciones</div>
+  <div class="nav-tab" onclick="showPanel('observancia',this)"        data-i18n="tab_obs" data-tip-key="tip_obs">Observancia</div>
   <div class="nav-tab" onclick="showPanel('medicamentos',this)"      data-i18n="tab_meds">💊 Medicamentos</div>
   <div class="nav-tab" onclick="showPanel('bacterio',this)"          data-i18n="tab_bacterio">🦠 Bacteriología</div>
-  <div class="nav-tab alert" onclick="showPanel('farma',this)"        data-i18n="tab_farma" data-tip="⚠ Interacciones medicamentosas basadas en fichas CIMA/AEMPS oficiales">⚠ Farmacovigilancia</div>
-  <div class="nav-tab" onclick="showPanel('importar',this)"           data-i18n="tab_import" data-tip="📥 Importar datos: PDF automático (API Claude), portapapeles o entrada manual">📥 Datos</div>
+  <div class="nav-tab alert" onclick="showPanel('farma',this)"        data-i18n="tab_farma" data-tip-key="tip_farma">⚠ Farmacovigilancia</div>
+  <div class="nav-tab" onclick="showPanel('importar',this)"           data-i18n="tab_import" data-tip-key="tip_import">📥 Datos</div>
   <div class="nav-tab" onclick="toggleSidebar()" style="margin-left:auto;font-size:18px;padding:4px 10px" title="Menú lateral">☰</div>
 </div>
 
@@ -566,17 +566,17 @@ body.no-tips [data-tip]::before { display: none !important; }
       <!-- Profil -->
       <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:12px;text-align:center">¿QUIÉN ACCEDE?</div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px" id="profil-btns">
-        <button onclick="setProfile('medico')" data-profile="medico" data-tip="Vista clínica completa con farmacovigilancia y análisis vascular" class="profil-btn" style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 8px;cursor:pointer;transition:all .2s;text-align:center">
+        <button onclick="setProfile('medico')" data-profile="medico" data-tip-key="tip_medico" class="profil-btn" style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 8px;cursor:pointer;transition:all .2s;text-align:center">
           <div style="font-size:28px;margin-bottom:6px">👨‍⚕️</div>
           <div style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text)">Médico</div>
           <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px">Vista clínica completa</div>
         </button>
-        <button onclick="setProfile('paciente')" data-profile="paciente" data-tip="Vista personal con glosario y curvas de evolución" class="profil-btn" style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 8px;cursor:pointer;transition:all .2s;text-align:center">
+        <button onclick="setProfile('paciente')" data-profile="paciente" data-tip-key="tip_paciente" class="profil-btn" style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 8px;cursor:pointer;transition:all .2s;text-align:center">
           <div style="font-size:28px;margin-bottom:6px">🧑</div>
           <div style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text)">Paciente</div>
           <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px">Vista personal</div>
         </button>
-        <button onclick="setProfile('familia')" data-profile="familia" data-tip="Vista simplificada con explicaciones en lenguaje sencillo" class="profil-btn" style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 8px;cursor:pointer;transition:all .2s;text-align:center">
+        <button onclick="setProfile('familia')" data-profile="familia" data-tip-key="tip_familia" class="profil-btn" style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 8px;cursor:pointer;transition:all .2s;text-align:center">
           <div style="font-size:28px;margin-bottom:6px">👨‍👩‍👧</div>
           <div style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text)">Familia</div>
           <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px">Vista simplificada</div>
@@ -637,7 +637,7 @@ body.no-tips [data-tip]::before { display: none !important; }
 
 <!-- ===== PANEL RADAR ===== -->
 <div id="panel-radar" class="panel">
-  <div class="section-label">🕸️ Vista de conjunto — Radar de parámetros biológicos</div>
+  <div class="section-label" data-i18n="radar_title">🕸️ Vista de conjunto — Radar de parámetros biológicos</div>
 
   <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:var(--radius);padding:14px 18px;margin-bottom:20px;font-size:15px;color:var(--muted);line-height:1.7">
     💡 <strong style="color:var(--text)">Cómo leer este gráfico</strong> —
@@ -674,7 +674,7 @@ body.no-tips [data-tip]::before { display: none !important; }
 <div id="panel-tabla" class="panel">
   <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:16px">
     <div class="section-label" style="margin-bottom:0" data-i18n="synth_table">Tabla de síntesis cronológica</div>
-    <button class="btn" onclick="openGlosario()" data-tip="❓ Glosario médico trilingüe — 32 parámetros explicados en lenguaje sencillo" style="font-size:11px;padding:6px 14px">
+    <button class="btn" onclick="openGlosario()" data-tip-key="tip_glosario" style="font-size:11px;padding:6px 14px">
       ❓ Glosario de parámetros
     </button>
   </div>
@@ -694,7 +694,7 @@ body.no-tips [data-tip]::before { display: none !important; }
 
 <!-- ===== PANEL ANTECEDENTES ===== -->
 <div id="panel-antecedentes" class="panel">
-  <div class="section-label">📋 Antecedentes médicos estructurados — M.E.J. · F · 87 años</div>
+  <div class="section-label" data-i18n="ant_title">📋 Antecedentes médicos estructurados</div>
 
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;margin-bottom:24px">
 
@@ -804,7 +804,7 @@ body.no-tips [data-tip]::before { display: none !important; }
 
 <!-- ===== PANEL ANÁLISIS VASCULAR ===== -->
 <div id="panel-vascular" class="panel">
-  <div class="section-label">🧠 Análisis Vascular — Síntesis para evaluación médica</div>
+  <div class="section-label" data-i18n="vasc_title">🧠 Análisis Vascular — Síntesis para evaluación médica</div>
 
   <!-- ALERTA PRINCIPAL -->
   <div style="background:rgba(232,74,74,0.12);border:2px solid #e84a4a;border-radius:var(--radius);padding:20px 24px;margin-bottom:24px">
@@ -819,7 +819,7 @@ body.no-tips [data-tip]::before { display: none !important; }
   </div>
 
   <!-- CRONOLOGÍA VASCULAR -->
-  <div class="section-label">Cronología vascular reconstituida — 2016 → 2026</div>
+  <div class="section-label" data-i18n="vasc_chron">Cronología vascular reconstituida — 2016 → 2026</div>
   <!-- LÉGENDE -->
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 20px;margin-bottom:16px;display:flex;gap:24px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;color:var(--text)">
     <strong style="color:var(--muted);font-size:10px;letter-spacing:2px;text-transform:uppercase;align-self:center">LEYENDA</strong>
@@ -909,7 +909,7 @@ body.no-tips [data-tip]::before { display: none !important; }
   </div>
 
   <!-- ANALYSE POUR LE MÉDECIN -->
-  <div class="section-label">Preguntas clave para el médico</div>
+  <div class="section-label" data-i18n="vasc_questions">Preguntas clave para el médico</div>
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;margin-bottom:24px">
 
     <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid #e84a4a;border-radius:var(--radius);padding:16px 20px">
@@ -979,7 +979,7 @@ body.no-tips [data-tip]::before { display: none !important; }
 
 <!-- ===== PANEL CORRELACIONES ===== -->
 <div id="panel-correlaciones" class="panel">
-  <div class="section-label">📊 Correlaciones clínicas — Parámetros biológicos vs Medicamentos</div>
+  <div class="section-label" data-i18n="corr_title">📊 Correlaciones clínicas — Parámetros biológicos vs Medicamentos</div>
 
   <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent2);border-radius:var(--radius);padding:14px 18px;margin-bottom:24px;font-size:13px;color:var(--muted)">
     💡 <strong style="color:var(--text)">Cómo leer estos gráficos</strong> —
@@ -994,7 +994,7 @@ body.no-tips [data-tip]::before { display: none !important; }
 
 <!-- ===== PANEL OBSERVANCIA ===== -->
 <div id="panel-observancia" class="panel">
-  <div class="section-label">Observancia terapéutica — Registro de toma real de medicamentos</div>
+  <div class="section-label" data-i18n="obs_title">Observancia terapéutica — Registro de toma real de medicamentos</div>
 
   <!-- NOTA METODOLÓGICA -->
   <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent2);border-radius:var(--radius);padding:14px 18px;margin-bottom:24px;font-size:13px;color:var(--muted)">
@@ -1019,7 +1019,7 @@ body.no-tips [data-tip]::before { display: none !important; }
 
 <!-- ===== PANEL MEDICAMENTOS ===== -->
 <div id="panel-medicamentos" class="panel">
-  <div class="section-label">💊 Historial de medicamentos — Extraído automáticamente de los documentos PDF</div>
+  <div class="section-label" data-i18n="meds_title">💊 Historial de medicamentos — Extraído automáticamente de los documentos PDF</div>
 
   <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:var(--radius);padding:14px 18px;margin-bottom:24px;font-size:13px;color:var(--muted)">
     💡 <strong style="color:var(--text)">Fuentes</strong> —
@@ -1052,7 +1052,7 @@ body.no-tips [data-tip]::before { display: none !important; }
 
 <!-- ===== PANEL BACTERIOLOGÍA ===== -->
 <div id="panel-bacterio" class="panel">
-  <div class="section-label">🦠 Bacteriología — Resultados de cultivos y antibiogramas</div>
+  <div class="section-label" data-i18n="bact_title">🦠 Bacteriología — Resultados de cultivos y antibiogramas</div>
 
   <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:var(--radius);padding:14px 18px;margin-bottom:24px;font-size:13px;color:var(--muted)">
     💡 <strong style="color:var(--text)">Fuentes</strong> —
@@ -1066,7 +1066,7 @@ body.no-tips [data-tip]::before { display: none !important; }
 
 <!-- ===== PANEL FARMA ===== -->
 <div id="panel-farma" class="panel">
-  <div class="section-label">⚠ Farmacovigilancia — Interacciones & Contraindicaciones · Fuente: CIMA/AEMPS</div>
+  <div class="section-label" data-i18n="farma_title_full">⚠ Farmacovigilancia — Interacciones & Contraindicaciones · Fuente: CIMA/AEMPS</div>
 
   <!-- AVISO -->
   <div style="background:var(--surface);border:1px solid rgba(232,74,74,0.3);border-radius:var(--radius);padding:14px 18px;margin-bottom:20px;font-size:13px;color:var(--muted)">
@@ -1084,7 +1084,7 @@ body.no-tips [data-tip]::before { display: none !important; }
   <div style="background:var(--surface);border:2px solid var(--accent);border-radius:var(--radius);padding:16px 20px;margin-bottom:24px">
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
       <div id="lbl-datos-memoria" data-i18n="data_in_memory" style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent);letter-spacing:2px;text-transform:uppercase">📊 DATOS EN MEMORIA</div>
-      <button id="lbl-guardar-backup" data-i18n="save_backup" class="btn primary" onclick="exportData()" data-tip="💾 Descarga todos los datos como archivo MediTrace-Paciente-Fecha.mt" style="font-size:13px;padding:8px 16px">💾 Guardar backup (.mt)</button>
+      <button id="lbl-guardar-backup" data-i18n="save_backup" class="btn primary" onclick="exportData()" data-tip-key="tip_backup_btn" style="font-size:13px;padding:8px 16px">💾 Guardar backup (.mt)</button>
     </div>
     <div id="data-summary" style="font-family:var(--mono);font-size:14px;color:var(--text);margin-top:10px;line-height:2"></div>
 
@@ -1116,9 +1116,9 @@ body.no-tips [data-tip]::before { display: none !important; }
 
   <!-- ══════ ONGLETS DES 3 VOLETS ══════ -->
   <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
-    <button class="btn primary" id="lbl-tab-leer" data-i18n="tab_leer_mt" data-tab="auto" data-tip="🤖 Extracción automática con Claude API — arrastra tu PDF médico" onclick="showImportTab('auto')" style="font-size:14px;padding:10px 20px">📷 Leer documento</button>
-    <button class="btn" id="lbl-tab-portapapeles" data-i18n="tab_portapapeles_mt" data-tab="clipboard" data-tip="📋 Pega texto copiado de un PDF o documento médico" onclick="showImportTab('clipboard')" style="font-size:14px;padding:10px 20px">📋 Desde portapapeles</button>
-    <button class="btn" id="lbl-tab-manual" data-i18n="tab_manual_mt" data-tab="manual" data-tip="✏️ Introduce valores manualmente: fecha, parámetro y valor" onclick="showImportTab('manual')" style="font-size:14px;padding:10px 20px">✏️ Entrada manual</button>
+    <button class="btn primary" id="lbl-tab-leer" data-i18n="tab_leer_mt" data-tab="auto" data-tip-key="tip_tab_leer" onclick="showImportTab('auto')" style="font-size:14px;padding:10px 20px">📷 Leer documento</button>
+    <button class="btn" id="lbl-tab-portapapeles" data-i18n="tab_portapapeles_mt" data-tab="clipboard" data-tip-key="tip_tab_clip" onclick="showImportTab('clipboard')" style="font-size:14px;padding:10px 20px">📋 Desde portapapeles</button>
+    <button class="btn" id="lbl-tab-manual" data-i18n="tab_manual_mt" data-tab="manual" data-tip-key="tip_tab_manual" onclick="showImportTab('manual')" style="font-size:14px;padding:10px 20px">✏️ Entrada manual</button>
   </div>
 
   <!-- ═══════════════════════════════════════════ -->
@@ -1450,7 +1450,50 @@ const T = {
     bad_format:"Formato no reconocido. Usa un backup .mt o .json de MediTrace.",
     import_ok:"✅ {mes} mediciones · {ev} eventos · {med} medicamentos restaurados",
     change_patient:"Cambiar de paciente",
+    sit_actual:"' + t('sit_actual') + '",
+    sit_pinned:"' + t('sit_pinned') + '",
+    chron_complete:"Cronología completa",
+    eventos_doc:"eventos documentados",
+    radar_title:"🕸️ Vista de conjunto — Radar de parámetros biológicos",
+    ant_title:"📋 Antecedentes médicos estructurados",
+    vasc_title:"🧠 Análisis Vascular — Síntesis para evaluación médica",
+    vasc_chron:"Cronología vascular reconstituida — 2016 → 2026",
+    vasc_questions:"Preguntas clave para el médico",
+    corr_title:"📊 Correlaciones clínicas — Parámetros biológicos vs Medicamentos",
+    obs_title:"Observancia terapéutica — Registro de toma real de medicamentos",
+    meds_title:"💊 Historial de medicamentos — Extraído automáticamente de los documentos PDF",
+    bact_title:"🦠 Bacteriología — Resultados de cultivos y antibiogramas",
+    farma_title_full:"⚠ Farmacovigilancia — Interacciones & Contraindicaciones · Fuente: CIMA/AEMPS",
     pref_tips:"💬 Mostrar ayuda contextual",
+    /* Tooltips */
+    tip_profile:"👤 Cambiar perfil o seleccionar paciente",
+    tip_theme:"☀️ Cambiar entre tema claro y oscuro",
+    tip_lang_es:"Cambiar idioma a Español",
+    tip_lang_fr:"Passer en Français",
+    tip_lang_en:"Switch to English",
+    tip_nuevo:"👤 Guardar el paciente actual y crear uno nuevo",
+    tip_restaurar:"📂 Restaurar datos desde un archivo backup .mt o .json",
+    tip_guardar:"💾 Guardar copia de seguridad — Descarga todos los datos del paciente actual",
+    tip_informe:"📄 Generar informe PDF médico completo o sintético",
+    tip_reset:"⟳ Borrar todos los datos actuales (se pedirá confirmación)",
+    tip_resumen:"📊 Vista general: KPIs, situación actual y alertas urgentes",
+    tip_curvas:"📈 Evolución gráfica de 25+ parámetros biológicos en el tiempo",
+    tip_tabla:"📋 Tabla cronológica de todos los análisis · Botón Glosario",
+    tip_timeline:"🕐 Cronología clínica completa con situación actual fijada",
+    tip_ant:"📋 Antecedentes médicos estructurados en 6 categorías clínicas",
+    tip_vasc:"🧠 Cronología vascular 2016→2026 · Hallazgos y preguntas",
+    tip_corr:"🔗 Correlaciones entre parámetros biológicos y medicación",
+    tip_obs:"💊 Observancia terapéutica: 13 medicamentos documentados",
+    tip_farma:"⚠ Interacciones medicamentosas basadas en fichas CIMA/AEMPS",
+    tip_import:"📥 Importar: PDF automático (API Claude), portapapeles o manual",
+    tip_glosario:"❓ Glosario médico trilingüe — 32 parámetros explicados",
+    tip_medico:"Vista clínica completa con farmacovigilancia y análisis vascular",
+    tip_paciente:"Vista personal con glosario y curvas de evolución",
+    tip_familia:"Vista simplificada con explicaciones en lenguaje sencillo",
+    tip_backup_btn:"💾 Descarga todos los datos como archivo MediTrace-Paciente-Fecha.mt",
+    tip_tab_leer:"🤖 Extracción automática con Claude API — arrastra tu PDF médico",
+    tip_tab_clip:"📋 Pega texto copiado de un PDF o documento médico",
+    tip_tab_manual:"✏️ Introduce valores manualmente: fecha, parámetro y valor",
   },
   fr: {
     tab_resumen:"Résumé", tab_curvas:"Courbes", tab_tabla:"Tableau",
@@ -1551,7 +1594,50 @@ const T = {
     bad_format:"Format non reconnu. Utilisez un backup .mt ou .json MediTrace.",
     import_ok:"✅ {mes} mesures · {ev} événements · {med} médicaments restaurés",
     change_patient:"Changer de patient",
+    sit_actual:"📋 SITUATION CLINIQUE ACTUELLE — MAI 2026",
+    sit_pinned:"📌 SITUATION ACTUELLE — MAI 2026",
+    chron_complete:"Chronologie complète",
+    eventos_doc:"événements documentés",
+    radar_title:"🕸️ Vue d\'ensemble — Radar des paramètres biologiques",
+    ant_title:"📋 Antécédents médicaux structurés",
+    vasc_title:"🧠 Analyse Vasculaire — Synthèse pour évaluation médicale",
+    vasc_chron:"Chronologie vasculaire reconstituée — 2016 → 2026",
+    vasc_questions:"Questions clés pour le médecin",
+    corr_title:"📊 Corrélations cliniques — Paramètres biologiques vs Médicaments",
+    obs_title:"Observance thérapeutique — Registre de prise réelle des médicaments",
+    meds_title:"💊 Historique des médicaments — Extrait automatiquement des documents PDF",
+    bact_title:"🦠 Bactériologie — Résultats de cultures et antibiogrammes",
+    farma_title_full:"⚠ Pharmacovigilance — Interactions & Contre-indications · Source : CIMA/AEMPS",
     pref_tips:"💬 Afficher l'aide contextuelle",
+    /* Tooltips */
+    tip_profile:"👤 Changer de profil ou sélectionner un patient",
+    tip_theme:"☀️ Basculer entre thème clair et sombre",
+    tip_lang_es:"Passer en Espagnol",
+    tip_lang_fr:"Rester en Français",
+    tip_lang_en:"Switch to English",
+    tip_nuevo:"👤 Sauvegarder le patient actuel et en créer un nouveau",
+    tip_restaurar:"📂 Restaurer des données depuis un fichier backup .mt ou .json",
+    tip_guardar:"💾 Sauvegarder — Télécharge toutes les données du patient actuel",
+    tip_informe:"📄 Générer un rapport PDF médical complet ou synthétique",
+    tip_reset:"⟳ Effacer toutes les données actuelles (confirmation demandée)",
+    tip_resumen:"📊 Vue générale : KPIs, situation actuelle et alertes urgentes",
+    tip_curvas:"📈 Évolution graphique de 25+ paramètres biologiques",
+    tip_tabla:"📋 Tableau chronologique de toutes les analyses · Bouton Glossaire",
+    tip_timeline:"🕐 Chronologie clinique complète avec situation actuelle épinglée",
+    tip_ant:"📋 Antécédents médicaux structurés en 6 catégories cliniques",
+    tip_vasc:"🧠 Chronologie vasculaire 2016→2026 · Découvertes et questions",
+    tip_corr:"🔗 Corrélations entre paramètres biologiques et médicaments",
+    tip_obs:"💊 Observance thérapeutique : 13 médicaments documentés",
+    tip_farma:"⚠ Interactions médicamenteuses basées sur les fiches CIMA/AEMPS",
+    tip_import:"📥 Importer : PDF automatique (API Claude), presse-papiers ou manuel",
+    tip_glosario:"❓ Glossaire médical trilingue — 32 paramètres expliqués",
+    tip_medico:"Vue clinique complète avec pharmacovigilance et analyse vasculaire",
+    tip_paciente:"Vue personnelle avec glossaire et courbes d'évolution",
+    tip_familia:"Vue simplifiée avec explications en langage accessible",
+    tip_backup_btn:"💾 Télécharge toutes les données comme fichier MediTrace-Patient-Date.mt",
+    tip_tab_leer:"🤖 Extraction automatique via Claude API — glissez votre PDF médical",
+    tip_tab_clip:"📋 Collez le texte copié d'un PDF ou document médical",
+    tip_tab_manual:"✏️ Saisissez les valeurs manuellement : date, paramètre et valeur",
   },
   en: {
     tab_resumen:"Summary", tab_curvas:"Charts", tab_tabla:"Table",
@@ -1652,12 +1738,62 @@ const T = {
     bad_format:"Unrecognised format. Use a MediTrace .mt or .json backup.",
     import_ok:"✅ {mes} readings · {ev} events · {med} medications restored",
     change_patient:"Change patient",
+    sit_actual:"📋 CURRENT CLINICAL SITUATION — MAY 2026",
+    sit_pinned:"📌 CURRENT SITUATION — MAY 2026",
+    chron_complete:"Complete timeline",
+    eventos_doc:"documented events",
+    radar_title:"🕸️ Overview — Biological parameters radar",
+    ant_title:"📋 Structured medical history",
+    vasc_title:"🧠 Vascular Analysis — Summary for medical evaluation",
+    vasc_chron:"Reconstructed vascular timeline — 2016 → 2026",
+    vasc_questions:"Key questions for the doctor",
+    corr_title:"📊 Clinical correlations — Biological parameters vs Medications",
+    obs_title:"Therapeutic compliance — Record of actual medication intake",
+    meds_title:"💊 Medication history — Automatically extracted from PDF documents",
+    bact_title:"🦠 Bacteriology — Culture results and antibiograms",
+    farma_title_full:"⚠ Pharmacovigilance — Interactions & Contraindications · Source: CIMA/AEMPS",
     pref_tips:"💬 Show contextual help",
+    /* Tooltips */
+    tip_profile:"👤 Change profile or select a patient",
+    tip_theme:"☀️ Toggle between light and dark theme",
+    tip_lang_es:"Switch to Spanish",
+    tip_lang_fr:"Passer en Français",
+    tip_lang_en:"Stay in English",
+    tip_nuevo:"👤 Save current patient and create a new one",
+    tip_restaurar:"📂 Restore data from a .mt or .json backup file",
+    tip_guardar:"💾 Save backup — Downloads all current patient data",
+    tip_informe:"📄 Generate a complete or summary medical PDF report",
+    tip_reset:"⟳ Delete all current data (confirmation required)",
+    tip_resumen:"📊 Overview: KPIs, current situation and urgent alerts",
+    tip_curvas:"📈 Graphical evolution of 25+ biological parameters over time",
+    tip_tabla:"📋 Chronological table of all analyses · Glossary button",
+    tip_timeline:"🕐 Complete clinical timeline with current situation pinned",
+    tip_ant:"📋 Medical history structured in 6 clinical categories",
+    tip_vasc:"🧠 Vascular timeline 2016→2026 · Findings and doctor questions",
+    tip_corr:"🔗 Correlations between biological parameters and medications",
+    tip_obs:"💊 Therapeutic compliance: 13 documented medications",
+    tip_farma:"⚠ Drug interactions based on official CIMA/AEMPS data sheets",
+    tip_import:"📥 Import: automatic PDF (Claude API), clipboard or manual",
+    tip_glosario:"❓ Trilingual medical glossary — 32 parameters explained",
+    tip_medico:"Full clinical view with pharmacovigilance and vascular analysis",
+    tip_paciente:"Personal view with glossary and evolution charts",
+    tip_familia:"Simplified view with plain language explanations",
+    tip_backup_btn:"💾 Downloads all data as MediTrace-Patient-Date.mt file",
+    tip_tab_leer:"🤖 Automatic extraction via Claude API — drag your medical PDF",
+    tip_tab_clip:"📋 Paste text copied from a PDF or medical document",
+    tip_tab_manual:"✏️ Enter values manually: date, parameter and value",
   }
 };
 
 /* ── FONCTION UNIFIÉE ── */
 let currentLang = localStorage.getItem('mt_lang') || 'es';
+
+function updateTips() {
+  document.querySelectorAll('[data-tip-key]').forEach(el => {
+    const key = el.getAttribute('data-tip-key');
+    el.setAttribute('data-tip', t(key));
+  });
+}
 
 function t(key, vars) {
   const lang = T[currentLang] || T.es;
@@ -1675,7 +1811,7 @@ function setLang(l) {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.dataset.i18n;
     const val = t(key);
-    if (val) el.innerHTML = val.replace(/\\n/g, '<br>');
+    if (val) el.innerHTML = val.replace(/\n/g, '<br>');
   });
   /* Mettre à jour boutons langue */
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
@@ -1686,6 +1822,7 @@ function setLang(l) {
   document.documentElement.lang = l;
   fillParamSelect();
   if (typeof translatePanel === 'function') translatePanel(T[l] || T.es);
+  updateTips();
 }
 
 /* Alias pour compatibilité avec ancien code */
@@ -1701,34 +1838,19 @@ if (typeof pdfjsLib !== 'undefined') {
    TRADUCTIONS
 ================================================================ */
 
-function setLang(l) {
-  currentLang = l;
-  const t = LANG[l];
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const k = el.dataset.i18n;
-    if (t[k]) el.innerHTML = t[k].replace(/\n/g,'<br>');
-  });
-  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-  const activeBtn = document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`);
-  if (activeBtn) activeBtn.classList.add('active');
-  localStorage.setItem('mt_lang', l);
-  fillParamSelect();
-  translatePanel(t);
-}
 
 function translatePanel(tObj) {
   var map = {
-    'lbl-datos-memoria': '📊 ' + t.datos_memoria,
-    'lbl-guardar-backup': '💾 ' + t.guardar_backup,
-    'lbl-ver-eventos': '📜 ' + t.ver_eventos + ' ▼',
-    'lbl-ver-mediciones': '📊 ' + t.ver_mediciones + ' ▼',
-    'lbl-tab-leer': t.tab_leer,
-    'lbl-tab-portapapeles': t.tab_portapapeles,
-    'lbl-tab-manual': t.tab_manual,
-    'lbl-importar-datos': '📋 ' + t.importar_datos,
-    'lbl-lectura-docs': '🤖 ' + t.lectura_docs,
-    'lbl-entrada-manual': '✏️ ' + t.entrada_manual,
+    'lbl-datos-memoria': t('datos_memoria'),
+    'lbl-guardar-backup': t('guardar_backup'),
+    'lbl-ver-eventos': t('ver_eventos'),
+    'lbl-ver-mediciones': t('ver_mediciones'),
+    'lbl-tab-leer': t('tab_leer'),
+    'lbl-tab-portapapeles': t('tab_portapapeles'),
+    'lbl-tab-manual': t('tab_manual'),
+    'lbl-importar-datos': '📋 ' + t('importar_datos'),
+    'lbl-lectura-docs': '🤖 ' + t('lectura_docs'),
+    'lbl-entrada-manual': '✏️ ' + t('entrada_manual'),
   };
   Object.keys(map).forEach(function(id) {
     var el = document.getElementById(id);
@@ -3903,7 +4025,7 @@ function buildTimeline() {
   /* ── LABEL SECTION ── */
   const secLabel = document.createElement('div');
   secLabel.className = 'section-label';
-  secLabel.textContent = 'Cronología completa — ' + evts.length + ' eventos documentados';
+  secLabel.textContent = t('chron_complete') + ' — ' + evts.length + ' ' + t('eventos_doc');
   el.appendChild(secLabel);
 
   /* ── TIMELINE ── */
@@ -5695,6 +5817,7 @@ window.addEventListener('load', () => {
   initProfile();
   initTips();
   setLang(localStorage.getItem('mt_lang') || 'es');
+  updateTips();
 
   /* Version avec date/heure */
   var vl = document.getElementById('version-label');
