@@ -503,15 +503,15 @@ body.no-tips [data-tip]::before { display: none !important; }
 <div class="nav" id="main-nav" style="display:none">
   <div class="nav-tab active" onclick="showPanel('resumen',this)"     data-i18n="tab_resumen" data-tip-key="tip_resumen">Resumen</div>
   <div class="nav-tab" onclick="showPanel('curvas',this)"             data-i18n="tab_curvas" data-tip-key="tip_curvas">Curvas</div>
-  <div class="nav-tab" onclick="showPanel('radar',this)"              data-i18n="tab_radar">🕸️ Radar</div>
+  <div class="nav-tab" onclick="showPanel('radar',this)"              data-i18n="tab_radar" data-tip-key="tip_radar">🕸️ Radar</div>
   <div class="nav-tab" onclick="showPanel('tabla',this)"              data-i18n="tab_tabla" data-tip-key="tip_tabla">Tabla</div>
   <div class="nav-tab" onclick="showPanel('timeline',this)"           data-i18n="tab_timeline" data-tip-key="tip_timeline">Cronología</div>
   <div class="nav-tab" onclick="showPanel('antecedentes',this)"      data-i18n="tab_ant" data-tip-key="tip_ant">Antecedentes</div>
   <div class="nav-tab" onclick="showPanel('vascular',this)"           data-i18n="tab_vasc" data-tip-key="tip_vasc">🧠 Análisis Vascular</div>
   <div class="nav-tab" onclick="showPanel('correlaciones',this)"      data-i18n="tab_corr" data-tip-key="tip_corr">📊 Correlaciones</div>
   <div class="nav-tab" onclick="showPanel('observancia',this)"        data-i18n="tab_obs" data-tip-key="tip_obs">Observancia</div>
-  <div class="nav-tab" onclick="showPanel('medicamentos',this)"      data-i18n="tab_meds">💊 Medicamentos</div>
-  <div class="nav-tab" onclick="showPanel('bacterio',this)"          data-i18n="tab_bacterio">🦠 Bacteriología</div>
+  <div class="nav-tab" onclick="showPanel('medicamentos',this)"      data-i18n="tab_meds" data-tip-key="tip_meds">💊 Medicamentos</div>
+  <div class="nav-tab" onclick="showPanel('bacterio',this)"          data-i18n="tab_bacterio" data-tip-key="tip_bact">🦠 Bacteriología</div>
   <div class="nav-tab alert" onclick="showPanel('farma',this)"        data-i18n="tab_farma" data-tip-key="tip_farma">⚠ Farmacovigilancia</div>
   <div class="nav-tab" onclick="showPanel('importar',this)"           data-i18n="tab_import" data-tip-key="tip_import">📥 Datos</div>
   <div class="nav-tab" onclick="toggleSidebar()" style="margin-left:auto;font-size:18px;padding:4px 10px" title="Menú lateral">☰</div>
@@ -560,26 +560,26 @@ body.no-tips [data-tip]::before { display: none !important; }
       <!-- Logo -->
       <div style="text-align:center;margin-bottom:24px">
         <div style="font-family:var(--serif);font-size:32px;font-weight:700;color:var(--text)">Medi<span style="font-style:italic;color:var(--accent)">Trace</span></div>
-        <div style="font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--muted);margin-top:4px">SEGUIMIENTO MÉDICO LONGITUDINAL</div>
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--muted);margin-top:4px" data-i18n="app_subtitle">SEGUIMIENTO MÉDICO LONGITUDINAL</div>
       </div>
 
       <!-- Profil -->
-      <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:12px;text-align:center">¿QUIÉN ACCEDE?</div>
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:12px;text-align:center" data-i18n="who_accesses">¿QUIÉN ACCEDE?</div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px" id="profil-btns">
         <button onclick="setProfile('medico')" data-profile="medico" data-tip-key="tip_medico" class="profil-btn" style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 8px;cursor:pointer;transition:all .2s;text-align:center">
           <div style="font-size:28px;margin-bottom:6px">👨‍⚕️</div>
-          <div style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text)">Médico</div>
-          <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px">Vista clínica completa</div>
+          <div style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text)" data-i18n="profile_medico">Médico</div>
+          <div data-i18n="profile_medico_sub" style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px">Vista clínica completa</div>
         </button>
         <button onclick="setProfile('paciente')" data-profile="paciente" data-tip-key="tip_paciente" class="profil-btn" style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 8px;cursor:pointer;transition:all .2s;text-align:center">
           <div style="font-size:28px;margin-bottom:6px">🧑</div>
-          <div style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text)">Paciente</div>
-          <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px">Vista personal</div>
+          <div style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text)" data-i18n="profile_paciente">Paciente</div>
+          <div data-i18n="profile_paciente_sub" style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px">Vista personal</div>
         </button>
         <button onclick="setProfile('familia')" data-profile="familia" data-tip-key="tip_familia" class="profil-btn" style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 8px;cursor:pointer;transition:all .2s;text-align:center">
           <div style="font-size:28px;margin-bottom:6px">👨‍👩‍👧</div>
-          <div style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text)">Familia</div>
-          <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px">Vista simplificada</div>
+          <div style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text)" data-i18n="profile_familia">Familia</div>
+          <div data-i18n="profile_familia_sub" style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px">Vista simplificada</div>
         </button>
       </div>
 
@@ -588,16 +588,16 @@ body.no-tips [data-tip]::before { display: none !important; }
         <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:10px">SELECCIONAR PACIENTE</div>
         <div id="patient-list" style="display:flex;flex-direction:column;gap:6px;max-height:180px;overflow-y:auto;margin-bottom:12px"></div>
         <div style="display:flex;gap:8px">
-          <button onclick="closeStartupNew()" class="btn primary" style="flex:1">+ Nuevo paciente</button>
-          <button onclick="closeStartupImport()" class="btn" style="flex:1">📂 Restaurar .mt</button>
+          <button onclick="closeStartupNew()" class="btn primary" data-i18n="btn_nuevo_paciente" style="flex:1">+ Nuevo paciente</button>
+          <button onclick="closeStartupImport()" class="btn" data-i18n="btn_restaurar_mt" style="flex:1">📂 Restaurar .mt</button>
         </div>
       </div>
 
       <!-- Sans données -->
       <div id="nodata-section" style="display:none">
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button onclick="closeStartupNew()" class="btn primary" style="flex:1">+ Nuevo paciente</button>
-          <button onclick="closeStartupImport()" class="btn" style="flex:1">📂 Restaurar .mt</button>
+          <button onclick="closeStartupNew()" class="btn primary" data-i18n="btn_nuevo_paciente" style="flex:1">+ Nuevo paciente</button>
+          <button onclick="closeStartupImport()" class="btn" data-i18n="btn_restaurar_mt" style="flex:1">📂 Restaurar .mt</button>
         </div>
       </div>
 
@@ -1487,10 +1487,19 @@ const T = {
     tip_farma:"⚠ Interacciones medicamentosas basadas en fichas CIMA/AEMPS",
     tip_import:"📥 Importar: PDF automático (API Claude), portapapeles o manual",
     tip_glosario:"❓ Glosario médico trilingüe — 32 parámetros explicados",
+    who_accesses:"¿QUIÉN ACCEDE?",
+    app_subtitle:"SEGUIMIENTO MÉDICO LONGITUDINAL",
+    profile_medico:"Médico", profile_medico_sub:"Vista clínica completa",
+    profile_paciente:"Paciente", profile_paciente_sub:"Vista personal",
+    profile_familia:"Familia", profile_familia_sub:"Vista simplificada",
+    btn_nuevo_paciente:"+ Nuevo paciente", btn_restaurar_mt:"📂 Restaurar .mt",
     tip_medico:"Vista clínica completa con farmacovigilancia y análisis vascular",
     tip_paciente:"Vista personal con glosario y curvas de evolución",
     tip_familia:"Vista simplificada con explicaciones en lenguaje sencillo",
     tip_backup_btn:"💾 Descarga todos los datos como archivo MediTrace-Paciente-Fecha.mt",
+    tip_radar:"🕸️ Vista de conjunto — Radar de parámetros biológicos",
+    tip_meds:"💊 Historial completo de medicamentos con períodos y observancia",
+    tip_bact:"🦠 Resultados de cultivos y antibiogramas",
     tip_tab_leer:"🤖 Extracción automática con Claude API — arrastra tu PDF médico",
     tip_tab_clip:"📋 Pega texto copiado de un PDF o documento médico",
     tip_tab_manual:"✏️ Introduce valores manualmente: fecha, parámetro y valor",
@@ -1631,10 +1640,19 @@ const T = {
     tip_farma:"⚠ Interactions médicamenteuses basées sur les fiches CIMA/AEMPS",
     tip_import:"📥 Importer : PDF automatique (API Claude), presse-papiers ou manuel",
     tip_glosario:"❓ Glossaire médical trilingue — 32 paramètres expliqués",
+    who_accesses:"QUI ACCÈDE ?",
+    app_subtitle:"SUIVI MÉDICAL LONGITUDINAL",
+    profile_medico:"Médecin", profile_medico_sub:"Vue clinique complète",
+    profile_paciente:"Patient", profile_paciente_sub:"Vue personnelle",
+    profile_familia:"Famille", profile_familia_sub:"Vue simplifiée",
+    btn_nuevo_paciente:"+ Nouveau patient", btn_restaurar_mt:"📂 Restaurer .mt",
     tip_medico:"Vue clinique complète avec pharmacovigilance et analyse vasculaire",
     tip_paciente:"Vue personnelle avec glossaire et courbes d'évolution",
     tip_familia:"Vue simplifiée avec explications en langage accessible",
     tip_backup_btn:"💾 Télécharge toutes les données comme fichier MediTrace-Patient-Date.mt",
+    tip_radar:"🕸️ Vue d'ensemble — Radar des paramètres biologiques",
+    tip_meds:"💊 Historique complet des médicaments avec périodes et observance",
+    tip_bact:"🦠 Résultats de cultures et antibiogrammes",
     tip_tab_leer:"🤖 Extraction automatique via Claude API — glissez votre PDF médical",
     tip_tab_clip:"📋 Collez le texte copié d'un PDF ou document médical",
     tip_tab_manual:"✏️ Saisissez les valeurs manuellement : date, paramètre et valeur",
@@ -1775,10 +1793,19 @@ const T = {
     tip_farma:"⚠ Drug interactions based on official CIMA/AEMPS data sheets",
     tip_import:"📥 Import: automatic PDF (Claude API), clipboard or manual",
     tip_glosario:"❓ Trilingual medical glossary — 32 parameters explained",
+    who_accesses:"WHO IS ACCESSING?",
+    app_subtitle:"LONGITUDINAL MEDICAL TRACKING",
+    profile_medico:"Doctor", profile_medico_sub:"Full clinical view",
+    profile_paciente:"Patient", profile_paciente_sub:"Personal view",
+    profile_familia:"Family", profile_familia_sub:"Simplified view",
+    btn_nuevo_paciente:"+ New patient", btn_restaurar_mt:"📂 Restore .mt",
     tip_medico:"Full clinical view with pharmacovigilance and vascular analysis",
     tip_paciente:"Personal view with glossary and evolution charts",
     tip_familia:"Simplified view with plain language explanations",
     tip_backup_btn:"💾 Downloads all data as MediTrace-Patient-Date.mt file",
+    tip_radar:"🕸️ Overview — Biological parameters radar chart",
+    tip_meds:"💊 Complete medication history with periods and compliance",
+    tip_bact:"🦠 Culture results and antibiograms",
     tip_tab_leer:"🤖 Automatic extraction via Claude API — drag your medical PDF",
     tip_tab_clip:"📋 Paste text copied from a PDF or medical document",
     tip_tab_manual:"✏️ Enter values manually: date, parameter and value",
@@ -1786,7 +1813,7 @@ const T = {
 };
 
 /* ── FONCTION UNIFIÉE ── */
-let currentLang = localStorage.getItem('mt_lang') || localStorage.getItem('mt_landing_lang') || 'es';
+let currentLang = localStorage.getItem('mt_lang') || 'es';
 
 function updateTips() {
   document.querySelectorAll('[data-tip-key]').forEach(el => {
@@ -5800,7 +5827,7 @@ window.addEventListener('load', () => {
   /* Dédoublonner les données au chargement */
   deduplicateAll();
 
-  const savedLang = localStorage.getItem('mt_lang') || localStorage.getItem('mt_landing_lang') || 'es';
+  const savedLang = localStorage.getItem('mt_lang') || 'es';
   setLang(savedLang);
   fillParamSelect();
 
@@ -5816,7 +5843,8 @@ window.addEventListener('load', () => {
   updatePatientBadge();
   initProfile();
   initTips();
-  setLang(localStorage.getItem('mt_lang') || localStorage.getItem('mt_landing_lang') || 'es');
+  /* Appeler setLang APRÈS initProfile pour traduire le modal startup */
+  setLang(localStorage.getItem('mt_lang') || 'es');
   updateTips();
 
   /* Version avec date/heure */
