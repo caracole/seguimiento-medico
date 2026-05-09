@@ -517,17 +517,17 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
       <!-- Profil -->
       <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:12px;text-align:center">¿QUIÉN ACCEDE?</div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px" id="profil-btns">
-        <button onclick="setProfile('medico')" class="profil-btn" style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 8px;cursor:pointer;transition:all .2s;text-align:center">
+        <button onclick="setProfile('medico')" data-profile="medico" class="profil-btn" style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 8px;cursor:pointer;transition:all .2s;text-align:center">
           <div style="font-size:28px;margin-bottom:6px">👨‍⚕️</div>
           <div style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text)">Médico</div>
           <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px">Vista clínica completa</div>
         </button>
-        <button onclick="setProfile('paciente')" class="profil-btn" style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 8px;cursor:pointer;transition:all .2s;text-align:center">
+        <button onclick="setProfile('paciente')" data-profile="paciente" class="profil-btn" style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 8px;cursor:pointer;transition:all .2s;text-align:center">
           <div style="font-size:28px;margin-bottom:6px">🧑</div>
           <div style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text)">Paciente</div>
           <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px">Vista personal</div>
         </button>
-        <button onclick="setProfile('familia')" class="profil-btn" style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 8px;cursor:pointer;transition:all .2s;text-align:center">
+        <button onclick="setProfile('familia')" data-profile="familia" class="profil-btn" style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 8px;cursor:pointer;transition:all .2s;text-align:center">
           <div style="font-size:28px;margin-bottom:6px">👨‍👩‍👧</div>
           <div style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text)">Familia</div>
           <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px">Vista simplificada</div>
@@ -5195,7 +5195,7 @@ function showStartupModal() {
   document.querySelectorAll('.profil-btn').forEach(b => b.classList.remove('active'));
   const p = getProfile();
   if (p) {
-    const btn = document.querySelector('.profil-btn[onclick="setProfile('' + p + '')"]');
+    const btn = document.querySelector('[data-profile="' + p + '"]');
     if (btn) { btn.classList.add('active'); showPatientSection(); }
   }
 }
@@ -5208,7 +5208,7 @@ function hideStartupModal() {
 function setProfile(p) {
   saveProfile(p);
   document.querySelectorAll('.profil-btn').forEach(b => b.classList.remove('active'));
-  const btn = document.querySelector('.profil-btn[onclick="setProfile('' + p + '')"]');
+  const btn = document.querySelector('[data-profile="' + p + '"]');
   if (btn) btn.classList.add('active');
   showPatientSection();
 }
