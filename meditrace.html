@@ -417,6 +417,10 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 .profile-badge:hover { border-color: var(--accent); color: var(--accent); }
 
 /* ── TOOLTIPS ── */
+/* Désactiver les tooltips si préférence utilisateur */
+body.no-tips [data-tip]::after,
+body.no-tips [data-tip]::before { display: none !important; }
+
 [data-tip] { position: relative; }
 [data-tip]::after {
   content: attr(data-tip);
@@ -597,8 +601,14 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
         </div>
       </div>
 
-      <div style="text-align:center;margin-top:16px;font-family:var(--mono);font-size:9px;color:var(--muted)">
-        v2026.4 · GNU GPL v3 · <a href="https://caracole.github.io/seguimiento-medico/" target="_blank" style="color:var(--accent)">caracole.github.io</a>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding-top:12px;border-top:1px solid var(--border)">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-family:var(--mono);font-size:9px;color:var(--muted)">
+          <input type="checkbox" id="pref-tips" onchange="toggleTips(this.checked)" style="cursor:pointer;accent-color:var(--accent)"/>
+          💬 Mostrar ayuda contextual
+        </label>
+        <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">
+          v2026.4 · <a href="https://caracole.github.io/seguimiento-medico/" target="_blank" style="color:var(--accent)">GNU GPL v3</a>
+        </span>
       </div>
     </div>
   </div>
@@ -5641,6 +5651,12 @@ function updateProfileBadge() {
 function showStartupModal() {
   const modal = document.getElementById('startup-modal');
   if (modal) { modal.style.display = 'flex'; }
+  /* Sync checkbox with current preference */
+  const cb = document.getElementById('pref-tips');
+  if (cb) {
+    const saved = localStorage.getItem(PREF_TIPS_KEY);
+    cb.checked = saved === null ? true : saved === '1';
+  }
   // Reset profil buttons
   document.querySelectorAll('.profil-btn').forEach(b => b.classList.remove('active'));
   const p = getProfile();
@@ -5758,6 +5774,24 @@ function applyProfileView() {
 /* ================================================================
    INIT PROFIL — à appeler dans window.addEventListener('load')
 ================================================================ */
+/* ── PRÉFÉRENCES ── */
+const PREF_TIPS_KEY = 'mt_pref_tips';
+
+function toggleTips(show) {
+  localStorage.setItem(PREF_TIPS_KEY, show ? '1' : '0');
+  document.body.classList.toggle('no-tips', !show);
+}
+
+function initTips() {
+  /* Par défaut : activé */
+  const saved = localStorage.getItem(PREF_TIPS_KEY);
+  const show = saved === null ? true : saved === '1';
+  document.body.classList.toggle('no-tips', !show);
+  /* Mettre à jour la checkbox si le modal est visible */
+  const cb = document.getElementById('pref-tips');
+  if (cb) cb.checked = show;
+}
+
 function initProfile() {
   const p = getProfile();
   /* Si pas de profil — montrer le modal */
@@ -5830,6 +5864,7 @@ window.addEventListener('load', () => {
   updateDataSummary(data);
   updatePatientBadge();
   initProfile();
+  initTips();
   MT_setLangue((localStorage.getItem('mt_lang') || 'es').toUpperCase());
 
   /* Version avec date/heure */
