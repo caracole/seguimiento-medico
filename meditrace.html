@@ -1059,9 +1059,9 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 
   <!-- ══════ ONGLETS DES 3 VOLETS ══════ -->
   <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
-    <button class="btn primary" id="tab-auto" onclick="showImportTab('auto')" style="font-size:14px;padding:10px 20px" id="lbl-tab-leer">📷 Leer documento</button>
-    <button class="btn" id="tab-clipboard" onclick="showImportTab('clipboard')" style="font-size:14px;padding:10px 20px" id="lbl-tab-portapapeles">📋 Desde portapapeles</button>
-    <button class="btn" id="tab-manual" onclick="showImportTab('manual')" style="font-size:14px;padding:10px 20px" id="lbl-tab-manual">✏️ Entrada manual</button>
+    <button class="btn primary" id="lbl-tab-leer" data-tab="auto" onclick="showImportTab('auto')" style="font-size:14px;padding:10px 20px">📷 Leer documento</button>
+    <button class="btn" id="lbl-tab-portapapeles" data-tab="clipboard" onclick="showImportTab('clipboard')" style="font-size:14px;padding:10px 20px">📋 Desde portapapeles</button>
+    <button class="btn" id="lbl-tab-manual" data-tab="manual" onclick="showImportTab('manual')" style="font-size:14px;padding:10px 20px">✏️ Entrada manual</button>
   </div>
 
   <!-- ═══════════════════════════════════════════ -->
@@ -3016,9 +3016,11 @@ function buildSidebarItems() {
 function showImportTab(tab) {
   ['clipboard', 'auto', 'manual'].forEach(t => {
     const volet = document.getElementById('volet-' + t);
-    const btn = document.getElementById('tab-' + t);
+    /* Try both id formats for backward compat */
+    const btn = document.getElementById('tab-' + t) 
+             || document.querySelector('[data-tab="' + t + '"]');
     if (volet) volet.style.display = t === tab ? 'block' : 'none';
-    if (btn) { btn.classList.toggle('primary', t === tab); }
+    if (btn) { btn.classList.toggle('primary', t === tab); btn.classList.toggle('btn', true); }
   });
 }
 
