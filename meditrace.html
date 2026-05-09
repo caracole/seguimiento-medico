@@ -1334,6 +1334,8 @@ const LANG = {
     med_suspendido:"Suspendido", med_abandonado:"Abandonado", med_terminado:"Terminado",
     receta_publica:"Receta pública (financiada)", receta_privada:"Receta privada",
     receta_no_fin:"No financiado (paciente paga)", receta_hospital:"Dispensación hospitalaria",
+    tab_ant:"Antecedentes", tab_vasc:"🧠 Análisis Vascular", tab_corr:"📊 Correlaciones",
+    tab_obs:"Observancia", tab_meds:"Medicamentos", tab_radar:"Radar", tab_bacterio:"Bacteriología",
   },
   fr: {
     tab_resumen:"Résumé", tab_curvas:"Courbes", tab_tabla:"Tableau",
@@ -1388,6 +1390,8 @@ const LANG = {
     med_suspendido:"Suspendu", med_abandonado:"Abandonné", med_terminado:"Terminé",
     receta_publica:"Ordonnance publique (remboursée)", receta_privada:"Ordonnance privée",
     receta_no_fin:"Non remboursé (patient paie)", receta_hospital:"Dispensation hospitalière",
+    tab_ant:"Antécédents", tab_vasc:"🧠 Analyse Vasculaire", tab_corr:"📊 Corrélations",
+    tab_obs:"Observance", tab_meds:"Médicaments", tab_radar:"Radar", tab_bacterio:"Bactériologie",
   },
   en: {
     tab_resumen:"Summary", tab_curvas:"Charts", tab_tabla:"Table",
@@ -1442,6 +1446,8 @@ const LANG = {
     med_suspendido:"Suspended", med_abandonado:"Discontinued", med_terminado:"Completed",
     receta_publica:"Public prescription (covered)", receta_privada:"Private prescription",
     receta_no_fin:"Not covered (patient pays)", receta_hospital:"Hospital dispensation",
+    tab_ant:"Medical History", tab_vasc:"🧠 Vascular Analysis", tab_corr:"📊 Correlations",
+    tab_obs:"Compliance", tab_meds:"Medications", tab_radar:"Radar", tab_bacterio:"Bacteriology",
   }
 };
 let currentLang = 'es';
@@ -1453,7 +1459,9 @@ function setLang(l) {
     if (t[k]) el.innerHTML = t[k].replace(/\n/g,'<br>');
   });
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-  document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`).classList.add('active');
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  const activeBtn = document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`);
+  if (activeBtn) activeBtn.classList.add('active');
   localStorage.setItem('mt_lang', l);
   fillParamSelect();
   translatePanel(t);
