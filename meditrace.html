@@ -502,10 +502,8 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 <div class="main">
 
 <!-- ===== PANEL BIENVENIDA (sin datos) ===== -->
-<div id="panel-bienvenida" class="panel active">
-
-  <!-- MODAL DÉMARRAGE -->
-  <div id="startup-modal" style="position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)">
+<!-- MODAL DÉMARRAGE — outside panels so always visible -->
+<div id="startup-modal" style="position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)">
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:36px 40px;max-width:560px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.4)">
 
       <!-- Logo -->
@@ -558,7 +556,8 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
     </div>
   </div>
 
-  <!-- Fond vide -->
+<!-- panel-bienvenida — fond vide -->
+<div id="panel-bienvenida" class="panel active">
   <div class="empty-state" style="padding-top:120px">
     <span class="empty-icon">🏥</span>
     <div class="empty-title">MediTrace</div>
