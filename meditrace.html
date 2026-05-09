@@ -1280,7 +1280,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 ================================================================ */
 var MT_codelangue = "ES";
 var MT_langues = {};
-var MT_curlangue = {};
+var MT_curlangue = null; // will be set by MT_setLangue
 var MT_debugLG = false;
 
 /* TABLE DE RÉFÉRENCES — mot-clé → index numérique */
@@ -1583,6 +1583,9 @@ MT_langues["EN"] = {
   838:"DISCONTINUED", 839:"PRESCRIBED", 840:"SUSPENDED ✓", 841:"ACTIVE ✓", 842:"UNCERTAIN",
 };
 
+/* ── INITIALISATION ── */
+MT_curlangue = MT_langues["ES"]; // défaut ES au démarrage
+
 /* ── FONCTIONS DE TRADUCTION (fidèles à l'original) ── */
 function MT_translate(p, vars) {
   if (p === null || p === undefined) return '';
@@ -1590,15 +1593,16 @@ function MT_translate(p, vars) {
   var id = MT_base[w];
   var s = '';
   if (id === undefined) {
-    /* Clé inconnue — afficher en rouge (mode debug) ou retourner la clé */
     if (MT_debugLG) return '<b style="color:red">' + p + '</b>';
     return p;
   }
   if (MT_debugLG) s += '(' + id + ') {';
-  var m = MT_curlangue[id];
+  /* Safety: if MT_curlangue not yet initialized */
+  var curLang = MT_curlangue || MT_langues['ES'] || {};
+  var m = curLang[id];
   if (m === undefined) {
-    /* Traduction manquante — rouge + étoile */
-    m = (MT_langues["ES"][id] || p) + '<b style="color:orange">*</b>';
+    m = (MT_langues && MT_langues["ES"] && MT_langues["ES"][id]) ? MT_langues["ES"][id] : p;
+    if (MT_debugLG) m += '<b style="color:orange">*</b>';
   }
   /* Substitution variables {key} */
   if (vars) {
@@ -3468,11 +3472,11 @@ function exportPDF(mode) {
   }
 
   /* Build timeline */
-  let timelineHtml = isDetailed && events.length ? '<div class="section"><div class="section-title">' + MT_tr('timeline title') + ' (' + events.length + '</div>' +
+  let timelineHtml = isDetailed && events.length ? '<div class="section"><div class="section-title">' + MT_tr('timeline title') + ' (' + events.length + ')</div>' +
     [...events].reverse().map(ev => '<div class="tl-item"><div class="tl-dot ' + (ev.type||'laboratorio') + '"></div><div class="tl-content"><div class="tl-date">' + ev.date + ' \u00b7 ' + (ev.type||'').toUpperCase() + '</div><div class="tl-title">' + (ev.title||'') + '</div><div class="tl-text">' + (ev.text||'') + '</div></div></div>').join('') + '</div>' : '';
 
   /* Build bacterio */
-  let bacterioHtml = isDetailed && bacts.length ? '<div class="section"><div class="section-title">' + MT_tr('bacterio title') + ' (' + bacts.length + '</div>' +
+  let bacterioHtml = isDetailed && bacts.length ? '<div class="section"><div class="section-title">' + MT_tr('bacterio title') + ' (' + bacts.length + ')</div>' +
     bacts.map(b => {
       const isPos = b.germe && b.germe.toLowerCase() !== 'n\u00e9gatif' && b.germe.toLowerCase() !== 'negativo';
       return '<div class="alert ' + (isPos?'critical':'ok') + '"><div class="alert-title">' + (isPos?'\ud83d\udd34':'\ud83d\udfe2') + ' ' + (b.germe||'Resultado') + ' \u2014 ' + (b.prelevement||'') + ' ' + (b.quantite||'') + '</div>' +
@@ -3554,7 +3558,7 @@ function exportPDF(mode) {
     '</style></head><body><div class="page">' +
 
     '<div class="report-header"><div><div class="report-logo">Medi<span>Trace</span></div><div class="report-type">' + titleType + '</div></div>' +
-    '<div class="report-meta"><strong>Paciente:</strong> ' + patLabel + '<br><strong>' + MT_tr('generated') + ':</strong> ' + now + '<br><strong>Per\u00edodo:</strong> ' + dateRange + '<br><strong>' + MT_tr('data') + ':</strong> ' + data.length + ' fechas \u00b7 ' + events.length + ' eventos<br><strong>Autor:</strong> Pierre-Henri Giraud \u00d7 Claude (Anthropic)<br>DOI: 10.5281/zenodo.19973451<br><strong>' + MT_tr('warning doc') + '</strong></div></div>' +
+    '<div class="report-meta"><strong>Paciente:</strong> ' + patLabel + '<br><strong>' + MT_tr('generated') + ':</strong> ' + now + '<br><strong>Per\u00edodo:</strong> ' + dateRange + '<br><strong>' + MT_tr('data') + ':</strong> ' + data.length + ' fechas \u00b7 ' + events.length + ' eventos<br><strong>' + MT_tr('author') + ':</strong> Pierre-Henri Giraud \u00d7 Claude (Anthropic)<br>DOI: 10.5281/zenodo.19973451<br><strong>' + MT_tr('warning doc') + '</strong></div></div>' +
 
     '<div class="exec-summary"><div class="exec-title">' + MT_tr('anamnesis title') + '</div>' +
     '<div style="font-size:15px;line-height:1.8;color:#1a1a2e;text-align:justify">' +
