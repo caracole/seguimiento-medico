@@ -1342,6 +1342,50 @@ var MT_base = {
   "del confirm":        709,
   "data replaced warn": 710,
   "change patient":     711,
+  /* Informe PDF */
+  "informe detallado":  800,
+  "informe sintetico":  801,
+  "patient":            802,
+  "generated":          803,
+  "period":             804,
+  "data":               805,
+  "author":             806,
+  "warning doc":        807,
+  "anamnesis title":    808,
+  "vascular synthesis": 809,
+  "critical finding":   810,
+  "pharma title":       811,
+  "ecg pending":        812,
+  "dabigatran stopped": 813,
+  "pantoprazol b12":    814,
+  "tiotropio donepezil":815,
+  "donepezil memantine":816,
+  "observance title":   817,
+  "last values title":  818,
+  "synth table title":  819,
+  "timeline title":     820,
+  "bacterio title":     821,
+  "sources title":      822,
+  "charts title":       823,
+  "share title":        824,
+  "save pdf":           825,
+  "copy report":        826,
+  "send email":         827,
+  "out of range":       828,
+  "values out of range":829,
+  "footer info":        830,
+  "doc not medical":    831,
+  "doctor questions":   832,
+  "section":            833,
+  "date":               834,
+  "source":             835,
+  "status":             836,
+  "observation":        837,
+  "abandoned":          838,
+  "prescribed":         839,
+  "suspended ok":       840,
+  "active ok":          841,
+  "uncertain":          842,
 };
 
 /* ── ESPAÑOL (langue par défaut) ── */
@@ -1375,7 +1419,41 @@ MT_langues["ES"] = {
   709:"✕ Eliminar",
   710:"Los datos actuales serán reemplazados por el archivo importado.",
   711:"Cambiar de paciente",
+  /* Informe */
+  800:"INFORME DETALLADO DE SEGUIMIENTO MÉDICO",
+  801:"INFORME SINTÉTICO DE SEGUIMIENTO MÉDICO",
+  802:"Paciente", 803:"Generado", 804:"Período", 805:"Datos", 806:"Autor",
+  807:"⚠ Documento informativo — No diagnóstico",
+  808:"' + MT_tr('anamnesis title') + '",
+  809:"🧠 Análisis Vascular — Síntesis",
+  810:"🚨 HALLAZGO CRÍTICO — IRM Vascular ASCIRES 10/03/2026",
+  811:"⚠ Farmacovigilancia — CIMA/AEMPS",
+  812:"🚨 ECG PENDIENTE antes de Donepezilo",
+  813:"🚨 Dabigatrán ABANDONADO — Sin anticoagulación con ACI ocluida",
+  814:"⚠ Pantoprazol largo plazo → Déficit B12",
+  815:"⚠ Tiotropio + Donepezilo → Antagonismo anticolinérgico",
+  816:"✓ Donepezilo + Memantina — SEGURO",
+  817:"💊 Observancia terapéutica",
+  818:"📊 Últimos valores conocidos",
+  819:"📋 Tabla de síntesis cronológica",
+  820:"🕐 Cronología clínica",
+  821:"🦠 Bacteriología",
+  822:"🏥 Fuentes documentales",
+  823:"📈 Curvas de evolución — Parámetros significativos",
+  824:"' + MT_tr('share title') + '",
+  825:"Guardar como PDF",
+  826:MT_tr('copy report'),
+  827:"Enviar por Email",
+  828:"⚠ Fuera de rango",
+  829:"' + MT_tr('values out of range') + '",
+  830:"MediTrace v2026 — Informe — ",
+  831:"Documento informativo — No sustituye el criterio médico profesional.",
+  832:"Preguntas para el médico",
+  833:"Sección", 834:"Fecha", 835:"Fuente", 836:"Estado", 837:"Observación",
+  838:"ABANDONADO", 839:"PRESCRITO", 840:"SUSPENDIDO ✓", 841:"EN CURSO ✓", 842:"INCIERTO",
 };
+
+/* ── FRANÇAIS MT_langues ── */
 
 /* ── FRANÇAIS ── */
 MT_langues["FR"] = {
@@ -1408,6 +1486,37 @@ MT_langues["FR"] = {
   709:"✕ Supprimer",
   710:"Les données actuelles seront remplacées par le fichier importé.",
   711:"Changer de patient",
+  800:"RAPPORT DÉTAILLÉ DE SUIVI MÉDICAL",
+  801:"RAPPORT SYNTHÉTIQUE DE SUIVI MÉDICAL",
+  802:"Patient", 803:"Généré", 804:"Période", 805:"Données", 806:"Auteur",
+  807:"⚠ Document informatif — Non diagnostique",
+  808:"Anamnèse et Synthèse Clinique",
+  809:"🧠 Analyse Vasculaire — Synthèse",
+  810:"🚨 DÉCOUVERTE CRITIQUE — IRM Vasculaire ASCIRES 10/03/2026",
+  811:"⚠ Pharmacovigilance — CIMA/AEMPS",
+  812:"🚨 ECG EN ATTENTE avant Donépézil",
+  813:"🚨 Dabigatran ABANDONNÉ — Sans anticoagulation avec ACI occluse",
+  814:"⚠ Pantoprazol long terme → Déficit B12",
+  815:"⚠ Tiotropium + Donépézil → Antagonisme anticholinergique",
+  816:"✓ Donépézil + Mémantine — SÛR",
+  817:"💊 Observance thérapeutique",
+  818:"📊 Dernières valeurs connues",
+  819:"📋 Tableau de synthèse chronologique",
+  820:"🕐 Chronologie clinique",
+  821:"🦠 Bactériologie",
+  822:"🏥 Sources documentaires",
+  823:"📈 Courbes d'évolution — Paramètres significatifs",
+  824:"Partager ce rapport",
+  825:"Enregistrer en PDF",
+  826:"Copier le rapport",
+  827:"Envoyer par Email",
+  828:"⚠ Hors référence",
+  829:"⚠ VALEURS HORS RÉFÉRENCE",
+  830:"MediTrace v2026 — Rapport — ",
+  831:"Document informatif — Ne remplace pas l'avis médical professionnel.",
+  832:"Questions pour le médecin",
+  833:"Section", 834:"Date", 835:"Source", 836:"Statut", 837:"Observation",
+  838:"ABANDONNÉ", 839:"PRESCRIT", 840:"SUSPENDU ✓", 841:"EN COURS ✓", 842:"INCERTAIN",
 };
 
 /* ── ENGLISH ── */
@@ -1441,6 +1550,37 @@ MT_langues["EN"] = {
   709:"✕ Delete",
   710:"Current data will be replaced by the imported file.",
   711:"Change patient",
+  800:"DETAILED MEDICAL FOLLOW-UP REPORT",
+  801:"SUMMARY MEDICAL FOLLOW-UP REPORT",
+  802:"Patient", 803:"Generated", 804:"Period", 805:"Data", 806:"Author",
+  807:"⚠ Informational document — Not a diagnosis",
+  808:"Anamnesis and Clinical Summary",
+  809:"🧠 Vascular Analysis — Summary",
+  810:"🚨 CRITICAL FINDING — Vascular MRI ASCIRES 10/03/2026",
+  811:"⚠ Pharmacovigilance — CIMA/AEMPS",
+  812:"🚨 ECG PENDING before Donepezil",
+  813:"🚨 Dabigatran DISCONTINUED — No anticoagulation with occluded ICA",
+  814:"⚠ Long-term Pantoprazole → B12 deficiency",
+  815:"⚠ Tiotropium + Donepezil → Anticholinergic antagonism",
+  816:"✓ Donepezil + Memantine — SAFE",
+  817:"💊 Therapeutic compliance",
+  818:"📊 Latest known values",
+  819:"📋 Chronological synthesis table",
+  820:"🕐 Clinical timeline",
+  821:"🦠 Bacteriology",
+  822:"🏥 Documentary sources",
+  823:"📈 Evolution charts — Significant parameters",
+  824:"Share this report",
+  825:"Save as PDF",
+  826:"Copy report",
+  827:"Send by Email",
+  828:"⚠ Out of range",
+  829:"⚠ VALUES OUT OF RANGE",
+  830:"MediTrace v2026 — Report — ",
+  831:"Informational document — Does not replace professional medical advice.",
+  832:"Questions for the doctor",
+  833:"Section", 834:"Date", 835:"Source", 836:"Status", 837:"Note",
+  838:"DISCONTINUED", 839:"PRESCRIBED", 840:"SUSPENDED ✓", 841:"ACTIVE ✓", 842:"UNCERTAIN",
 };
 
 /* ── FONCTIONS DE TRADUCTION (fidèles à l'original) ── */
@@ -3274,7 +3414,7 @@ function exportPDF(mode) {
   const dateRange = data[0].date + ' \u2192 ' + data[data.length-1].date;
   const patLabel = getPatientLabel() || 'M.E.J.';
   const isDetailed = mode === 'detallado';
-  const titleType = isDetailed ? 'INFORME DETALLADO DE SEGUIMIENTO M\u00c9DICO' : 'INFORME SINT\u00c9TICO DE SEGUIMIENTO M\u00c9DICO';
+  const titleType = MT_tr(isDetailed ? 'informe detallado' : 'informe sintetico');
 
   /* Build exec summary alert list */
   let alertListHtml = alertParams.map(([k, info]) => {
@@ -3285,7 +3425,7 @@ function exportPDF(mode) {
   /* Build KPI cards */
   let kpiHtml = Object.entries(lastVals).filter(([k]) => PARAMS[k]).slice(0, isDetailed ? 16 : 8).map(([k, info]) => {
     const p = PARAMS[k]; const st = getStatus(k, info.v);
-    return '<div class="kpi-card ' + st + '"><div class="kpi-label">' + (p.label||k) + '</div><div class="kpi-value">' + info.v + ' <span class="kpi-unit">' + p.unit + '</span></div><div class="kpi-date">' + fmtDate(info.date) + '</div>' + (st==='bad' ? '<div class="kpi-bad">\u26a0 Fuera de rango</div>' : '') + '</div>';
+    return '<div class="kpi-card ' + st + '"><div class="kpi-label">' + (p.label||k) + '</div><div class="kpi-value">' + info.v + ' <span class="kpi-unit">' + p.unit + '</span></div><div class="kpi-date">' + fmtDate(info.date) + '</div>' + (st==='bad' ? '<div class="kpi-bad">' + MT_tr('out of range') + '</div>' : '') + '</div>';
   }).join('');
 
   /* Build synthesis table — dates décroissantes (plus récent en haut) */
@@ -3328,11 +3468,11 @@ function exportPDF(mode) {
   }
 
   /* Build timeline */
-  let timelineHtml = isDetailed && events.length ? '<div class="section"><div class="section-title">\ud83d\udd50 Cronolog\u00eda cl\u00ednica (' + events.length + ' eventos)</div>' +
+  let timelineHtml = isDetailed && events.length ? '<div class="section"><div class="section-title">' + MT_tr('timeline title') + ' (' + events.length + '</div>' +
     [...events].reverse().map(ev => '<div class="tl-item"><div class="tl-dot ' + (ev.type||'laboratorio') + '"></div><div class="tl-content"><div class="tl-date">' + ev.date + ' \u00b7 ' + (ev.type||'').toUpperCase() + '</div><div class="tl-title">' + (ev.title||'') + '</div><div class="tl-text">' + (ev.text||'') + '</div></div></div>').join('') + '</div>' : '';
 
   /* Build bacterio */
-  let bacterioHtml = isDetailed && bacts.length ? '<div class="section"><div class="section-title">\ud83e\udda0 Bacteriolog\u00eda (' + bacts.length + ' cultivo(s))</div>' +
+  let bacterioHtml = isDetailed && bacts.length ? '<div class="section"><div class="section-title">' + MT_tr('bacterio title') + ' (' + bacts.length + '</div>' +
     bacts.map(b => {
       const isPos = b.germe && b.germe.toLowerCase() !== 'n\u00e9gatif' && b.germe.toLowerCase() !== 'negativo';
       return '<div class="alert ' + (isPos?'critical':'ok') + '"><div class="alert-title">' + (isPos?'\ud83d\udd34':'\ud83d\udfe2') + ' ' + (b.germe||'Resultado') + ' \u2014 ' + (b.prelevement||'') + ' ' + (b.quantite||'') + '</div>' +
@@ -3347,7 +3487,7 @@ function exportPDF(mode) {
     var allSources = new Set();
     data.forEach(function(m) { if (m.src) allSources.add(m.src); });
     events.forEach(function(e) { if (e.src) allSources.add(e.src); });
-    var sourcesHtml = isDetailed && allSources.size > 0 ? '<div class="section"><div class="section-title">\ud83c\udfe5 Fuentes documentales</div>' +
+    var sourcesHtml = isDetailed && allSources.size > 0 ? '<div class="section"><div class="section-title">' + MT_tr('sources title') + '</div>' +
       '<table><thead><tr><th>N\u00ba</th><th>Fuente / Establecimiento</th><th>Documentos</th></tr></thead><tbody>' +
       Array.from(allSources).sort().map(function(src, i) {
         var count = data.filter(function(d) { return d.src === src; }).length + events.filter(function(e) { return e.src === src; }).length;
@@ -3359,11 +3499,11 @@ function exportPDF(mode) {
   var shareSubject = 'MediTrace \u2014 Informe ' + shareType + ' \u2014 ' + patLabel;
   var shareBarHtml =
     '<div style="text-align:center;margin:16px 0;padding:14px;background:#f0f5fa;border:1px solid #cce;border-radius:8px" class="share-bar">' +
-    '<div style="font-size:15px;font-weight:700;color:#1a5276;margin-bottom:10px">Compartir este informe</div>' +
+    '<div style="font-size:15px;font-weight:700;color:#1a5276;margin-bottom:10px">' + MT_tr('share title') + '</div>' +
     '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">' +
-    '<button onclick="window.print()" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#1a5276;border:none;cursor:pointer">Guardar como PDF</button>' +
-    '<button onclick="copiarInforme()" id="btn-copiar" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#2ecc71;border:none;cursor:pointer">Copiar informe</button>' +
-    '<a style="display:inline-block;padding:10px 20px;border-radius:6px;text-decoration:none;font-size:14px;font-weight:600;color:white;background:#0088cc" href="mailto:?subject=' + encodeURIComponent(shareSubject) + '&body=Estimado%2Fa%20Doctor%2Fa%2C%0D%0A%0D%0AAdjunto%20el%20informe%20de%20seguimiento%20m%C3%A9dico%20(' + encodeURIComponent(shareType) + ')%20del%20paciente%20' + encodeURIComponent(patLabel) + '.%0D%0A%0D%0AQuedo%20a%20su%20disposici%C3%B3n.%0D%0A%0D%0AAtentamente%0D%0APierre-Henri%20Giraud">Enviar por Email</a>' +
+    '<button onclick="window.print()" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#1a5276;border:none;cursor:pointer">' + MT_tr('save pdf') + '</button>' +
+    '<button onclick="copiarInforme()" id="btn-copiar" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#2ecc71;border:none;cursor:pointer">' + MT_tr('copy report') + '</button>' +
+    '<a style="display:inline-block;padding:10px 20px;border-radius:6px;text-decoration:none;font-size:14px;font-weight:600;color:white;background:#0088cc" href="mailto:?subject=' + encodeURIComponent(shareSubject) + '&body=Estimado%2Fa%20Doctor%2Fa%2C%0D%0A%0D%0AAdjunto%20el%20informe%20de%20seguimiento%20m%C3%A9dico%20(' + encodeURIComponent(shareType) + ')%20del%20paciente%20' + encodeURIComponent(patLabel) + '.%0D%0A%0D%0AQuedo%20a%20su%20disposici%C3%B3n.%0D%0A%0D%0AAtentamente%0D%0APierre-Henri%20Giraud">' + MT_tr('send email') + '</a>' +
     '</div>' +
     '<div id="copiar-feedback" style="font-size:12px;color:#2ecc71;margin-top:8px;min-height:20px"></div>' +
     '</div>';
@@ -3414,9 +3554,9 @@ function exportPDF(mode) {
     '</style></head><body><div class="page">' +
 
     '<div class="report-header"><div><div class="report-logo">Medi<span>Trace</span></div><div class="report-type">' + titleType + '</div></div>' +
-    '<div class="report-meta"><strong>Paciente:</strong> ' + patLabel + '<br><strong>Generado:</strong> ' + now + '<br><strong>Per\u00edodo:</strong> ' + dateRange + '<br><strong>Datos:</strong> ' + data.length + ' fechas \u00b7 ' + events.length + ' eventos<br><strong>Autor:</strong> Pierre-Henri Giraud \u00d7 Claude (Anthropic)<br>DOI: 10.5281/zenodo.19973451<br><strong>\u26a0 Documento informativo \u2014 No diagn\u00f3stico</strong></div></div>' +
+    '<div class="report-meta"><strong>Paciente:</strong> ' + patLabel + '<br><strong>' + MT_tr('generated') + ':</strong> ' + now + '<br><strong>Per\u00edodo:</strong> ' + dateRange + '<br><strong>' + MT_tr('data') + ':</strong> ' + data.length + ' fechas \u00b7 ' + events.length + ' eventos<br><strong>Autor:</strong> Pierre-Henri Giraud \u00d7 Claude (Anthropic)<br>DOI: 10.5281/zenodo.19973451<br><strong>' + MT_tr('warning doc') + '</strong></div></div>' +
 
-    '<div class="exec-summary"><div class="exec-title">Anamnesis y Síntesis Clínica</div>' +
+    '<div class="exec-summary"><div class="exec-title">' + MT_tr('anamnesis title') + '</div>' +
     '<div style="font-size:15px;line-height:1.8;color:#1a1a2e;text-align:justify">' +
     'Paciente <strong>' + patLabel + '</strong>, mujer de 87 años, con antecedentes de tromboembolismo pulmonar bilateral recurrente (2016, 2022), ' +
     'ictus vertebrobasilar (septiembre 2021, diagnóstico tardío 27h), deterioro cognitivo progresivo (MMSE: 25→22→16 entre 2021-2024), ' +
@@ -3428,21 +3568,21 @@ function exportPDF(mode) {
     'Donepezilo prescrito, no iniciado (pendiente ECG 03/2026). Haloperidol suspendido (QTc). Hidroferol mensual en curso. ' +
     'Déficit crónico vitamina D (27→12 ng/mL). LDL 202 mg/dL.' +
     '</div>' +
-    (alertParams.length ? '<div style="margin-top:14px;padding-top:12px;border-top:1px solid #cce"><div style="font-size:15px;font-weight:700;color:#c0392b;margin-bottom:8px">⚠ VALORES FUERA DE RANGO (' + alertParams.length + ')</div>' + alertListHtml + '</div>' : '') +
+    (alertParams.length ? '<div style="margin-top:14px;padding-top:12px;border-top:1px solid #cce"><div style="font-size:15px;font-weight:700;color:#c0392b;margin-bottom:8px">' + MT_tr('values out of range') + ' (' + alertParams.length + ')</div>' + alertListHtml + '</div>' : '') +
     '</div>' +
 
-    (isDetailed ? '<div class="section"><div class="section-title">\ud83e\udde0 An\u00e1lisis Vascular \u2014 S\u00edntesis</div><div class="alert critical"><div class="alert-title">\ud83d\udea8 HALLAZGO CR\u00cdTICO \u2014 IRM Vascular ASCIRES 10/03/2026</div>Obstrucci\u00f3n completa arteria car\u00f3tida interna izquierda. Leucoaraiosis Fazekas II-III.</div><table><thead><tr><th>Fecha</th><th>Exploraci\u00f3n</th><th>Hallazgo clave</th></tr></thead><tbody><tr><td>11/2016</td><td>TEP bilateral</td><td>HTpulmonar PAPs 55-60mmHg</td></tr><tr><td>09/2021</td><td>Ictus VB</td><td class="val-bad">Diagn\u00f3stico tard\u00edo 27h</td></tr><tr><td>12/2021</td><td>PET/CT FDG</td><td class="val-bad">Hipometabolismo frontal IZQ</td></tr><tr><td>01/2022</td><td>2\u00ba TEP agudo</td><td class="val-bad">Troponina 76.68</td></tr><tr><td>03/2026</td><td>IRM Vascular</td><td class="val-bad">Oclusi\u00f3n COMPLETA ACI izq</td></tr></tbody></table><div class="alert warn"><div class="alert-title">\u2753 Preguntas para el m\u00e9dico</div>1. \u00bfFue el ictus de 09/2021 el evento oclusivo inicial?<br>2. \u00bfDeterioro cognitivo vascular (DFT) vs Alzheimer?<br>3. \u00bfRiesgo del abandono anticoagulante con ACI ocluida?</div></div>' +
-    '<div class="section"><div class="section-title">\u26a0 Farmacovigilancia \u2014 CIMA/AEMPS</div><div class="alert critical"><div class="alert-title">\ud83d\udea8 ECG PENDIENTE antes de Donepezilo</div>Haloperidol suspendido (QTc). ECG prescrito 03/2026 a\u00fan no realizado.</div><div class="alert critical"><div class="alert-title">\ud83d\udea8 Dabigatr\u00e1n ABANDONADO</div>Sin anticoagulaci\u00f3n con ACI ocluida. Riesgo tromb\u00f3tico elevado.</div><div class="alert warn"><div class="alert-title">\u26a0 Pantoprazol largo plazo \u2192 D\u00e9ficit B12</div>B12=152 pg/mL (2022). Riesgo hipomagnesemia.</div><div class="alert warn"><div class="alert-title">\u26a0 Tiotropio + Donepezilo \u2192 Antagonismo</div>Revisar necesidad de ambos.</div><div class="alert ok"><div class="alert-title">\u2713 Donepezilo + Memantina \u2014 SEGURO</div>Sin interacciones relevantes.</div></div>' +
-    '<div class="section"><div class="section-title">\ud83d\udc8a Observancia terap\u00e9utica</div><table><thead><tr><th>Medicamento</th><th>Estado</th><th>Observaci\u00f3n</th></tr></thead><tbody><tr><td><strong>Dabigatr\u00e1n</strong></td><td style="color:#c0392b;font-weight:700">ABANDONADO</td><td>Decisi\u00f3n familiar 02/2025</td></tr><tr><td><strong>Donepezilo</strong></td><td style="color:#d68910;font-weight:700">PRESCRITO</td><td>Pendiente ECG</td></tr><tr><td><strong>Haloperidol</strong></td><td style="color:#1e8449;font-weight:700">SUSPENDIDO \u2713</td><td>Correcto (QTc)</td></tr><tr><td><strong>Hidroferol</strong></td><td style="color:#1e8449;font-weight:700">EN CURSO \u2713</td><td>Mensual</td></tr><tr><td><strong>Atorvastatina</strong></td><td style="color:#d68910;font-weight:700">INCIERTO</td><td>LDL 202 mg/dL</td></tr></tbody></table></div>' : '') +
+    (isDetailed ? '<div class="section"><div class="section-title">\ud83e\udde0 An\u00e1lisis Vascular \u2014 S\u00edntesis</div><div class="alert critical"><div class="alert-title">\ud83d\udea8 HALLAZGO CR\u00cdTICO \u2014 IRM Vascular ASCIRES 10/03/2026</div>Obstrucci\u00f3n completa arteria car\u00f3tida interna izquierda. Leucoaraiosis Fazekas II-III.</div><table><thead><tr><th>Fecha</th><th>Exploraci\u00f3n</th><th>Hallazgo clave</th></tr></thead><tbody><tr><td>11/2016</td><td>TEP bilateral</td><td>HTpulmonar PAPs 55-60mmHg</td></tr><tr><td>09/2021</td><td>Ictus VB</td><td class="val-bad">Diagn\u00f3stico tard\u00edo 27h</td></tr><tr><td>12/2021</td><td>PET/CT FDG</td><td class="val-bad">Hipometabolismo frontal IZQ</td></tr><tr><td>01/2022</td><td>2\u00ba TEP agudo</td><td class="val-bad">Troponina 76.68</td></tr><tr><td>03/2026</td><td>IRM Vascular</td><td class="val-bad">Oclusi\u00f3n COMPLETA ACI izq</td></tr></tbody></table><div class="alert warn"><div class="alert-title">❓ ' + MT_tr('doctor questions') + '</div>1. \u00bfFue el ictus de 09/2021 el evento oclusivo inicial?<br>2. \u00bfDeterioro cognitivo vascular (DFT) vs Alzheimer?<br>3. \u00bfRiesgo del abandono anticoagulante con ACI ocluida?</div></div>' +
+    '<div class="section"><div class="section-title">\u26a0 Farmacovigilancia \u2014 CIMA/AEMPS</div><div class="alert critical"><div class="alert-title">\ud83d\udea8 ECG PENDIENTE antes de Donepezilo</div>Haloperidol suspendido (QTc). ECG prescrito 03/2026 a\u00fan no realizado.</div><div class="alert critical"><div class="alert-title">\ud83d\udea8 Dabigatr\u00e1n ABANDONADO</div>Sin anticoagulaci\u00f3n con ACI ocluida. Riesgo tromb\u00f3tico elevado.</div><div class="alert warn"><div class="alert-title">\u26a0 Pantoprazol largo plazo \u2192 D\u00e9ficit B12</div>B12=152 pg/mL (2022). Riesgo hipomagnesemia.</div><div class="alert warn"><div class="alert-title">\u26a0 Tiotropio + Donepezilo \u2192 Antagonismo</div>Revisar necesidad de ambos.</div><div class="alert ok"><div class="alert-title">' + MT_tr('donepezil memantine') + '</div>Sin interacciones relevantes.</div></div>' +
+    '<div class="section"><div class="section-title">\ud83d\udc8a Observancia terap\u00e9utica</div><table><thead><tr><th>Medicamento</th><th>' + MT_tr('status') + '</th><th>' + MT_tr('observation') + '</th></tr></thead><tbody><tr><td><strong>Dabigatr\u00e1n</strong></td><td style="color:#c0392b;font-weight:700">ABANDONADO</td><td>Decisi\u00f3n familiar 02/2025</td></tr><tr><td><strong>Donepezilo</strong></td><td style="color:#d68910;font-weight:700">PRESCRITO</td><td>Pendiente ECG</td></tr><tr><td><strong>Haloperidol</strong></td><td style="color:#1e8449;font-weight:700">SUSPENDIDO \u2713</td><td>Correcto (QTc)</td></tr><tr><td><strong>Hidroferol</strong></td><td style="color:#1e8449;font-weight:700">EN CURSO \u2713</td><td>Mensual</td></tr><tr><td><strong>Atorvastatina</strong></td><td style="color:#d68910;font-weight:700">INCIERTO</td><td>LDL 202 mg/dL</td></tr></tbody></table></div>' : '') +
 
-    '<div class="section"><div class="section-title">\ud83d\udcca \u00daltimos valores conocidos</div><div class="kpi-grid">' + kpiHtml + '</div></div>' +
+    '<div class="section"><div class="section-title">' + MT_tr('last values title') + '</div><div class="kpi-grid">' + kpiHtml + '</div></div>' +
 
-    '<div class="section"><div class="section-title">\ud83d\udccb Tabla de s\u00edntesis cronol\u00f3gica</div><table><thead><tr><th>Fecha</th><th>Fuente</th><th>Hb</th><th>Leuc.</th><th>Gluc.</th><th>Creat.</th><th>FG</th><th>Colest.</th><th>PCR</th><th>TSH</th><th>VitD</th></tr></thead><tbody>' + tableRowsDesc + '</tbody></table></div>' +
+    '<div class="section"><div class="section-title">\ud83d\udccb Tabla de s\u00edntesis cronol\u00f3gica</div><table><thead><tr><th>' + MT_tr('date') + '</th><th>' + MT_tr('source') + '</th><th>Hb</th><th>Leuc.</th><th>Gluc.</th><th>Creat.</th><th>FG</th><th>Colest.</th><th>PCR</th><th>TSH</th><th>VitD</th></tr></thead><tbody>' + tableRowsDesc + '</tbody></table></div>' +
 
     timelineHtml + bacterioHtml + sourcesHtml + chartsHtml +
 
     shareBarHtml +
-    '<div class="report-footer"><span>MediTrace v2026.4 \u2014 ' + (isDetailed ? 'INFORME DETALLADO' : 'INFORME SINT\u00c9TICO') + ' \u2014 ' + patLabel + '</span><span>Documento informativo \u2014 No sustituye el criterio m\u00e9dico profesional.</span></div>' +
+    '<div class="report-footer"><span>MediTrace v2026.4 \u2014 ' + titleType + ' \u2014 ' + patLabel + '</span><span>' + MT_tr('doc not medical') + '</span></div>' +
     '</div>' +
     '<scr' + 'ipt>' +
     'function copiarInforme() {' +'  var c = document.querySelector(".page");' +'  if (c) {' +'    navigator.clipboard.writeText(c.innerText).then(function() {' +'      var btn = document.getElementById("btn-copiar");' +'      btn.textContent = "Copiado!"; btn.style.background = "#27ae60";' +'      var fb = document.getElementById("copiar-feedback");' +'      if (fb) fb.textContent = "Informe copiado al portapapeles";' +'      setTimeout(function() { btn.textContent = "Copiar informe"; btn.style.background = "#2ecc71"; if(fb) fb.textContent=""; }, 3000);' +'    });' +'  }' +'}' +
@@ -3471,7 +3611,7 @@ function exportPDF(mode) {
     '<\\/scr' + 'ipt>' +
     '</body></html>';
 
-  const filename = 'MediTrace_' + (isDetailed ? 'Detallado' : 'Sintetico') + '_' + patLabel.replace(/[^a-zA-Z0-9]/g,'_') + '_' + new Date().toISOString().slice(0,10);
+  const filename = 'MediTrace_' + (isDetailed ? 'Detallado' : 'Sintetico') /* keep EN for filename */ + '_' + patLabel.replace(/[^a-zA-Z0-9]/g,'_') + '_' + new Date().toISOString().slice(0,10);
   const win = window.open('', '_blank');
   win.document.open(); win.document.write(html); win.document.close();
   win.document.title = filename; win.focus();
