@@ -1026,8 +1026,8 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <!-- ══════ RÉSUMÉ DES DONNÉES EN MÉMOIRE ══════ -->
   <div style="background:var(--surface);border:2px solid var(--accent);border-radius:var(--radius);padding:16px 20px;margin-bottom:24px">
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
-      <div style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent);letter-spacing:2px;text-transform:uppercase">" id="lbl-datos-memoria">📊 DATOS EN MEMORIA</div>
-      <button class="btn primary" onclick="exportData()" style="font-size:13px;padding:8px 16px">" id="lbl-guardar-backup">💾 Guardar backup (.mt)</button>
+      <div id="lbl-datos-memoria" style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent);letter-spacing:2px;text-transform:uppercase">📊 DATOS EN MEMORIA</div>
+      <button id="lbl-guardar-backup" class="btn primary" onclick="exportData()" style="font-size:13px;padding:8px 16px">💾 Guardar backup (.mt)</button>
     </div>
     <div id="data-summary" style="font-family:var(--mono);font-size:14px;color:var(--text);margin-top:10px;line-height:2"></div>
 
@@ -2338,7 +2338,7 @@ Retourne UNIQUEMENT le JSON, sans markdown, sans backticks, sans commentaire.`;
 ================================================================ */
 async function extractPdf(file) {
   const apiKey = localStorage.getItem('mt_apikey') || document.getElementById('api-key-input').value;
-  if (!apiKey) { alert(LANG[currentLang].no_key); return; }
+  if (!apiKey) { customAlert('API Key requerida', LANG[currentLang].no_key, '🔑', 'var(--warn)'); return; }
 
   const pb = document.getElementById('progress-box');
   const pbar = document.getElementById('progress-bar');
@@ -2551,10 +2551,10 @@ function addManual() {
   /* Si "nouveau paramètre" sélectionné, enregistrer d'abord */
   if (key === '__NEW__') {
     key = registerCustomParam();
-    if (!key) { alert('Indica el nombre del nuevo parámetro'); return; }
+    if (!key) { customAlert('Campo requerido', 'Indica el nombre del nuevo parámetro.', '⚠️', 'var(--warn)'); return; }
   }
 
-  if (!date || !key || isNaN(val)) { alert('Rellena todos los campos'); return; }
+  if (!date || !key || isNaN(val)) { customAlert('Campos incompletos', 'Rellena fecha, parámetro y valor antes de añadir.', '⚠️', 'var(--warn)'); return; }
 
   /* Sauvegarder la source pour réutilisation */
   addCustomSource(src);
@@ -2588,7 +2588,7 @@ function addManual() {
 function addEvent() {
   const date  = document.getElementById('m-date').value;
   const src   = getSelectedSource() || 'Manuel';
-  if (!date) { alert('Indica la fecha'); return; }
+  if (!date) { customAlert('Fecha requerida', 'Indica la fecha del evento clínico.', '📅', 'var(--warn)'); return; }
   const title = prompt('Título del evento clínico:');
   if (!title) return;
   const text  = prompt('Descripción breve (opcional):') || '';
@@ -2600,7 +2600,7 @@ function addEvent() {
   saveEvents(evts);
   fillSourceList();
   document.getElementById('m-source-select').value = src;
-  alert('✓ Evento añadido');
+  customAlert('Evento añadido', '✓ El evento clínico se ha guardado correctamente.', '✅', 'var(--accent2)');
 }
 
 function updateDataSummary(data) {
@@ -2632,7 +2632,7 @@ function exportData() {
   const meds   = loadMeds();
   const bacts  = loadBacterio();
   const label  = getPatientLabel();
-  if (!data.length && !events.length && !meds.length) { alert('No hay datos que exportar.'); return; }
+  if (!data.length && !events.length && !meds.length) { customAlert('Sin datos', 'No hay datos que exportar. Carga primero un archivo o añade datos manualmente.', '📂', 'var(--muted)'); return; }
   const payload = {
     version: "MediTrace-2026",
     exported: new Date().toISOString(),
@@ -2660,10 +2660,18 @@ function importData(input) {
   const file = input.files[0];
   if (!file) return;
   const hasData = loadData().length || loadEvents().length || loadMeds().length;
-  if (hasData && !confirm('Datos del paciente actual serán reemplazados. ¿Continuar?\n(Antes: usa 💾 Backup .mt para guardarlos)')) {
-    input.value = '';
+  if (hasData) {
+    customConfirm('⚠️ Datos existentes',
+      'Los datos del paciente actual serán reemplazados por el archivo importado.<br><br>Se recomienda hacer un <strong>💾 Backup .mt</strong> antes de continuar.',
+      function() { _doImport(file, input); }
+    );
     return;
   }
+  /* No data — import directly */
+  _doImport(file, input);
+}
+
+function _doImport(file, input) {
   const reader = new FileReader();
   reader.onload = e => {
     try {
@@ -2679,12 +2687,13 @@ function importData(input) {
           if (parsed.custom_params)  { saveCustomParams(parsed.custom_params); Object.entries(parsed.custom_params).forEach(([k,p]) => { PARAMS[k] = p; }); }
           if (parsed.custom_sources) saveCustomSources(parsed.custom_sources);
           if (parsed.patient_label) setPatientLabel(parsed.patient_label);
-          alert('✓ ' + parsed.mesures.length + ' mediciones + '
-                     + (parsed.events?.length||0) + ' eventos + '
-                     + (parsed.medicaments?.length||0) + ' medicamentos + '
-                     + (parsed.bacteriologie?.length||0) + ' bactériologies restaurados'
-                     + (parsed.patient_label ? '\nPaciente: ' + parsed.patient_label : ''));
-        } else { alert('Format non reconnu.'); return; }
+          customAlert('✅ Datos restaurados',
+            '<strong>' + parsed.mesures.length + '</strong> mediciones<br>'
+            + '<strong>' + (parsed.events?.length||0) + '</strong> eventos clínicos<br>'
+            + '<strong>' + (parsed.medicaments?.length||0) + '</strong> medicamentos<br>'
+            + (parsed.patient_label ? '<br>👤 Paciente: <strong>' + parsed.patient_label + '</strong>' : ''),
+            '✅', 'var(--accent2)');
+        } else { customAlert('Formato no reconocido', 'El archivo no es un backup MediTrace válido (.mt o .json).', '❌', 'var(--danger)'); return; }
       } else {
         const match   = text.match(/(?:const|let|var)\s+data\s*=\s*(\[[\s\S]*?\])\s*;/);
         const matchEv = text.match(/(?:const|let|var)\s+events\s*=\s*(\[[\s\S]*?\])\s*;/);
@@ -2692,12 +2701,14 @@ function importData(input) {
           const data = JSON.parse(match[1]);
           saveData(data);
           if (matchEv) saveEvents(JSON.parse(matchEv[1]));
-          alert('✓ ' + data.length + ' entrées restaurées !');
-        } else { alert('Format non reconnu.'); return; }
+          customAlert('✅ Datos restaurados',
+            '<strong>' + data.length + '</strong> entradas restauradas correctamente.',
+            '✅', 'var(--accent2)');
+        } else { customAlert('Formato no reconocido', 'El archivo no es un backup MediTrace válido (.mt o .json).', '❌', 'var(--danger)'); return; }
       }
       showMainNav();
       window.location.href = window.location.href.split('?')[0];
-    } catch(err) { alert('Erreur : ' + err.message); }
+    } catch(err) { customAlert('Error', err.message, '❌', 'var(--danger)'); }
   };
   reader.readAsText(file);
   input.value = '';
@@ -3023,7 +3034,7 @@ function exportPDF(mode) {
   const events = loadEvents();
   const meds   = loadMeds();
   const bacts  = loadBacterio();
-  if (!data.length) { alert('No hay datos que exportar.'); return; }
+  if (!data.length) { customAlert('Sin datos', 'No hay datos que exportar. Carga primero un archivo o añade datos manualmente.', '📂', 'var(--muted)'); return; }
 
   const lastVals = {};
   data.forEach(m => Object.entries(m.vals).forEach(([k,v]) => {
@@ -3255,6 +3266,27 @@ function customConfirm(title, message, onOk) {
   bo.onclick = function() { document.body.removeChild(ov); if (onOk) onOk(); };
   bc.onclick = function() { document.body.removeChild(ov); };
   ov.onclick = function(e) { if (e.target === ov) document.body.removeChild(ov); };
+}
+
+function customAlert(title, message, icon='ℹ️', color='var(--accent)') {
+  var ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:6000;background:rgba(0,0,0,0.55);display:flex;justify-content:center;align-items:center;backdrop-filter:blur(4px)';
+  var bx = document.createElement('div');
+  bx.style.cssText = 'background:var(--surface);border:2px solid ' + color + ';border-radius:14px;padding:28px 32px;width:90%;max-width:420px;text-align:center;box-shadow:0 16px 48px rgba(0,0,0,0.4)';
+  bx.innerHTML = '<div style="font-size:36px;margin-bottom:12px">' + icon + '</div>'
+    + '<div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:10px">' + title + '</div>'
+    + '<div style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.7;text-align:left">' + message + '</div>';
+  var bo = document.createElement('button');
+  bo.textContent = 'OK';
+  bo.className = 'btn primary';
+  bo.style.cssText = 'font-size:14px;padding:10px 32px;width:100%';
+  bx.appendChild(bo);
+  ov.appendChild(bx);
+  document.body.appendChild(ov);
+  bo.onclick = function() { document.body.removeChild(ov); };
+  ov.onclick = function(e) { if (e.target === ov) document.body.removeChild(ov); };
+  /* Auto-focus OK */
+  setTimeout(() => bo.focus(), 50);
 }
 
 function confirmReset() {
@@ -5247,7 +5279,11 @@ function loadPatient(label) {
   /* Sinon demander de sauvegarder d'abord */
   const data = loadData();
   if (data.length > 0) {
-    if (!confirm('Cambiar de paciente. ¿Guardar backup del paciente actual antes?')) return;
+    customConfirm('Cambiar de paciente',
+      'Los datos actuales se guardarán en backup antes de cambiar de paciente.',
+      function() { exportData(); setTimeout(() => { _loadPatientAfterSave(label); }, 800); }
+    );
+    return;
     exportData();
     setTimeout(() => {
       _loadPatientAfterSave(label);
