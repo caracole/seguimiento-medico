@@ -415,6 +415,60 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   cursor: pointer; white-space: nowrap;
 }
 .profile-badge:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── TOOLTIPS ── */
+[data-tip] { position: relative; }
+[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(14,17,23,0.96);
+  color: #e0e4ef;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.5;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  white-space: nowrap;
+  max-width: 260px;
+  white-space: normal;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .15s;
+  z-index: 9000;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+[data-tip]:hover::after { opacity: 1; }
+/* Tooltip vers le bas pour topbar */
+.topbar [data-tip]::after {
+  bottom: auto;
+  top: calc(100% + 8px);
+}
+/* Flèche */
+[data-tip]::before {
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--border);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .15s;
+  z-index: 9001;
+}
+[data-tip]:hover::before { opacity: 1; }
+.topbar [data-tip]::before {
+  bottom: auto;
+  top: calc(100% + 2px);
+  border-top-color: transparent;
+  border-bottom-color: var(--border);
+}
 </style>
 </head>
 <body>
@@ -429,9 +483,9 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
     <span id="patient-badge" style="display:none;padding:4px 10px;background:rgba(74,143,232,0.2);border:1px solid var(--accent);border-radius:6px;font-size:13px"></span>
   </div>
   <div style="display:flex;align-items:center;gap:6px">
-    <button id="profile-badge-btn" class="profile-badge" onclick="showStartupModal()" title="Cambiar perfil">👤 —</button>
-    <button class="btn-topbar" onclick="toggleTheme()" id="theme-btn" title="Cambiar tema">☀️</button>
-    <button class="lang-btn active" onclick="setLang('es')">ES</button>
+    <button id="profile-badge-btn" class="profile-badge" onclick="showStartupModal()" data-tip="👤 Cambiar perfil (Médico / Paciente / Familia) o seleccionar paciente" title="Cambiar perfil">👤 —</button>
+    <button class="btn-topbar" onclick="toggleTheme()" data-tip="☀️ Cambiar entre tema claro y oscuro" id="theme-btn" title="Cambiar tema">☀️</button>
+    <button class="lang-btn active" onclick="setLang('es')" data-tip="Cambiar idioma a Español">ES</button>
     <button class="lang-btn" onclick="setLang('fr')">FR</button>
     <button class="lang-btn" onclick="setLang('en')">EN</button>
   </div>
@@ -439,30 +493,30 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 
 <!-- TOP BAR — Ligne 2: Actions -->
 <div class="topbar-actions">
-  <button class="btn-topbar" onclick="nuevoPaciente()" title="Cambiar de paciente" style="color:#e8a44a;border-color:#e8a44a">👥 Nuevo Paciente</button>
+  <button class="btn-topbar" onclick="nuevoPaciente()" data-tip="👤 Guardar el paciente actual y crear uno nuevo" title="Cambiar de paciente" style="color:#e8a44a;border-color:#e8a44a">👥 Nuevo Paciente</button>
   <button class="btn-topbar" onclick="showPanel('importar',this)" data-i18n="nav_import">📥 Datos</button>
-  <button class="btn-topbar" onclick="document.getElementById('import-json').click()" title="Restaurar desde backup">📂 Restaurar</button>
+  <button class="btn-topbar" onclick="document.getElementById('import-json').click()" data-tip="📂 Restaurar datos desde un archivo backup .mt o .json" title="Restaurar desde backup">📂 Restaurar</button>
   <input type="file" id="import-json" accept=".json,.js,.mt,application/json,text/plain" style="display:none" onchange="importData(this)"/>
-  <button class="btn-topbar" onclick="exportData()" title="Guardar copia de seguridad">💾 Guardar</button>
-  <button class="btn-topbar" onclick="showInformeChoice()" title="Generar informe médico" style="color:#4ae8a4;border-color:#4ae8a4">📄 Informe</button>
-  <button class="btn-topbar danger" onclick="confirmReset()" data-i18n="nav_reset">⟳ Reset</button>
+  <button class="btn-topbar" onclick="exportData()" data-tip="💾 Guardar copia de seguridad (.mt) — Descarga todos los datos del paciente actual" title="Guardar copia de seguridad">💾 Guardar</button>
+  <button class="btn-topbar" onclick="showInformeChoice()" data-tip="📄 Generar informe PDF médico completo o sintético" title="Generar informe médico" style="color:#4ae8a4;border-color:#4ae8a4">📄 Informe</button>
+  <button class="btn-topbar danger" onclick="confirmReset()" data-tip="⟳ Borrar todos los datos actuales (se pedirá confirmación)" data-i18n="nav_reset">⟳ Reset</button>
 </div>
 
 <!-- NAV — barre horizontale (desktop) -->
 <div class="nav" id="main-nav" style="display:none">
-  <div class="nav-tab active" onclick="showPanel('resumen',this)"     data-i18n="tab_resumen">Resumen</div>
-  <div class="nav-tab" onclick="showPanel('curvas',this)"             data-i18n="tab_curvas">Curvas</div>
+  <div class="nav-tab active" onclick="showPanel('resumen',this)"     data-i18n="tab_resumen" data-tip="📊 Vista general: KPIs, situación actual y alertas urgentes">Resumen</div>
+  <div class="nav-tab" onclick="showPanel('curvas',this)"             data-i18n="tab_curvas" data-tip="📈 Evolución gráfica de 25+ parámetros biológicos en el tiempo">Curvas</div>
   <div class="nav-tab" onclick="showPanel('radar',this)"              data-i18n="tab_radar">🕸️ Radar</div>
-  <div class="nav-tab" onclick="showPanel('tabla',this)"              data-i18n="tab_tabla">Tabla</div>
-  <div class="nav-tab" onclick="showPanel('timeline',this)"           data-i18n="tab_timeline">Cronología</div>
-  <div class="nav-tab" onclick="showPanel('antecedentes',this)"      data-i18n="tab_ant">Antecedentes</div>
-  <div class="nav-tab" onclick="showPanel('vascular',this)"           data-i18n="tab_vasc">🧠 Análisis Vascular</div>
-  <div class="nav-tab" onclick="showPanel('correlaciones',this)"      data-i18n="tab_corr">📊 Correlaciones</div>
-  <div class="nav-tab" onclick="showPanel('observancia',this)"        data-i18n="tab_obs">Observancia</div>
+  <div class="nav-tab" onclick="showPanel('tabla',this)"              data-i18n="tab_tabla" data-tip="📋 Tabla cronológica de todos los análisis · Botón Glosario para entender cada parámetro">Tabla</div>
+  <div class="nav-tab" onclick="showPanel('timeline',this)"           data-i18n="tab_timeline" data-tip="🕐 Cronología clínica completa con situación actual fijada en cabeza">Cronología</div>
+  <div class="nav-tab" onclick="showPanel('antecedentes',this)"      data-i18n="tab_ant" data-tip="📋 Antecedentes médicos estructurados en 6 categorías clínicas">Antecedentes</div>
+  <div class="nav-tab" onclick="showPanel('vascular',this)"           data-i18n="tab_vasc" data-tip="🧠 Cronología vascular 2016→2026 · Hallazgos y preguntas para el médico">🧠 Análisis Vascular</div>
+  <div class="nav-tab" onclick="showPanel('correlaciones',this)"      data-i18n="tab_corr" data-tip="🔗 Correlaciones entre parámetros biológicos y períodos de medicación">📊 Correlaciones</div>
+  <div class="nav-tab" onclick="showPanel('observancia',this)"        data-i18n="tab_obs" data-tip="💊 Observancia terapéutica: períodos de toma documentados para 13 medicamentos">Observancia</div>
   <div class="nav-tab" onclick="showPanel('medicamentos',this)"      data-i18n="tab_meds">💊 Medicamentos</div>
   <div class="nav-tab" onclick="showPanel('bacterio',this)"          data-i18n="tab_bacterio">🦠 Bacteriología</div>
-  <div class="nav-tab alert" onclick="showPanel('farma',this)"        data-i18n="tab_farma">⚠ Farmacovigilancia</div>
-  <div class="nav-tab" onclick="showPanel('importar',this)"           data-i18n="tab_import">📥 Datos</div>
+  <div class="nav-tab alert" onclick="showPanel('farma',this)"        data-i18n="tab_farma" data-tip="⚠ Interacciones medicamentosas basadas en fichas CIMA/AEMPS oficiales">⚠ Farmacovigilancia</div>
+  <div class="nav-tab" onclick="showPanel('importar',this)"           data-i18n="tab_import" data-tip="📥 Importar datos: PDF automático (API Claude), portapapeles o entrada manual">📥 Datos</div>
   <div class="nav-tab" onclick="toggleSidebar()" style="margin-left:auto;font-size:18px;padding:4px 10px" title="Menú lateral">☰</div>
 </div>
 
@@ -515,17 +569,17 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
       <!-- Profil -->
       <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:12px;text-align:center">¿QUIÉN ACCEDE?</div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px" id="profil-btns">
-        <button onclick="setProfile('medico')" data-profile="medico" class="profil-btn" style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 8px;cursor:pointer;transition:all .2s;text-align:center">
+        <button onclick="setProfile('medico')" data-profile="medico" data-tip="Vista clínica completa con farmacovigilancia y análisis vascular" class="profil-btn" style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 8px;cursor:pointer;transition:all .2s;text-align:center">
           <div style="font-size:28px;margin-bottom:6px">👨‍⚕️</div>
           <div style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text)">Médico</div>
           <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px">Vista clínica completa</div>
         </button>
-        <button onclick="setProfile('paciente')" data-profile="paciente" class="profil-btn" style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 8px;cursor:pointer;transition:all .2s;text-align:center">
+        <button onclick="setProfile('paciente')" data-profile="paciente" data-tip="Vista personal con glosario y curvas de evolución" class="profil-btn" style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 8px;cursor:pointer;transition:all .2s;text-align:center">
           <div style="font-size:28px;margin-bottom:6px">🧑</div>
           <div style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text)">Paciente</div>
           <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px">Vista personal</div>
         </button>
-        <button onclick="setProfile('familia')" data-profile="familia" class="profil-btn" style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 8px;cursor:pointer;transition:all .2s;text-align:center">
+        <button onclick="setProfile('familia')" data-profile="familia" data-tip="Vista simplificada con explicaciones en lenguaje sencillo" class="profil-btn" style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 8px;cursor:pointer;transition:all .2s;text-align:center">
           <div style="font-size:28px;margin-bottom:6px">👨‍👩‍👧</div>
           <div style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text)">Familia</div>
           <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px">Vista simplificada</div>
@@ -617,7 +671,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 <div id="panel-tabla" class="panel">
   <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:16px">
     <div class="section-label" style="margin-bottom:0" data-i18n="synth_table">Tabla de síntesis cronológica</div>
-    <button class="btn" onclick="openGlosario()" style="font-size:11px;padding:6px 14px">
+    <button class="btn" onclick="openGlosario()" data-tip="❓ Glosario médico trilingüe — 32 parámetros explicados en lenguaje sencillo" style="font-size:11px;padding:6px 14px">
       ❓ Glosario de parámetros
     </button>
   </div>
@@ -1027,7 +1081,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <div style="background:var(--surface);border:2px solid var(--accent);border-radius:var(--radius);padding:16px 20px;margin-bottom:24px">
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
       <div id="lbl-datos-memoria" mt-translate mt-key="data in memory" style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent);letter-spacing:2px;text-transform:uppercase">📊 DATOS EN MEMORIA</div>
-      <button id="lbl-guardar-backup" mt-translate mt-key="save backup" class="btn primary" onclick="exportData()" style="font-size:13px;padding:8px 16px">💾 Guardar backup (.mt)</button>
+      <button id="lbl-guardar-backup" mt-translate mt-key="save backup" class="btn primary" onclick="exportData()" data-tip="💾 Descarga todos los datos como archivo MediTrace-Paciente-Fecha.mt" style="font-size:13px;padding:8px 16px">💾 Guardar backup (.mt)</button>
     </div>
     <div id="data-summary" style="font-family:var(--mono);font-size:14px;color:var(--text);margin-top:10px;line-height:2"></div>
 
@@ -1059,9 +1113,9 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 
   <!-- ══════ ONGLETS DES 3 VOLETS ══════ -->
   <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
-    <button class="btn primary" id="lbl-tab-leer" mt-translate mt-key="tab leer" data-tab="auto" onclick="showImportTab('auto')" style="font-size:14px;padding:10px 20px">📷 Leer documento</button>
-    <button class="btn" id="lbl-tab-portapapeles" mt-translate mt-key="tab portapapeles" data-tab="clipboard" onclick="showImportTab('clipboard')" style="font-size:14px;padding:10px 20px">📋 Desde portapapeles</button>
-    <button class="btn" id="lbl-tab-manual" mt-translate mt-key="tab manual" data-tab="manual" onclick="showImportTab('manual')" style="font-size:14px;padding:10px 20px">✏️ Entrada manual</button>
+    <button class="btn primary" id="lbl-tab-leer" mt-translate mt-key="tab leer" data-tab="auto" data-tip="🤖 Extracción automática con Claude API — arrastra tu PDF médico" onclick="showImportTab('auto')" style="font-size:14px;padding:10px 20px">📷 Leer documento</button>
+    <button class="btn" id="lbl-tab-portapapeles" mt-translate mt-key="tab portapapeles" data-tab="clipboard" data-tip="📋 Pega texto copiado de un PDF o documento médico" onclick="showImportTab('clipboard')" style="font-size:14px;padding:10px 20px">📋 Desde portapapeles</button>
+    <button class="btn" id="lbl-tab-manual" mt-translate mt-key="tab manual" data-tab="manual" data-tip="✏️ Introduce valores manualmente: fecha, parámetro y valor" onclick="showImportTab('manual')" style="font-size:14px;padding:10px 20px">✏️ Entrada manual</button>
   </div>
 
   <!-- ═══════════════════════════════════════════ -->
