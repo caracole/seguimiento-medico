@@ -427,48 +427,41 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   background: rgba(14,17,23,0.96);
   color: #e0e4ef;
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 8px;
   line-height: 1.5;
-  padding: 6px 10px;
+  padding: 5px 9px;
   border-radius: 6px;
   border: 1px solid var(--border);
-  white-space: nowrap;
-  max-width: 260px;
   white-space: normal;
+  max-width: 240px;
   text-align: center;
   pointer-events: none;
   opacity: 0;
   transition: opacity .15s;
   z-index: 9000;
   box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-}
-[data-tip]:hover::after { opacity: 1; }
-/* Tooltip vers le bas pour topbar */
-.topbar [data-tip]::after {
+  /* Toujours en bas */
   bottom: auto;
   top: calc(100% + 8px);
 }
-/* Flèche */
+[data-tip]:hover::after { opacity: 1; }
+/* Flèche — toujours vers le bas */
 [data-tip]::before {
   content: '';
   position: absolute;
-  bottom: calc(100% + 2px);
+  top: calc(100% + 2px);
+  bottom: auto;
   left: 50%;
   transform: translateX(-50%);
   border: 5px solid transparent;
-  border-top-color: var(--border);
+  border-bottom-color: var(--border);
+  border-top-color: transparent;
   pointer-events: none;
   opacity: 0;
   transition: opacity .15s;
   z-index: 9001;
 }
 [data-tip]:hover::before { opacity: 1; }
-.topbar [data-tip]::before {
-  bottom: auto;
-  top: calc(100% + 2px);
-  border-top-color: transparent;
-  border-bottom-color: var(--border);
-}
 </style>
 </head>
 <body>
