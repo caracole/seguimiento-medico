@@ -1026,14 +1026,14 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <!-- ══════ RÉSUMÉ DES DONNÉES EN MÉMOIRE ══════ -->
   <div style="background:var(--surface);border:2px solid var(--accent);border-radius:var(--radius);padding:16px 20px;margin-bottom:24px">
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
-      <div id="lbl-datos-memoria" style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent);letter-spacing:2px;text-transform:uppercase">📊 DATOS EN MEMORIA</div>
-      <button id="lbl-guardar-backup" class="btn primary" onclick="exportData()" style="font-size:13px;padding:8px 16px">💾 Guardar backup (.mt)</button>
+      <div id="lbl-datos-memoria" mt-translate mt-key="data in memory" style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent);letter-spacing:2px;text-transform:uppercase">📊 DATOS EN MEMORIA</div>
+      <button id="lbl-guardar-backup" mt-translate mt-key="save backup" class="btn primary" onclick="exportData()" style="font-size:13px;padding:8px 16px">💾 Guardar backup (.mt)</button>
     </div>
     <div id="data-summary" style="font-family:var(--mono);font-size:14px;color:var(--text);margin-top:10px;line-height:2"></div>
 
     <!-- Liste dépliante des événements importés -->
     <details style="margin-top:12px">
-      <summary style="font-family:var(--mono);font-size:13px;color:var(--accent);cursor:pointer;font-weight:600" id="lbl-ver-eventos">📜 Ver / gestionar eventos importados ▼</summary>
+      <summary style="font-family:var(--mono);font-size:13px;color:var(--accent);cursor:pointer;font-weight:600" id="lbl-ver-eventos" mt-translate mt-key="ver eventos">📜 Ver / gestionar eventos importados ▼</summary>
       <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;align-items:center">
         <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">Filtrar:</span>
         <select id="event-filter" onchange="buildImportList()" style="font-family:var(--mono);font-size:12px;padding:4px 8px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:4px">
@@ -1052,16 +1052,16 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 
     <!-- Liste dépliante des mesures avec correction de date -->
     <details style="margin-top:8px">
-      <summary style="font-family:var(--mono);font-size:13px;color:var(--warn);cursor:pointer;font-weight:600" id="lbl-ver-mediciones">📊 Ver / corregir fechas de mediciones ▼</summary>
+      <summary style="font-family:var(--mono);font-size:13px;color:var(--warn);cursor:pointer;font-weight:600" id="lbl-ver-mediciones" mt-translate mt-key="ver mediciones">📊 Ver / corregir fechas de mediciones ▼</summary>
       <div id="mesures-list" style="margin-top:10px;max-height:300px;overflow-y:auto"></div>
     </details>
   </div>
 
   <!-- ══════ ONGLETS DES 3 VOLETS ══════ -->
   <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
-    <button class="btn primary" id="lbl-tab-leer" data-tab="auto" onclick="showImportTab('auto')" style="font-size:14px;padding:10px 20px">📷 Leer documento</button>
-    <button class="btn" id="lbl-tab-portapapeles" data-tab="clipboard" onclick="showImportTab('clipboard')" style="font-size:14px;padding:10px 20px">📋 Desde portapapeles</button>
-    <button class="btn" id="lbl-tab-manual" data-tab="manual" onclick="showImportTab('manual')" style="font-size:14px;padding:10px 20px">✏️ Entrada manual</button>
+    <button class="btn primary" id="lbl-tab-leer" mt-translate mt-key="tab leer" data-tab="auto" onclick="showImportTab('auto')" style="font-size:14px;padding:10px 20px">📷 Leer documento</button>
+    <button class="btn" id="lbl-tab-portapapeles" mt-translate mt-key="tab portapapeles" data-tab="clipboard" onclick="showImportTab('clipboard')" style="font-size:14px;padding:10px 20px">📋 Desde portapapeles</button>
+    <button class="btn" id="lbl-tab-manual" mt-translate mt-key="tab manual" data-tab="manual" onclick="showImportTab('manual')" style="font-size:14px;padding:10px 20px">✏️ Entrada manual</button>
   </div>
 
   <!-- ═══════════════════════════════════════════ -->
@@ -1069,7 +1069,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <!-- ═══════════════════════════════════════════ -->
   <div id="volet-clipboard" class="import-volet" style="display:none">
     <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent2);border-radius:var(--radius);padding:20px 24px">
-      <div id="lbl-importar-datos" style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent2);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">📋 IMPORTAR DATOS</div>
+      <div id="lbl-importar-datos" mt-translate mt-key="importar datos" style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent2);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">📋 IMPORTAR DATOS</div>
       <div style="font-size:15px;color:var(--muted);margin-bottom:16px;line-height:1.7">
         Copie los datos generados por Claude y pulse el botón para importarlos.
       </div>
@@ -1100,7 +1100,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <!-- ═══════════════════════════════════════════ -->
   <div id="volet-auto" class="import-volet">
     <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:var(--radius);padding:20px 24px">
-      <div id="lbl-lectura-docs" style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">🤖 LECTURA DE DOCUMENTOS</div>
+      <div id="lbl-lectura-docs" mt-translate mt-key="lectura docs" style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">🤖 LECTURA DE DOCUMENTOS</div>
 
       <div style="font-size:15px;color:var(--muted);margin-bottom:16px;line-height:1.7">
         Seleccione una imagen o un PDF escaneado. MediTrace extraerá el texto automáticamente.
@@ -1179,7 +1179,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   <!-- ═══════════════════════════════════════════ -->
   <div id="volet-manual" class="import-volet" style="display:none">
     <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--warn);border-radius:var(--radius);padding:20px 24px">
-      <div id="lbl-entrada-manual" style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--warn);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">✏️ ENTRADA MANUAL DE VALORES</div>
+      <div id="lbl-entrada-manual" mt-translate mt-key="entrada manual" style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--warn);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">✏️ ENTRADA MANUAL DE VALORES</div>
       <div class="manual-form">
         <div class="form-grid">
           <div class="form-field">
@@ -1273,6 +1273,226 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
+
+/* ================================================================
+   SYSTÈME DE TRADUCTION — Pierre-Henri Giraud (adapté pour MediTrace)
+   Fidèle à l'architecture originale langue.js
+================================================================ */
+var MT_codelangue = "ES";
+var MT_langues = {};
+var MT_curlangue = {};
+var MT_debugLG = false;
+
+/* TABLE DE RÉFÉRENCES — mot-clé → index numérique */
+var MT_base = {
+  /* Navigation */
+  "tab resumen":        100,
+  "tab curvas":         101,
+  "tab tabla":          102,
+  "tab timeline":       103,
+  "tab ant":            104,
+  "tab vasc":           105,
+  "tab corr":           106,
+  "tab obs":            107,
+  "tab meds":           108,
+  "tab farma":          109,
+  "tab radar":          110,
+  "tab bacterio":       111,
+  "tab import":         112,
+  /* Barre supérieure */
+  "nav import":         200,
+  "nav reset":          201,
+  /* Données en mémoire */
+  "data in memory":     300,
+  "save backup":        301,
+  "ver eventos":        302,
+  "ver mediciones":     303,
+  /* Onglets import */
+  "tab leer":           400,
+  "tab portapapeles":   401,
+  "tab manual":         402,
+  "importar datos":     403,
+  "lectura docs":       404,
+  "entrada manual":     405,
+  /* Paramètres */
+  "last values":        500,
+  "key charts":         501,
+  "all params":         502,
+  "synth table":        503,
+  "clinical timeline":  504,
+  "select pdf":         505,
+  /* Labels formulaire */
+  "lbl date":           600,
+  "lbl source":         601,
+  "lbl param":          602,
+  "lbl value":          603,
+  "btn add":            604,
+  "btn add event":      605,
+  "btn show":           606,
+  /* Messages dynamiques */
+  "no api key":         700,
+  "no data":            701,
+  "field required":     702,
+  "event added":        703,
+  "no export data":     704,
+  "bad format":         705,
+  "import ok":          706,
+  "confirm delete":     707,
+  "del cancel":         708,
+  "del confirm":        709,
+  "data replaced warn": 710,
+  "change patient":     711,
+};
+
+/* ── ESPAÑOL (langue par défaut) ── */
+MT_langues["ES"] = {
+  100:"Resumen",        101:"Curvas",          102:"Tabla",
+  103:"Cronología",     104:"Antecedentes",    105:"🧠 Análisis Vascular",
+  106:"📊 Correlaciones", 107:"Observancia",   108:"Medicamentos",
+  109:"⚠ Farmacovigilancia", 110:"Radar",      111:"Bacteriología",
+  112:"📥 Datos",
+  200:"📥 Datos",       201:"⟳ Reiniciar",
+  300:"DATOS EN MEMORIA",  301:"💾 Guardar backup (.mt)",
+  302:"📜 Ver / gestionar eventos importados ▼",
+  303:"📊 Ver / corregir fechas de mediciones ▼",
+  400:"📷 Leer documento", 401:"📋 Desde portapapeles", 402:"✏️ Entrada manual",
+  403:"📋 IMPORTAR DATOS",  404:"🤖 LECTURA DE DOCUMENTOS",
+  405:"✏️ ENTRADA MANUAL DE VALORES",
+  500:"Últimos valores conocidos",   501:"Parámetros clave",
+  502:"Todos los parámetros",        503:"Tabla de síntesis",
+  504:"Cronología clínica",          505:"Selecciona el PDF",
+  600:"Fecha",    601:"Fuente",    602:"Parámetro",  603:"Valor",
+  604:"+ Añadir", 605:"+ Evento",  606:"Mostrar",
+  700:"⚠ Introduce una clave API Claude para la extracción automática.",
+  701:"Sin datos",
+  702:"Rellena todos los campos obligatorios.",
+  703:"✓ Evento clínico añadido correctamente.",
+  704:"No hay datos que exportar.",
+  705:"Formato no reconocido. Usa un backup .mt o .json de MediTrace.",
+  706:"✅ {mes} mediciones · {ev} eventos · {med} medicamentos restaurados",
+  707:"¿Eliminar este evento?",
+  708:"Cancelar",
+  709:"✕ Eliminar",
+  710:"Los datos actuales serán reemplazados por el archivo importado.",
+  711:"Cambiar de paciente",
+};
+
+/* ── FRANÇAIS ── */
+MT_langues["FR"] = {
+  100:"Résumé",         101:"Courbes",         102:"Tableau",
+  103:"Chronologie",    104:"Antécédents",     105:"🧠 Analyse Vasculaire",
+  106:"📊 Corrélations", 107:"Observance",     108:"Médicaments",
+  109:"⚠ Pharmacovigilance", 110:"Radar",      111:"Bactériologie",
+  112:"📥 Données",
+  200:"📥 Données",     201:"⟳ Réinitialiser",
+  300:"DONNÉES EN MÉMOIRE",  301:"💾 Sauvegarder (.mt)",
+  302:"📜 Voir / gérer les événements importés ▼",
+  303:"📊 Voir / corriger les dates de mesures ▼",
+  400:"📷 Lire un document", 401:"📋 Presse-papiers", 402:"✏️ Saisie manuelle",
+  403:"📋 IMPORTER DES DONNÉES", 404:"🤖 LECTURE DE DOCUMENTS",
+  405:"✏️ SAISIE MANUELLE DE VALEURS",
+  500:"Dernières valeurs connues",   501:"Paramètres clés",
+  502:"Tous les paramètres",         503:"Tableau de synthèse",
+  504:"Chronologie clinique",        505:"Sélectionnez le PDF",
+  600:"Date",      601:"Source",    602:"Paramètre",  603:"Valeur",
+  604:"+ Ajouter", 605:"+ Événement", 606:"Afficher",
+  700:"⚠ Entrez une clé API Claude pour l'extraction automatique.",
+  701:"Pas de données",
+  702:"Remplissez tous les champs obligatoires.",
+  703:"✓ Événement clinique ajouté correctement.",
+  704:"Aucune donnée à exporter.",
+  705:"Format non reconnu. Utilisez un backup .mt ou .json MediTrace.",
+  706:"✅ {mes} mesures · {ev} événements · {med} médicaments restaurés",
+  707:"Supprimer cet événement ?",
+  708:"Annuler",
+  709:"✕ Supprimer",
+  710:"Les données actuelles seront remplacées par le fichier importé.",
+  711:"Changer de patient",
+};
+
+/* ── ENGLISH ── */
+MT_langues["EN"] = {
+  100:"Summary",        101:"Charts",          102:"Table",
+  103:"Timeline",       104:"Medical History", 105:"🧠 Vascular Analysis",
+  106:"📊 Correlations", 107:"Compliance",     108:"Medications",
+  109:"⚠ Pharmacovigilance", 110:"Radar",      111:"Bacteriology",
+  112:"📥 Data",
+  200:"📥 Data",        201:"⟳ Reset",
+  300:"DATA IN MEMORY",      301:"💾 Save backup (.mt)",
+  302:"📜 View / manage imported events ▼",
+  303:"📊 View / correct measurement dates ▼",
+  400:"📷 Read document", 401:"📋 Clipboard",  402:"✏️ Manual entry",
+  403:"📋 IMPORT DATA",    404:"🤖 DOCUMENT READER",
+  405:"✏️ MANUAL VALUE ENTRY",
+  500:"Latest known values",    501:"Key parameters",
+  502:"All parameters",         503:"Synthesis table",
+  504:"Clinical timeline",      505:"Select the PDF",
+  600:"Date",    601:"Source",  602:"Parameter",  603:"Value",
+  604:"+ Add",   605:"+ Event", 606:"Show",
+  700:"⚠ Enter a Claude API key for automatic extraction.",
+  701:"No data",
+  702:"Please fill in all required fields.",
+  703:"✓ Clinical event added successfully.",
+  704:"No data to export.",
+  705:"Unrecognised format. Use a MediTrace .mt or .json backup.",
+  706:"✅ {mes} readings · {ev} events · {med} medications restored",
+  707:"Delete this event?",
+  708:"Cancel",
+  709:"✕ Delete",
+  710:"Current data will be replaced by the imported file.",
+  711:"Change patient",
+};
+
+/* ── FONCTIONS DE TRADUCTION (fidèles à l'original) ── */
+function MT_translate(p, vars) {
+  if (p === null || p === undefined) return '';
+  var w = p.replace(/_/g, ' ').toLowerCase();
+  var id = MT_base[w];
+  var s = '';
+  if (id === undefined) {
+    /* Clé inconnue — afficher en rouge (mode debug) ou retourner la clé */
+    if (MT_debugLG) return '<b style="color:red">' + p + '</b>';
+    return p;
+  }
+  if (MT_debugLG) s += '(' + id + ') {';
+  var m = MT_curlangue[id];
+  if (m === undefined) {
+    /* Traduction manquante — rouge + étoile */
+    m = (MT_langues["ES"][id] || p) + '<b style="color:orange">*</b>';
+  }
+  /* Substitution variables {key} */
+  if (vars) {
+    Object.keys(vars).forEach(function(k) {
+      m = m.replace(new RegExp('\{' + k + '\}', 'g'), vars[k]);
+    });
+  }
+  s += m;
+  if (MT_debugLG) s += '}';
+  return s;
+}
+
+function MT_tr(p, vars) { return MT_translate(p, vars); }
+
+function MT_setLangue(code) {
+  MT_codelangue = code.toUpperCase();
+  MT_curlangue = MT_langues[MT_codelangue] || MT_langues["ES"];
+  /* Traduire tous les éléments avec attribut [mt-translate] */
+  var lbls = document.querySelectorAll('[mt-translate]');
+  for (var i = 0; i < lbls.length; i++) {
+    var keyword = lbls[i].getAttribute('mt-key') || lbls[i].getAttribute('id');
+    if (keyword) lbls[i].innerHTML = MT_translate(keyword);
+  }
+  /* Traduire aussi les [data-i18n] via LANG existant (compatibilité) */
+  if (typeof LANG !== 'undefined' && LANG[code.toLowerCase()]) {
+    var t = LANG[code.toLowerCase()];
+    document.querySelectorAll('[data-i18n]').forEach(function(el) {
+      var k = el.dataset.i18n;
+      if (t[k]) el.innerHTML = t[k].replace(/\n/g, '<br>');
+    });
+  }
+}
+/* ── FIN SYSTÈME TRADUCTION ── */
+
 /* Configurer pdf.js worker */
 if (typeof pdfjsLib !== 'undefined') {
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -2346,7 +2566,7 @@ Retourne UNIQUEMENT le JSON, sans markdown, sans backticks, sans commentaire.`;
 ================================================================ */
 async function extractPdf(file) {
   const apiKey = localStorage.getItem('mt_apikey') || document.getElementById('api-key-input').value;
-  if (!apiKey) { customAlert('API Key requerida', LANG[currentLang].no_key, '🔑', 'var(--warn)'); return; }
+  if (!apiKey) { customAlert(MT_tr('no api key'), '', '🔑', 'var(--warn)'); return; }
 
   const pb = document.getElementById('progress-box');
   const pbar = document.getElementById('progress-bar');
@@ -2559,10 +2779,10 @@ function addManual() {
   /* Si "nouveau paramètre" sélectionné, enregistrer d'abord */
   if (key === '__NEW__') {
     key = registerCustomParam();
-    if (!key) { customAlert('Campo requerido', 'Indica el nombre del nuevo parámetro.', '⚠️', 'var(--warn)'); return; }
+    if (!key) { customAlert(MT_tr('field required'), '', '⚠️', 'var(--warn)'); return; }
   }
 
-  if (!date || !key || isNaN(val)) { customAlert('Campos incompletos', 'Rellena fecha, parámetro y valor antes de añadir.', '⚠️', 'var(--warn)'); return; }
+  if (!date || !key || isNaN(val)) { customAlert(MT_tr('field required'), '', '⚠️', 'var(--warn)'); return; }
 
   /* Sauvegarder la source pour réutilisation */
   addCustomSource(src);
@@ -2596,7 +2816,7 @@ function addManual() {
 function addEvent() {
   const date  = document.getElementById('m-date').value;
   const src   = getSelectedSource() || 'Manuel';
-  if (!date) { customAlert('Fecha requerida', 'Indica la fecha del evento clínico.', '📅', 'var(--warn)'); return; }
+  if (!date) { customAlert(MT_tr('field required'), '', '📅', 'var(--warn)'); return; }
   const title = prompt('Título del evento clínico:');
   if (!title) return;
   const text  = prompt('Descripción breve (opcional):') || '';
@@ -2608,7 +2828,7 @@ function addEvent() {
   saveEvents(evts);
   fillSourceList();
   document.getElementById('m-source-select').value = src;
-  customAlert('Evento añadido', '✓ El evento clínico se ha guardado correctamente.', '✅', 'var(--accent2)');
+  customAlert(MT_tr('event added'), '', '✅', 'var(--accent2)');
 }
 
 function updateDataSummary(data) {
@@ -2640,7 +2860,7 @@ function exportData() {
   const meds   = loadMeds();
   const bacts  = loadBacterio();
   const label  = getPatientLabel();
-  if (!data.length && !events.length && !meds.length) { customAlert('Sin datos', 'No hay datos que exportar. Carga primero un archivo o añade datos manualmente.', '📂', 'var(--muted)'); return; }
+  if (!data.length && !events.length && !meds.length) { customAlert(MT_tr('no export data'), '', '📂', 'var(--muted)'); return; }
   const payload = {
     version: "MediTrace-2026",
     exported: new Date().toISOString(),
@@ -2695,13 +2915,11 @@ function _doImport(file, input) {
           if (parsed.custom_params)  { saveCustomParams(parsed.custom_params); Object.entries(parsed.custom_params).forEach(([k,p]) => { PARAMS[k] = p; }); }
           if (parsed.custom_sources) saveCustomSources(parsed.custom_sources);
           if (parsed.patient_label) setPatientLabel(parsed.patient_label);
-          customAlert('✅ Datos restaurados',
-            '<strong>' + parsed.mesures.length + '</strong> mediciones<br>'
-            + '<strong>' + (parsed.events?.length||0) + '</strong> eventos clínicos<br>'
-            + '<strong>' + (parsed.medicaments?.length||0) + '</strong> medicamentos<br>'
-            + (parsed.patient_label ? '<br>👤 Paciente: <strong>' + parsed.patient_label + '</strong>' : ''),
+          customAlert('✅ ' + MT_tr('data in memory'),
+            MT_tr('import ok', {mes: parsed.mesures.length, ev: parsed.events?.length||0, med: parsed.medicaments?.length||0})
+            + (parsed.patient_label ? '<br>👤 ' + parsed.patient_label : ''),
             '✅', 'var(--accent2)');
-        } else { customAlert('Formato no reconocido', 'El archivo no es un backup MediTrace válido (.mt o .json).', '❌', 'var(--danger)'); return; }
+        } else { customAlert(MT_tr('bad format'), '', '❌', 'var(--danger)'); return; }
       } else {
         const match   = text.match(/(?:const|let|var)\s+data\s*=\s*(\[[\s\S]*?\])\s*;/);
         const matchEv = text.match(/(?:const|let|var)\s+events\s*=\s*(\[[\s\S]*?\])\s*;/);
@@ -5421,6 +5639,7 @@ window.addEventListener('load', () => {
   updateDataSummary(data);
   updatePatientBadge();
   initProfile();
+  MT_setLangue((localStorage.getItem('mt_lang') || 'es').toUpperCase());
 
   /* Version avec date/heure */
   var vl = document.getElementById('version-label');
