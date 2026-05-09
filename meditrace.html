@@ -402,6 +402,19 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
   .chart-grid { grid-template-columns: 1fr; }
   .topbar { padding: 8px 12px; }
 }
+
+/* ── PROFIL BUTTONS ── */
+.profil-btn:hover { border-color: var(--accent) !important; background: var(--surface) !important; transform: translateY(-2px); }
+.profil-btn.active { border-color: var(--accent) !important; background: rgba(74,143,232,0.15) !important; }
+
+/* ── PROFILE BADGE ── */
+.profile-badge {
+  font-family: var(--mono); font-size: 10px; padding: 3px 10px;
+  border-radius: 20px; border: 1px solid var(--border);
+  background: var(--surface2); color: var(--muted);
+  cursor: pointer; white-space: nowrap;
+}
+.profile-badge:hover { border-color: var(--accent); color: var(--accent); }
 </style>
 </head>
 <body>
@@ -416,6 +429,7 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
     <span id="patient-badge" style="display:none;padding:4px 10px;background:rgba(74,143,232,0.2);border:1px solid var(--accent);border-radius:6px;font-size:13px"></span>
   </div>
   <div style="display:flex;align-items:center;gap:6px">
+    <button id="profile-badge-btn" class="profile-badge" onclick="showStartupModal()" title="Cambiar perfil">👤 —</button>
     <button class="btn-topbar" onclick="toggleTheme()" id="theme-btn" title="Cambiar tema">☀️</button>
     <button class="lang-btn active" onclick="setLang('es')">ES</button>
     <button class="lang-btn" onclick="setLang('fr')">FR</button>
@@ -489,11 +503,65 @@ body { background: var(--bg); color: var(--text); font-family: var(--sans); font
 
 <!-- ===== PANEL BIENVENIDA (sin datos) ===== -->
 <div id="panel-bienvenida" class="panel active">
-  <div class="empty-state">
+
+  <!-- MODAL DÉMARRAGE -->
+  <div id="startup-modal" style="position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:36px 40px;max-width:560px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.4)">
+
+      <!-- Logo -->
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="font-family:var(--serif);font-size:32px;font-weight:700;color:var(--text)">Medi<span style="font-style:italic;color:var(--accent)">Trace</span></div>
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--muted);margin-top:4px">SEGUIMIENTO MÉDICO LONGITUDINAL</div>
+      </div>
+
+      <!-- Profil -->
+      <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:12px;text-align:center">¿QUIÉN ACCEDE?</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px" id="profil-btns">
+        <button onclick="setProfile('medico')" class="profil-btn" style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 8px;cursor:pointer;transition:all .2s;text-align:center">
+          <div style="font-size:28px;margin-bottom:6px">👨‍⚕️</div>
+          <div style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text)">Médico</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px">Vista clínica completa</div>
+        </button>
+        <button onclick="setProfile('paciente')" class="profil-btn" style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 8px;cursor:pointer;transition:all .2s;text-align:center">
+          <div style="font-size:28px;margin-bottom:6px">🧑</div>
+          <div style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text)">Paciente</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px">Vista personal</div>
+        </button>
+        <button onclick="setProfile('familia')" class="profil-btn" style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 8px;cursor:pointer;transition:all .2s;text-align:center">
+          <div style="font-size:28px;margin-bottom:6px">👨‍👩‍👧</div>
+          <div style="font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text)">Familia</div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:2px">Vista simplificada</div>
+        </button>
+      </div>
+
+      <!-- Liste patients -->
+      <div id="patient-section" style="display:none">
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:10px">SELECCIONAR PACIENTE</div>
+        <div id="patient-list" style="display:flex;flex-direction:column;gap:6px;max-height:180px;overflow-y:auto;margin-bottom:12px"></div>
+        <div style="display:flex;gap:8px">
+          <button onclick="closeStartupNew()" class="btn primary" style="flex:1">+ Nuevo paciente</button>
+          <button onclick="closeStartupImport()" class="btn" style="flex:1">📂 Restaurar .mt</button>
+        </div>
+      </div>
+
+      <!-- Sans données -->
+      <div id="nodata-section" style="display:none">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button onclick="closeStartupNew()" class="btn primary" style="flex:1">+ Nuevo paciente</button>
+          <button onclick="closeStartupImport()" class="btn" style="flex:1">📂 Restaurar .mt</button>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:16px;font-family:var(--mono);font-size:9px;color:var(--muted)">
+        v2026.4 · GNU GPL v3 · <a href="https://caracole.github.io/seguimiento-medico/" target="_blank" style="color:var(--accent)">caracole.github.io</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fond vide -->
+  <div class="empty-state" style="padding-top:120px">
     <span class="empty-icon">🏥</span>
-    <div class="empty-title" data-i18n="welcome_title">Bienvenido a MediTrace</div>
-    <div class="empty-sub" data-i18n="welcome_sub">Ningún dato médico cargado todavía.<br>Empiece importando un PDF o añadiendo datos manualmente.</div>
-    <button class="btn primary" onclick="goImport()" data-i18n="welcome_btn">→ Importar mi primer documento</button>
+    <div class="empty-title">MediTrace</div>
   </div>
 </div>
 
@@ -2464,6 +2532,10 @@ async function extractPdf(file) {
 }
 
 function showMainNav() {
+  /* Enregistrer le patient dans la liste */
+  const lbl = getPatientLabel();
+  if (lbl) addPatientToList(lbl);
+  updateProfileBadge();
   document.getElementById('main-nav').style.display = 'flex';
   document.getElementById('panel-bienvenida').classList.remove('active');
 }
@@ -2576,11 +2648,11 @@ function exportData() {
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
-  const safeLabel = (label || 'patient').replace(/[^a-zA-Z0-9_-]/g, '_');
+  const safeLabel = (label || 'Patient').replace(/[^a-zA-Z0-9_-]/g, '_');
   var d = new Date();
-  var ts = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + '-' + String(d.getHours()).padStart(2,'0') + String(d.getMinutes()).padStart(2,'0');
+  var ts = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
   a.href     = url;
-  a.download = safeLabel + '_' + ts + '.mt';
+  a.download = 'MediTrace-' + safeLabel + '-' + ts + '.mt';
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -5079,6 +5151,174 @@ function deduplicateAll() {
   }
 }
 
+
+/* ================================================================
+   GESTION PROFILS & PATIENTS
+================================================================ */
+const PROFILE_KEY  = 'mt_profile';   // 'medico' | 'paciente' | 'familia'
+const PATIENTS_KEY = 'mt_patients';  // liste des patients connus
+
+const PROFILE_ICONS = { medico:'👨‍⚕️', paciente:'🧑', familia:'👨‍👩‍👧' };
+const PROFILE_LABELS = { medico:'Médico', paciente:'Paciente', familia:'Familia' };
+
+function getProfile() { return localStorage.getItem(PROFILE_KEY) || ''; }
+function saveProfile(p) { localStorage.setItem(PROFILE_KEY, p); }
+
+/* Liste des patients (nom → dernière ouverture) */
+function getPatients() {
+  try { return JSON.parse(localStorage.getItem(PATIENTS_KEY) || '[]'); } catch { return []; }
+}
+function savePatients(list) { localStorage.setItem(PATIENTS_KEY, JSON.stringify(list)); }
+function addPatientToList(label) {
+  if (!label) return;
+  const list = getPatients().filter(p => p.label !== label);
+  list.unshift({ label, date: new Date().toISOString() });
+  savePatients(list.slice(0, 20)); // max 20 patients
+}
+
+/* Mettre à jour le badge profil dans la navbar */
+function updateProfileBadge() {
+  const p = getProfile();
+  const label = getPatientLabel();
+  const btn = document.getElementById('profile-badge-btn');
+  if (!btn) return;
+  const icon = PROFILE_ICONS[p] || '👤';
+  const prof = PROFILE_LABELS[p] || '—';
+  btn.textContent = icon + ' ' + prof + (label ? ' · ' + label : '');
+}
+
+/* Afficher le modal de démarrage */
+function showStartupModal() {
+  const modal = document.getElementById('startup-modal');
+  if (modal) { modal.style.display = 'flex'; }
+  // Reset profil buttons
+  document.querySelectorAll('.profil-btn').forEach(b => b.classList.remove('active'));
+  const p = getProfile();
+  if (p) {
+    const btn = document.querySelector('.profil-btn[onclick="setProfile('' + p + '')"]');
+    if (btn) { btn.classList.add('active'); showPatientSection(); }
+  }
+}
+
+function hideStartupModal() {
+  const modal = document.getElementById('startup-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function setProfile(p) {
+  saveProfile(p);
+  document.querySelectorAll('.profil-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector('.profil-btn[onclick="setProfile('' + p + '')"]');
+  if (btn) btn.classList.add('active');
+  showPatientSection();
+}
+
+function showPatientSection() {
+  const patients = getPatients();
+  const ps = document.getElementById('patient-section');
+  const ns = document.getElementById('nodata-section');
+  if (patients.length > 0) {
+    ps.style.display = 'block';
+    ns.style.display = 'none';
+    renderPatientList(patients);
+  } else {
+    ps.style.display = 'none';
+    ns.style.display = 'block';
+  }
+}
+
+function renderPatientList(patients) {
+  const el = document.getElementById('patient-list');
+  if (!el) return;
+  el.innerHTML = '';
+  const current = getPatientLabel();
+  patients.forEach(pat => {
+    const btn = document.createElement('button');
+    const isActive = pat.label === current;
+    btn.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-radius:8px;border:1px solid ' + (isActive ? 'var(--accent)' : 'var(--border)') + ';background:' + (isActive ? 'rgba(74,143,232,0.15)' : 'var(--surface2)') + ';cursor:pointer;font-family:var(--mono);font-size:11px;color:var(--text);text-align:left;width:100%;transition:all .15s';
+    btn.innerHTML = '<span>' + (isActive ? '✓ ' : '') + pat.label + '</span><span style="color:var(--muted);font-size:9px">' + (pat.date ? pat.date.slice(0,10) : '') + '</span>';
+    btn.onclick = () => loadPatient(pat.label);
+    el.appendChild(btn);
+  });
+}
+
+function loadPatient(label) {
+  /* Si c'est le patient actuel — juste fermer */
+  if (label === getPatientLabel()) { hideStartupModal(); updateProfileBadge(); return; }
+  /* Sinon demander de sauvegarder d'abord */
+  const data = loadData();
+  if (data.length > 0) {
+    if (!confirm('Cambiar de paciente. ¿Guardar backup del paciente actual antes?')) return;
+    exportData();
+    setTimeout(() => {
+      _loadPatientAfterSave(label);
+    }, 800);
+  } else {
+    _loadPatientAfterSave(label);
+  }
+}
+
+function _loadPatientAfterSave(label) {
+  localStorage.removeItem(STORE_KEY);
+  localStorage.removeItem(EVENT_KEY);
+  localStorage.removeItem(MED_KEY);
+  setPatientLabel(label);
+  hideStartupModal();
+  updateProfileBadge();
+  location.reload();
+}
+
+function closeStartupNew() {
+  hideStartupModal();
+  /* Si pas de profil choisi — prendre paciente par défaut */
+  if (!getProfile()) saveProfile('paciente');
+  updateProfileBadge();
+  /* Ouvrir dialog nouveau patient */
+  if (typeof nuevoPaciente === 'function') nuevoPaciente();
+  else goImport();
+}
+
+function closeStartupImport() {
+  hideStartupModal();
+  if (!getProfile()) saveProfile('paciente');
+  updateProfileBadge();
+  document.getElementById('import-json').click();
+}
+
+/* Adapter la vue selon le profil */
+function applyProfileView() {
+  const p = getProfile();
+  /* Onglet Farmacovigilancia en premier pour médecin */
+  const farmaTab = document.querySelector('.nav-tab.alert');
+  if (farmaTab && p === 'medico') {
+    farmaTab.style.fontWeight = '700';
+    farmaTab.style.fontSize = '11px';
+  }
+  /* Glosario plus visible pour famille */
+  if (p === 'familia') {
+    const glosBtn = document.querySelector('[onclick="openGlosario()"]');
+    if (glosBtn) glosBtn.style.background = 'var(--accent)';
+  }
+}
+
+/* ================================================================
+   INIT PROFIL — à appeler dans window.addEventListener('load')
+================================================================ */
+function initProfile() {
+  const p = getProfile();
+  /* Si pas de profil — montrer le modal */
+  if (!p) {
+    showStartupModal();
+  } else {
+    /* Profil existant — badge seulement */
+    updateProfileBadge();
+    applyProfileView();
+    /* Enregistrer le patient dans la liste */
+    const label = getPatientLabel();
+    if (label) addPatientToList(label);
+  }
+}
+
 /* ================================================================
    INIT
 ================================================================ */
@@ -5135,6 +5375,7 @@ window.addEventListener('load', () => {
   }
   updateDataSummary(data);
   updatePatientBadge();
+  initProfile();
 
   /* Version avec date/heure */
   var vl = document.getElementById('version-label');
