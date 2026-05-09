@@ -1083,14 +1083,14 @@ body.no-tips [data-tip]::before { display: none !important; }
   <!-- ══════ RÉSUMÉ DES DONNÉES EN MÉMOIRE ══════ -->
   <div style="background:var(--surface);border:2px solid var(--accent);border-radius:var(--radius);padding:16px 20px;margin-bottom:24px">
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
-      <div id="lbl-datos-memoria" mt-translate mt-key="data in memory" style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent);letter-spacing:2px;text-transform:uppercase">📊 DATOS EN MEMORIA</div>
-      <button id="lbl-guardar-backup" mt-translate mt-key="save backup" class="btn primary" onclick="exportData()" data-tip="💾 Descarga todos los datos como archivo MediTrace-Paciente-Fecha.mt" style="font-size:13px;padding:8px 16px">💾 Guardar backup (.mt)</button>
+      <div id="lbl-datos-memoria" data-i18n="data_in_memory" style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent);letter-spacing:2px;text-transform:uppercase">📊 DATOS EN MEMORIA</div>
+      <button id="lbl-guardar-backup" data-i18n="save_backup" class="btn primary" onclick="exportData()" data-tip="💾 Descarga todos los datos como archivo MediTrace-Paciente-Fecha.mt" style="font-size:13px;padding:8px 16px">💾 Guardar backup (.mt)</button>
     </div>
     <div id="data-summary" style="font-family:var(--mono);font-size:14px;color:var(--text);margin-top:10px;line-height:2"></div>
 
     <!-- Liste dépliante des événements importés -->
     <details style="margin-top:12px">
-      <summary style="font-family:var(--mono);font-size:13px;color:var(--accent);cursor:pointer;font-weight:600" id="lbl-ver-eventos" mt-translate mt-key="ver eventos">📜 Ver / gestionar eventos importados ▼</summary>
+      <summary style="font-family:var(--mono);font-size:13px;color:var(--accent);cursor:pointer;font-weight:600" id="lbl-ver-eventos" data-i18n="ver_eventos_mt">📜 Ver / gestionar eventos importados ▼</summary>
       <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;align-items:center">
         <span style="font-family:var(--mono);font-size:11px;color:var(--muted)">Filtrar:</span>
         <select id="event-filter" onchange="buildImportList()" style="font-family:var(--mono);font-size:12px;padding:4px 8px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:4px">
@@ -1109,16 +1109,16 @@ body.no-tips [data-tip]::before { display: none !important; }
 
     <!-- Liste dépliante des mesures avec correction de date -->
     <details style="margin-top:8px">
-      <summary style="font-family:var(--mono);font-size:13px;color:var(--warn);cursor:pointer;font-weight:600" id="lbl-ver-mediciones" mt-translate mt-key="ver mediciones">📊 Ver / corregir fechas de mediciones ▼</summary>
+      <summary style="font-family:var(--mono);font-size:13px;color:var(--warn);cursor:pointer;font-weight:600" id="lbl-ver-mediciones" data-i18n="ver_mediciones_mt">📊 Ver / corregir fechas de mediciones ▼</summary>
       <div id="mesures-list" style="margin-top:10px;max-height:300px;overflow-y:auto"></div>
     </details>
   </div>
 
   <!-- ══════ ONGLETS DES 3 VOLETS ══════ -->
   <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap">
-    <button class="btn primary" id="lbl-tab-leer" mt-translate mt-key="tab leer" data-tab="auto" data-tip="🤖 Extracción automática con Claude API — arrastra tu PDF médico" onclick="showImportTab('auto')" style="font-size:14px;padding:10px 20px">📷 Leer documento</button>
-    <button class="btn" id="lbl-tab-portapapeles" mt-translate mt-key="tab portapapeles" data-tab="clipboard" data-tip="📋 Pega texto copiado de un PDF o documento médico" onclick="showImportTab('clipboard')" style="font-size:14px;padding:10px 20px">📋 Desde portapapeles</button>
-    <button class="btn" id="lbl-tab-manual" mt-translate mt-key="tab manual" data-tab="manual" data-tip="✏️ Introduce valores manualmente: fecha, parámetro y valor" onclick="showImportTab('manual')" style="font-size:14px;padding:10px 20px">✏️ Entrada manual</button>
+    <button class="btn primary" id="lbl-tab-leer" data-i18n="tab_leer_mt" data-tab="auto" data-tip="🤖 Extracción automática con Claude API — arrastra tu PDF médico" onclick="showImportTab('auto')" style="font-size:14px;padding:10px 20px">📷 Leer documento</button>
+    <button class="btn" id="lbl-tab-portapapeles" data-i18n="tab_portapapeles_mt" data-tab="clipboard" data-tip="📋 Pega texto copiado de un PDF o documento médico" onclick="showImportTab('clipboard')" style="font-size:14px;padding:10px 20px">📋 Desde portapapeles</button>
+    <button class="btn" id="lbl-tab-manual" data-i18n="tab_manual_mt" data-tab="manual" data-tip="✏️ Introduce valores manualmente: fecha, parámetro y valor" onclick="showImportTab('manual')" style="font-size:14px;padding:10px 20px">✏️ Entrada manual</button>
   </div>
 
   <!-- ═══════════════════════════════════════════ -->
@@ -1126,7 +1126,7 @@ body.no-tips [data-tip]::before { display: none !important; }
   <!-- ═══════════════════════════════════════════ -->
   <div id="volet-clipboard" class="import-volet" style="display:none">
     <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent2);border-radius:var(--radius);padding:20px 24px">
-      <div id="lbl-importar-datos" mt-translate mt-key="importar datos" style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent2);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">📋 IMPORTAR DATOS</div>
+      <div id="lbl-importar-datos" data-i18n="importar_datos_mt" style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent2);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">📋 IMPORTAR DATOS</div>
       <div style="font-size:15px;color:var(--muted);margin-bottom:16px;line-height:1.7">
         Copie los datos generados por Claude y pulse el botón para importarlos.
       </div>
@@ -1157,7 +1157,7 @@ body.no-tips [data-tip]::before { display: none !important; }
   <!-- ═══════════════════════════════════════════ -->
   <div id="volet-auto" class="import-volet">
     <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:var(--radius);padding:20px 24px">
-      <div id="lbl-lectura-docs" mt-translate mt-key="lectura docs" style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">🤖 LECTURA DE DOCUMENTOS</div>
+      <div id="lbl-lectura-docs" data-i18n="lectura_docs_mt" style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">🤖 LECTURA DE DOCUMENTOS</div>
 
       <div style="font-size:15px;color:var(--muted);margin-bottom:16px;line-height:1.7">
         Seleccione una imagen o un PDF escaneado. MediTrace extraerá el texto automáticamente.
@@ -1236,7 +1236,7 @@ body.no-tips [data-tip]::before { display: none !important; }
   <!-- ═══════════════════════════════════════════ -->
   <div id="volet-manual" class="import-volet" style="display:none">
     <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--warn);border-radius:var(--radius);padding:20px 24px">
-      <div id="lbl-entrada-manual" mt-translate mt-key="entrada manual" style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--warn);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">✏️ ENTRADA MANUAL DE VALORES</div>
+      <div id="lbl-entrada-manual" data-i18n="entrada_manual_mt" style="font-family:var(--mono);font-size:14px;font-weight:600;color:var(--warn);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">✏️ ENTRADA MANUAL DE VALORES</div>
       <div class="manual-form">
         <div class="form-grid">
           <div class="form-field">
@@ -1331,368 +1331,367 @@ body.no-tips [data-tip]::before { display: none !important; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
 
+if (typeof pdfjsLib !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
 /* ================================================================
-   SYSTÈME DE TRADUCTION — Pierre-Henri Giraud (adapté pour MediTrace)
-   Fidèle à l'architecture originale langue.js
+   TRADUCTIONS
 ================================================================ */
-var MT_codelangue = "ES";
-var MT_langues = {};
-var MT_curlangue = null; // will be set by MT_setLangue
-var MT_debugLG = false;
-
-/* TABLE DE RÉFÉRENCES — mot-clé → index numérique */
-var MT_base = {
-  /* Navigation */
-  "tab resumen":        100,
-  "tab curvas":         101,
-  "tab tabla":          102,
-  "tab timeline":       103,
-  "tab ant":            104,
-  "tab vasc":           105,
-  "tab corr":           106,
-  "tab obs":            107,
-  "tab meds":           108,
-  "tab farma":          109,
-  "tab radar":          110,
-  "tab bacterio":       111,
-  "tab import":         112,
-  /* Barre supérieure */
-  "nav import":         200,
-  "nav reset":          201,
-  /* Données en mémoire */
-  "data in memory":     300,
-  "save backup":        301,
-  "ver eventos":        302,
-  "ver mediciones":     303,
-  /* Onglets import */
-  "tab leer":           400,
-  "tab portapapeles":   401,
-  "tab manual":         402,
-  "importar datos":     403,
-  "lectura docs":       404,
-  "entrada manual":     405,
-  /* Paramètres */
-  "last values":        500,
-  "key charts":         501,
-  "all params":         502,
-  "synth table":        503,
-  "clinical timeline":  504,
-  "select pdf":         505,
-  /* Labels formulaire */
-  "lbl date":           600,
-  "lbl source":         601,
-  "lbl param":          602,
-  "lbl value":          603,
-  "btn add":            604,
-  "btn add event":      605,
-  "btn show":           606,
-  /* Messages dynamiques */
-  "no api key":         700,
-  "no data":            701,
-  "field required":     702,
-  "event added":        703,
-  "no export data":     704,
-  "bad format":         705,
-  "import ok":          706,
-  "confirm delete":     707,
-  "del cancel":         708,
-  "del confirm":        709,
-  "data replaced warn": 710,
-  "change patient":     711,
-  /* Informe PDF */
-  "informe detallado":  800,
-  "informe sintetico":  801,
-  "patient":            802,
-  "generated":          803,
-  "period":             804,
-  "data":               805,
-  "author":             806,
-  "warning doc":        807,
-  "anamnesis title":    808,
-  "vascular synthesis": 809,
-  "critical finding":   810,
-  "pharma title":       811,
-  "ecg pending":        812,
-  "dabigatran stopped": 813,
-  "pantoprazol b12":    814,
-  "tiotropio donepezil":815,
-  "donepezil memantine":816,
-  "observance title":   817,
-  "last values title":  818,
-  "synth table title":  819,
-  "timeline title":     820,
-  "bacterio title":     821,
-  "sources title":      822,
-  "charts title":       823,
-  "share title":        824,
-  "save pdf":           825,
-  "copy report":        826,
-  "send email":         827,
-  "out of range":       828,
-  "values out of range":829,
-  "footer info":        830,
-  "doc not medical":    831,
-  "doctor questions":   832,
-  "section":            833,
-  "date":               834,
-  "source":             835,
-  "status":             836,
-  "observation":        837,
-  "abandoned":          838,
-  "prescribed":         839,
-  "suspended ok":       840,
-  "active ok":          841,
-  "uncertain":          842,
-};
-
-/* ── ESPAÑOL (langue par défaut) ── */
-MT_langues["ES"] = {
-  100:"Resumen",        101:"Curvas",          102:"Tabla",
-  103:"Cronología",     104:"Antecedentes",    105:"🧠 Análisis Vascular",
-  106:"📊 Correlaciones", 107:"Observancia",   108:"Medicamentos",
-  109:"⚠ Farmacovigilancia", 110:"Radar",      111:"Bacteriología",
-  112:"📥 Datos",
-  200:"📥 Datos",       201:"⟳ Reiniciar",
-  300:"DATOS EN MEMORIA",  301:"💾 Guardar backup (.mt)",
-  302:"📜 Ver / gestionar eventos importados ▼",
-  303:"📊 Ver / corregir fechas de mediciones ▼",
-  400:"📷 Leer documento", 401:"📋 Desde portapapeles", 402:"✏️ Entrada manual",
-  403:"📋 IMPORTAR DATOS",  404:"🤖 LECTURA DE DOCUMENTOS",
-  405:"✏️ ENTRADA MANUAL DE VALORES",
-  500:"Últimos valores conocidos",   501:"Parámetros clave",
-  502:"Todos los parámetros",        503:"Tabla de síntesis",
-  504:"Cronología clínica",          505:"Selecciona el PDF",
-  600:"Fecha",    601:"Fuente",    602:"Parámetro",  603:"Valor",
-  604:"+ Añadir", 605:"+ Evento",  606:"Mostrar",
-  700:"⚠ Introduce una clave API Claude para la extracción automática.",
-  701:"Sin datos",
-  702:"Rellena todos los campos obligatorios.",
-  703:"✓ Evento clínico añadido correctamente.",
-  704:"No hay datos que exportar.",
-  705:"Formato no reconocido. Usa un backup .mt o .json de MediTrace.",
-  706:"✅ {mes} mediciones · {ev} eventos · {med} medicamentos restaurados",
-  707:"¿Eliminar este evento?",
-  708:"Cancelar",
-  709:"✕ Eliminar",
-  710:"Los datos actuales serán reemplazados por el archivo importado.",
-  711:"Cambiar de paciente",
-  /* Informe */
-  800:"INFORME DETALLADO DE SEGUIMIENTO MÉDICO",
-  801:"INFORME SINTÉTICO DE SEGUIMIENTO MÉDICO",
-  802:"Paciente", 803:"Generado", 804:"Período", 805:"Datos", 806:"Autor",
-  807:"⚠ Documento informativo — No diagnóstico",
-  808:"' + MT_tr('anamnesis title') + '",
-  809:"🧠 Análisis Vascular — Síntesis",
-  810:"🚨 HALLAZGO CRÍTICO — IRM Vascular ASCIRES 10/03/2026",
-  811:"⚠ Farmacovigilancia — CIMA/AEMPS",
-  812:"🚨 ECG PENDIENTE antes de Donepezilo",
-  813:"🚨 Dabigatrán ABANDONADO — Sin anticoagulación con ACI ocluida",
-  814:"⚠ Pantoprazol largo plazo → Déficit B12",
-  815:"⚠ Tiotropio + Donepezilo → Antagonismo anticolinérgico",
-  816:"✓ Donepezilo + Memantina — SEGURO",
-  817:"💊 Observancia terapéutica",
-  818:"📊 Últimos valores conocidos",
-  819:"📋 Tabla de síntesis cronológica",
-  820:"🕐 Cronología clínica",
-  821:"🦠 Bacteriología",
-  822:"🏥 Fuentes documentales",
-  823:"📈 Curvas de evolución — Parámetros significativos",
-  824:"' + MT_tr('share title') + '",
-  825:"Guardar como PDF",
-  826:MT_tr('copy report'),
-  827:"Enviar por Email",
-  828:"⚠ Fuera de rango",
-  829:"' + MT_tr('values out of range') + '",
-  830:"MediTrace v2026 — Informe — ",
-  831:"Documento informativo — No sustituye el criterio médico profesional.",
-  832:"Preguntas para el médico",
-  833:"Sección", 834:"Fecha", 835:"Fuente", 836:"Estado", 837:"Observación",
-  838:"ABANDONADO", 839:"PRESCRITO", 840:"SUSPENDIDO ✓", 841:"EN CURSO ✓", 842:"INCIERTO",
-};
-
-/* ── FRANÇAIS MT_langues ── */
-
-/* ── FRANÇAIS ── */
-MT_langues["FR"] = {
-  100:"Résumé",         101:"Courbes",         102:"Tableau",
-  103:"Chronologie",    104:"Antécédents",     105:"🧠 Analyse Vasculaire",
-  106:"📊 Corrélations", 107:"Observance",     108:"Médicaments",
-  109:"⚠ Pharmacovigilance", 110:"Radar",      111:"Bactériologie",
-  112:"📥 Données",
-  200:"📥 Données",     201:"⟳ Réinitialiser",
-  300:"DONNÉES EN MÉMOIRE",  301:"💾 Sauvegarder (.mt)",
-  302:"📜 Voir / gérer les événements importés ▼",
-  303:"📊 Voir / corriger les dates de mesures ▼",
-  400:"📷 Lire un document", 401:"📋 Presse-papiers", 402:"✏️ Saisie manuelle",
-  403:"📋 IMPORTER DES DONNÉES", 404:"🤖 LECTURE DE DOCUMENTS",
-  405:"✏️ SAISIE MANUELLE DE VALEURS",
-  500:"Dernières valeurs connues",   501:"Paramètres clés",
-  502:"Tous les paramètres",         503:"Tableau de synthèse",
-  504:"Chronologie clinique",        505:"Sélectionnez le PDF",
-  600:"Date",      601:"Source",    602:"Paramètre",  603:"Valeur",
-  604:"+ Ajouter", 605:"+ Événement", 606:"Afficher",
-  700:"⚠ Entrez une clé API Claude pour l'extraction automatique.",
-  701:"Pas de données",
-  702:"Remplissez tous les champs obligatoires.",
-  703:"✓ Événement clinique ajouté correctement.",
-  704:"Aucune donnée à exporter.",
-  705:"Format non reconnu. Utilisez un backup .mt ou .json MediTrace.",
-  706:"✅ {mes} mesures · {ev} événements · {med} médicaments restaurés",
-  707:"Supprimer cet événement ?",
-  708:"Annuler",
-  709:"✕ Supprimer",
-  710:"Les données actuelles seront remplacées par le fichier importé.",
-  711:"Changer de patient",
-  800:"RAPPORT DÉTAILLÉ DE SUIVI MÉDICAL",
-  801:"RAPPORT SYNTHÉTIQUE DE SUIVI MÉDICAL",
-  802:"Patient", 803:"Généré", 804:"Période", 805:"Données", 806:"Auteur",
-  807:"⚠ Document informatif — Non diagnostique",
-  808:"Anamnèse et Synthèse Clinique",
-  809:"🧠 Analyse Vasculaire — Synthèse",
-  810:"🚨 DÉCOUVERTE CRITIQUE — IRM Vasculaire ASCIRES 10/03/2026",
-  811:"⚠ Pharmacovigilance — CIMA/AEMPS",
-  812:"🚨 ECG EN ATTENTE avant Donépézil",
-  813:"🚨 Dabigatran ABANDONNÉ — Sans anticoagulation avec ACI occluse",
-  814:"⚠ Pantoprazol long terme → Déficit B12",
-  815:"⚠ Tiotropium + Donépézil → Antagonisme anticholinergique",
-  816:"✓ Donépézil + Mémantine — SÛR",
-  817:"💊 Observance thérapeutique",
-  818:"📊 Dernières valeurs connues",
-  819:"📋 Tableau de synthèse chronologique",
-  820:"🕐 Chronologie clinique",
-  821:"🦠 Bactériologie",
-  822:"🏥 Sources documentaires",
-  823:"📈 Courbes d'évolution — Paramètres significatifs",
-  824:"Partager ce rapport",
-  825:"Enregistrer en PDF",
-  826:"Copier le rapport",
-  827:"Envoyer par Email",
-  828:"⚠ Hors référence",
-  829:"⚠ VALEURS HORS RÉFÉRENCE",
-  830:"MediTrace v2026 — Rapport — ",
-  831:"Document informatif — Ne remplace pas l'avis médical professionnel.",
-  832:"Questions pour le médecin",
-  833:"Section", 834:"Date", 835:"Source", 836:"Statut", 837:"Observation",
-  838:"ABANDONNÉ", 839:"PRESCRIT", 840:"SUSPENDU ✓", 841:"EN COURS ✓", 842:"INCERTAIN",
-};
-
-/* ── ENGLISH ── */
-MT_langues["EN"] = {
-  100:"Summary",        101:"Charts",          102:"Table",
-  103:"Timeline",       104:"Medical History", 105:"🧠 Vascular Analysis",
-  106:"📊 Correlations", 107:"Compliance",     108:"Medications",
-  109:"⚠ Pharmacovigilance", 110:"Radar",      111:"Bacteriology",
-  112:"📥 Data",
-  200:"📥 Data",        201:"⟳ Reset",
-  300:"DATA IN MEMORY",      301:"💾 Save backup (.mt)",
-  302:"📜 View / manage imported events ▼",
-  303:"📊 View / correct measurement dates ▼",
-  400:"📷 Read document", 401:"📋 Clipboard",  402:"✏️ Manual entry",
-  403:"📋 IMPORT DATA",    404:"🤖 DOCUMENT READER",
-  405:"✏️ MANUAL VALUE ENTRY",
-  500:"Latest known values",    501:"Key parameters",
-  502:"All parameters",         503:"Synthesis table",
-  504:"Clinical timeline",      505:"Select the PDF",
-  600:"Date",    601:"Source",  602:"Parameter",  603:"Value",
-  604:"+ Add",   605:"+ Event", 606:"Show",
-  700:"⚠ Enter a Claude API key for automatic extraction.",
-  701:"No data",
-  702:"Please fill in all required fields.",
-  703:"✓ Clinical event added successfully.",
-  704:"No data to export.",
-  705:"Unrecognised format. Use a MediTrace .mt or .json backup.",
-  706:"✅ {mes} readings · {ev} events · {med} medications restored",
-  707:"Delete this event?",
-  708:"Cancel",
-  709:"✕ Delete",
-  710:"Current data will be replaced by the imported file.",
-  711:"Change patient",
-  800:"DETAILED MEDICAL FOLLOW-UP REPORT",
-  801:"SUMMARY MEDICAL FOLLOW-UP REPORT",
-  802:"Patient", 803:"Generated", 804:"Period", 805:"Data", 806:"Author",
-  807:"⚠ Informational document — Not a diagnosis",
-  808:"Anamnesis and Clinical Summary",
-  809:"🧠 Vascular Analysis — Summary",
-  810:"🚨 CRITICAL FINDING — Vascular MRI ASCIRES 10/03/2026",
-  811:"⚠ Pharmacovigilance — CIMA/AEMPS",
-  812:"🚨 ECG PENDING before Donepezil",
-  813:"🚨 Dabigatran DISCONTINUED — No anticoagulation with occluded ICA",
-  814:"⚠ Long-term Pantoprazole → B12 deficiency",
-  815:"⚠ Tiotropium + Donepezil → Anticholinergic antagonism",
-  816:"✓ Donepezil + Memantine — SAFE",
-  817:"💊 Therapeutic compliance",
-  818:"📊 Latest known values",
-  819:"📋 Chronological synthesis table",
-  820:"🕐 Clinical timeline",
-  821:"🦠 Bacteriology",
-  822:"🏥 Documentary sources",
-  823:"📈 Evolution charts — Significant parameters",
-  824:"Share this report",
-  825:"Save as PDF",
-  826:"Copy report",
-  827:"Send by Email",
-  828:"⚠ Out of range",
-  829:"⚠ VALUES OUT OF RANGE",
-  830:"MediTrace v2026 — Report — ",
-  831:"Informational document — Does not replace professional medical advice.",
-  832:"Questions for the doctor",
-  833:"Section", 834:"Date", 835:"Source", 836:"Status", 837:"Note",
-  838:"DISCONTINUED", 839:"PRESCRIBED", 840:"SUSPENDED ✓", 841:"ACTIVE ✓", 842:"UNCERTAIN",
-};
-
-/* ── INITIALISATION ── */
-MT_curlangue = MT_langues["ES"]; // défaut ES au démarrage
-
-/* ── FONCTIONS DE TRADUCTION (fidèles à l'original) ── */
-function MT_translate(p, vars) {
-  if (p === null || p === undefined) return '';
-  var w = p.replace(/_/g, ' ').toLowerCase();
-  var id = MT_base[w];
-  var s = '';
-  if (id === undefined) {
-    if (MT_debugLG) return '<b style="color:red">' + p + '</b>';
-    return p;
+const T = {
+  es: {
+    /* Navigation */
+    tab_resumen:"Resumen", tab_curvas:"Curvas", tab_tabla:"Tabla",
+    tab_timeline:"Cronología", tab_ant:"Antecedentes",
+    tab_vasc:"🧠 Análisis Vascular", tab_corr:"📊 Correlaciones",
+    tab_obs:"Observancia", tab_meds:"Medicamentos",
+    tab_farma:"⚠ Farmacovigilancia", tab_radar:"Radar",
+    tab_bacterio:"Bacteriología", tab_import:"📥 Datos",
+    nav_import:"📥 Datos", nav_reset:"⟳ Reiniciar",
+    /* Bienvenida */
+    welcome_title:"Bienvenido a MediTrace",
+    welcome_sub:"Ningún dato médico cargado todavía.\nEmpiece importando un PDF o añadiendo datos manualmente.",
+    welcome_btn:"→ Importar mi primer documento",
+    /* Import */
+    import_title:"Importar documentos médicos",
+    api_key_label:"Clave API Claude — para extracción automática",
+    api_key_note:"La clave se guarda en localStorage. No se envía a ningún servidor externo.",
+    drop_title:"Arrastra un PDF aquí o haz clic para seleccionar",
+    drop_sub:"Informes de laboratorio · Notas de evolución · Informes de imagen",
+    manual_entry:"Añadir valor manualmente",
+    /* Formulaire */
+    lbl_date:"Fecha", lbl_source:"Fuente", lbl_param:"Parámetro", lbl_value:"Valor",
+    btn_add:"+ Añadir", btn_add_event:"+ Evento clínico", btn_show:"Mostrar",
+    /* Résumé */
+    current_data:"Datos en memoria", last_values:"Últimos valores conocidos",
+    key_charts:"Parámetros clave", all_params:"Todos los parámetros",
+    synth_table:"Tabla de síntesis", clinical_timeline:"Cronología clínica",
+    select_pdf:"Selecciona el PDF",
+    /* Extraction */
+    extracting:"Extrayendo datos del PDF...",
+    extract_ok:"✓ Extraídos", extract_err:"✗ Error de extracción",
+    no_key:"⚠ Introduce una clave API Claude para la extracción automática.",
+    /* Actions */
+    confirm_reset:"¿Borrar todos los datos? Esta acción no se puede deshacer.",
+    no_data:"Sin datos", del_title:"¿Eliminar este evento?",
+    del_cancel:"Cancelar", del_confirm:"✕ Eliminar",
+    edit_label:"Editar:", edit_save:"✓ Guardar", edit_cancel:"Cancelar",
+    no_events:"No hay eventos clínicos registrados.", events_count:"evento(s)",
+    /* Panel datos */
+    datos_memoria:"DATOS EN MEMORIA", guardar_backup:"💾 Guardar backup (.mt)",
+    ver_eventos:"📜 Ver / gestionar eventos importados ▼",
+    ver_mediciones:"📊 Ver / corregir fechas de mediciones ▼",
+    filtrar:"Filtrar:", todos:"Todos", ultima_import:"Última importación:",
+    /* Onglets import */
+    tab_leer:"📷 Leer documento", tab_portapapeles:"📋 Desde portapapeles",
+    tab_manual:"✏️ Entrada manual", importar_datos:"📋 IMPORTAR DATOS",
+    copiar_importar:"Pegar e importar", lectura_docs:"🤖 LECTURA DE DOCUMENTOS",
+    leer_ocr:"📷 Leer documento (OCR)", entrada_manual:"✏️ ENTRADA MANUAL DE VALORES",
+    /* Misc */
+    selec_med:"— Seleccionar medicamento —", ir_a:"Ir a:", btn_editar:"Editar",
+    importar_este:"¿Importar este documento?",
+    paso1:"Pulse el botón \"Copiar para Claude\"",
+    paso2:"Péguelo en su conversación con Claude",
+    paso3:"Claude le devolverá los datos en formato importable",
+    paso4:"Cópielos y use el botón Pegar e importar",
+    copiar_claude:"Copiar para Claude", texto_extraido:"TEXTO EXTRAÍDO",
+    avanzado:"Avanzado: extracción directa con clave API",
+    desc_leer:"Seleccione una imagen o un PDF escaneado. MediTrace lo enviará a Claude API para extraer los datos.",
+    desc_pegar:"Copie los datos generados por Claude y pulse el botón para importarlos.",
+    despues_lectura:"Después de la lectura:",
+    /* Médicaments */
+    med_prescriptor:"Prescrito por", med_receta:"Receta / Ordonnance",
+    med_motivo:"Motivo", med_reemplazo:"Reemplazado por",
+    med_inicio:"Fecha inicio", med_fin:"Fecha fin", med_estatuto:"Estatuto actual",
+    med_en_curso:"En curso", med_nuevo:"Nuevo", med_prn:"Si necesario (PRN)",
+    med_suspendido:"Suspendido", med_abandonado:"Abandonado", med_terminado:"Terminado",
+    receta_publica:"Receta pública (financiada)", receta_privada:"Receta privada",
+    receta_no_fin:"No financiado (paciente paga)", receta_hospital:"Dispensación hospitalaria",
+    /* MT keys (ancien système) */
+    data_in_memory:"DATOS EN MEMORIA", save_backup:"💾 Guardar backup (.mt)",
+    ver_eventos_mt:"📜 Ver / gestionar eventos importados ▼",
+    ver_mediciones_mt:"📊 Ver / corregir fechas de mediciones ▼",
+    tab_leer_mt:"📷 Leer documento", tab_portapapeles_mt:"📋 Desde portapapeles",
+    tab_manual_mt:"✏️ Entrada manual", importar_datos_mt:"📋 IMPORTAR DATOS",
+    lectura_docs_mt:"🤖 LECTURA DE DOCUMENTOS", entrada_manual_mt:"✏️ ENTRADA MANUAL DE VALORES",
+    /* Informe PDF */
+    informe_detallado:"INFORME DETALLADO DE SEGUIMIENTO MÉDICO",
+    informe_sintetico:"INFORME SINTÉTICO DE SEGUIMIENTO MÉDICO",
+    patient_lbl:"Paciente", generated_lbl:"Generado", period_lbl:"Período",
+    data_lbl:"Datos", author_lbl:"Autor",
+    warning_doc:"⚠ Documento informativo — No diagnóstico",
+    anamnesis_title:"Anamnesis y Síntesis Clínica",
+    vascular_synthesis:"🧠 Análisis Vascular — Síntesis",
+    critical_finding:"🚨 HALLAZGO CRÍTICO — IRM Vascular ASCIRES 10/03/2026",
+    pharma_title:"⚠ Farmacovigilancia — CIMA/AEMPS",
+    ecg_pending:"🚨 ECG PENDIENTE antes de Donepezilo",
+    dabigatran_stopped:"🚨 Dabigatrán ABANDONADO — Sin anticoagulación",
+    pantoprazol_b12:"⚠ Pantoprazol largo plazo → Déficit B12",
+    tiotropio_donepezil:"⚠ Tiotropio + Donepezilo → Antagonismo",
+    donepezil_memantine:"✓ Donepezilo + Memantina — SEGURO",
+    observance_title:"💊 Observancia terapéutica",
+    last_values_title:"📊 Últimos valores conocidos",
+    synth_table_title:"📋 Tabla de síntesis cronológica",
+    timeline_title:"🕐 Cronología clínica",
+    bacterio_title:"🦠 Bacteriología",
+    sources_title:"🏥 Fuentes documentales",
+    charts_title:"📈 Curvas de evolución — Parámetros significativos",
+    share_title:"Compartir este informe",
+    save_pdf:"Guardar como PDF", copy_report:"Copiar informe", send_email:"Enviar por Email",
+    out_of_range:"⚠ Fuera de rango", values_out_of_range:"⚠ VALORES FUERA DE RANGO",
+    doc_not_medical:"Documento informativo — No sustituye el criterio médico profesional.",
+    doctor_questions:"Preguntas para el médico",
+    status_lbl:"Estado", observation_lbl:"Observación", date_lbl:"Fecha", source_lbl:"Fuente",
+    abandoned:"ABANDONADO", prescribed:"PRESCRITO",
+    suspended_ok:"SUSPENDIDO ✓", active_ok:"EN CURSO ✓", uncertain:"INCIERTO",
+    no_api_key:"⚠ Introduce una clave API Claude para la extracción automática.",
+    field_required:"Rellena todos los campos obligatorios.",
+    event_added:"✓ Evento clínico añadido correctamente.",
+    no_export_data:"No hay datos que exportar.",
+    bad_format:"Formato no reconocido. Usa un backup .mt o .json de MediTrace.",
+    import_ok:"✅ {mes} mediciones · {ev} eventos · {med} medicamentos restaurados",
+    change_patient:"Cambiar de paciente",
+    pref_tips:"💬 Mostrar ayuda contextual",
+  },
+  fr: {
+    tab_resumen:"Résumé", tab_curvas:"Courbes", tab_tabla:"Tableau",
+    tab_timeline:"Chronologie", tab_ant:"Antécédents",
+    tab_vasc:"🧠 Analyse Vasculaire", tab_corr:"📊 Corrélations",
+    tab_obs:"Observance", tab_meds:"Médicaments",
+    tab_farma:"⚠ Pharmacovigilance", tab_radar:"Radar",
+    tab_bacterio:"Bactériologie", tab_import:"📥 Données",
+    nav_import:"📥 Données", nav_reset:"⟳ Réinitialiser",
+    welcome_title:"Bienvenue sur MediTrace",
+    welcome_sub:"Aucune donnée médicale chargée.\nCommencez par importer un PDF ou saisir des données.",
+    welcome_btn:"→ Importer mon premier document",
+    import_title:"Importer des documents médicaux",
+    api_key_label:"Clé API Claude — pour l'extraction automatique",
+    api_key_note:"La clé est sauvegardée en localStorage. Non transmise à un serveur externe.",
+    drop_title:"Glissez un PDF ici ou cliquez pour sélectionner",
+    drop_sub:"Bilans biologiques · Notes d'évolution · Comptes-rendus d'imagerie",
+    manual_entry:"Ajouter une valeur manuellement",
+    lbl_date:"Date", lbl_source:"Source", lbl_param:"Paramètre", lbl_value:"Valeur",
+    btn_add:"+ Ajouter", btn_add_event:"+ Événement clinique", btn_show:"Afficher",
+    current_data:"Données en mémoire", last_values:"Dernières valeurs connues",
+    key_charts:"Paramètres clés", all_params:"Tous les paramètres",
+    synth_table:"Tableau de synthèse", clinical_timeline:"Chronologie clinique",
+    select_pdf:"Sélectionnez le PDF",
+    extracting:"Extraction des données du PDF...",
+    extract_ok:"✓ Extraits", extract_err:"✗ Erreur d'extraction",
+    no_key:"⚠ Entrez une clé API Claude pour l'extraction automatique.",
+    confirm_reset:"Supprimer toutes les données ? Cette action est irréversible.",
+    no_data:"Pas de données", del_title:"Supprimer cet événement ?",
+    del_cancel:"Annuler", del_confirm:"✕ Supprimer",
+    edit_label:"Modifier :", edit_save:"✓ Enregistrer", edit_cancel:"Annuler",
+    no_events:"Aucun événement clinique enregistré.", events_count:"événement(s)",
+    datos_memoria:"DONNÉES EN MÉMOIRE", guardar_backup:"💾 Sauvegarder (.mt)",
+    ver_eventos:"📜 Voir / gérer les événements importés ▼",
+    ver_mediciones:"📊 Voir / corriger les dates de mesures ▼",
+    filtrar:"Filtrer :", todos:"Tous", ultima_import:"Dernière importation :",
+    tab_leer:"📷 Lire un document", tab_portapapeles:"📋 Presse-papiers",
+    tab_manual:"✏️ Saisie manuelle", importar_datos:"📋 IMPORTER DES DONNÉES",
+    copiar_importar:"Coller et importer", lectura_docs:"🤖 LECTURE DE DOCUMENTS",
+    leer_ocr:"📷 Lire un document (OCR)", entrada_manual:"✏️ SAISIE MANUELLE DE VALEURS",
+    selec_med:"— Sélectionner un médicament —", ir_a:"Aller à :", btn_editar:"Modifier",
+    importar_este:"Importer ce document ?",
+    paso1:"Cliquez sur \"Copier pour Claude\"",
+    paso2:"Collez dans votre conversation avec Claude",
+    paso3:"Claude vous renverra les données en format importable",
+    paso4:"Copiez-les et utilisez le bouton Coller et importer",
+    copiar_claude:"Copier pour Claude", texto_extraido:"TEXTE EXTRAIT",
+    avanzado:"Avancé : extraction directe avec clé API",
+    desc_leer:"Sélectionnez une image ou un PDF scanné. MediTrace l'enverra à Claude API pour extraire les données.",
+    desc_pegar:"Collez les données générées par Claude et cliquez sur le bouton pour les importer.",
+    despues_lectura:"Après la lecture :",
+    med_prescriptor:"Prescrit par", med_receta:"Ordonnance",
+    med_motivo:"Motif", med_reemplazo:"Remplacé par",
+    med_inicio:"Date début", med_fin:"Date fin", med_estatuto:"Statut actuel",
+    med_en_curso:"En cours", med_nuevo:"Nouveau", med_prn:"Si besoin (PRN)",
+    med_suspendido:"Suspendu", med_abandonado:"Abandonné", med_terminado:"Terminé",
+    receta_publica:"Ordonnance publique (remboursée)", receta_privada:"Ordonnance privée",
+    receta_no_fin:"Non remboursé (patient paie)", receta_hospital:"Dispensation hospitalière",
+    data_in_memory:"DONNÉES EN MÉMOIRE", save_backup:"💾 Sauvegarder (.mt)",
+    ver_eventos_mt:"📜 Voir / gérer les événements ▼",
+    ver_mediciones_mt:"📊 Voir / corriger les mesures ▼",
+    tab_leer_mt:"📷 Lire un document", tab_portapapeles_mt:"📋 Presse-papiers",
+    tab_manual_mt:"✏️ Saisie manuelle", importar_datos_mt:"📋 IMPORTER DES DONNÉES",
+    lectura_docs_mt:"🤖 LECTURE DE DOCUMENTS", entrada_manual_mt:"✏️ SAISIE MANUELLE",
+    informe_detallado:"RAPPORT DÉTAILLÉ DE SUIVI MÉDICAL",
+    informe_sintetico:"RAPPORT SYNTHÉTIQUE DE SUIVI MÉDICAL",
+    patient_lbl:"Patient", generated_lbl:"Généré", period_lbl:"Période",
+    data_lbl:"Données", author_lbl:"Auteur",
+    warning_doc:"⚠ Document informatif — Non diagnostique",
+    anamnesis_title:"Anamnèse et Synthèse Clinique",
+    vascular_synthesis:"🧠 Analyse Vasculaire — Synthèse",
+    critical_finding:"🚨 DÉCOUVERTE CRITIQUE — IRM Vasculaire ASCIRES 10/03/2026",
+    pharma_title:"⚠ Pharmacovigilance — CIMA/AEMPS",
+    ecg_pending:"🚨 ECG EN ATTENTE avant Donépézil",
+    dabigatran_stopped:"🚨 Dabigatran ABANDONNÉ — Sans anticoagulation",
+    pantoprazol_b12:"⚠ Pantoprazol long terme → Déficit B12",
+    tiotropio_donepezil:"⚠ Tiotropium + Donépézil → Antagonisme",
+    donepezil_memantine:"✓ Donépézil + Mémantine — SÛR",
+    observance_title:"💊 Observance thérapeutique",
+    last_values_title:"📊 Dernières valeurs connues",
+    synth_table_title:"📋 Tableau de synthèse chronologique",
+    timeline_title:"🕐 Chronologie clinique",
+    bacterio_title:"🦠 Bactériologie",
+    sources_title:"🏥 Sources documentaires",
+    charts_title:"📈 Courbes d'évolution — Paramètres significatifs",
+    share_title:"Partager ce rapport",
+    save_pdf:"Enregistrer en PDF", copy_report:"Copier le rapport", send_email:"Envoyer par Email",
+    out_of_range:"⚠ Hors référence", values_out_of_range:"⚠ VALEURS HORS RÉFÉRENCE",
+    doc_not_medical:"Document informatif — Ne remplace pas l'avis médical professionnel.",
+    doctor_questions:"Questions pour le médecin",
+    status_lbl:"Statut", observation_lbl:"Observation", date_lbl:"Date", source_lbl:"Source",
+    abandoned:"ABANDONNÉ", prescribed:"PRESCRIT",
+    suspended_ok:"SUSPENDU ✓", active_ok:"EN COURS ✓", uncertain:"INCERTAIN",
+    no_api_key:"⚠ Entrez une clé API Claude pour l'extraction automatique.",
+    field_required:"Remplissez tous les champs obligatoires.",
+    event_added:"✓ Événement clinique ajouté correctement.",
+    no_export_data:"Aucune donnée à exporter.",
+    bad_format:"Format non reconnu. Utilisez un backup .mt ou .json MediTrace.",
+    import_ok:"✅ {mes} mesures · {ev} événements · {med} médicaments restaurés",
+    change_patient:"Changer de patient",
+    pref_tips:"💬 Afficher l'aide contextuelle",
+  },
+  en: {
+    tab_resumen:"Summary", tab_curvas:"Charts", tab_tabla:"Table",
+    tab_timeline:"Timeline", tab_ant:"Medical History",
+    tab_vasc:"🧠 Vascular Analysis", tab_corr:"📊 Correlations",
+    tab_obs:"Compliance", tab_meds:"Medications",
+    tab_farma:"⚠ Pharmacovigilance", tab_radar:"Radar",
+    tab_bacterio:"Bacteriology", tab_import:"📥 Data",
+    nav_import:"📥 Data", nav_reset:"⟳ Reset",
+    welcome_title:"Welcome to MediTrace",
+    welcome_sub:"No medical data loaded yet.\nStart by importing a PDF or adding data manually.",
+    welcome_btn:"→ Import my first document",
+    import_title:"Import medical documents",
+    api_key_label:"Claude API Key — for automatic extraction",
+    api_key_note:"The key is saved in localStorage. Never sent to any external server.",
+    drop_title:"Drag a PDF here or click to select",
+    drop_sub:"Lab reports · Clinical notes · Imaging reports",
+    manual_entry:"Add a value manually",
+    lbl_date:"Date", lbl_source:"Source", lbl_param:"Parameter", lbl_value:"Value",
+    btn_add:"+ Add", btn_add_event:"+ Clinical event", btn_show:"Show",
+    current_data:"Data in memory", last_values:"Latest known values",
+    key_charts:"Key parameters", all_params:"All parameters",
+    synth_table:"Synthesis table", clinical_timeline:"Clinical timeline",
+    select_pdf:"Select the PDF",
+    extracting:"Extracting data from PDF...",
+    extract_ok:"✓ Extracted", extract_err:"✗ Extraction error",
+    no_key:"⚠ Enter a Claude API key for automatic extraction.",
+    confirm_reset:"Delete all data? This action cannot be undone.",
+    no_data:"No data", del_title:"Delete this event?",
+    del_cancel:"Cancel", del_confirm:"✕ Delete",
+    edit_label:"Edit:", edit_save:"✓ Save", edit_cancel:"Cancel",
+    no_events:"No clinical events recorded.", events_count:"event(s)",
+    datos_memoria:"DATA IN MEMORY", guardar_backup:"💾 Save backup (.mt)",
+    ver_eventos:"📜 View / manage imported events ▼",
+    ver_mediciones:"📊 View / correct measurement dates ▼",
+    filtrar:"Filter:", todos:"All", ultima_import:"Last import:",
+    tab_leer:"📷 Read document", tab_portapapeles:"📋 Clipboard",
+    tab_manual:"✏️ Manual entry", importar_datos:"📋 IMPORT DATA",
+    copiar_importar:"Paste and import", lectura_docs:"🤖 DOCUMENT READER",
+    leer_ocr:"📷 Read document (OCR)", entrada_manual:"✏️ MANUAL VALUE ENTRY",
+    selec_med:"— Select medication —", ir_a:"Go to:", btn_editar:"Edit",
+    importar_este:"Import this document?",
+    paso1:"Click \"Copy for Claude\"",
+    paso2:"Paste in your Claude conversation",
+    paso3:"Claude will return the data in importable format",
+    paso4:"Copy it and use the Paste and import button",
+    copiar_claude:"Copy for Claude", texto_extraido:"EXTRACTED TEXT",
+    avanzado:"Advanced: direct extraction with API key",
+    desc_leer:"Select an image or scanned PDF. MediTrace will send it to Claude API to extract data.",
+    desc_pegar:"Paste the data generated by Claude and click the button to import.",
+    despues_lectura:"After reading:",
+    med_prescriptor:"Prescribed by", med_receta:"Prescription",
+    med_motivo:"Reason", med_reemplazo:"Replaced by",
+    med_inicio:"Start date", med_fin:"End date", med_estatuto:"Current status",
+    med_en_curso:"Active", med_nuevo:"New", med_prn:"As needed (PRN)",
+    med_suspendido:"Suspended", med_abandonado:"Discontinued", med_terminado:"Finished",
+    receta_publica:"Public prescription (covered)", receta_privada:"Private prescription",
+    receta_no_fin:"Not covered (patient pays)", receta_hospital:"Hospital dispensation",
+    data_in_memory:"DATA IN MEMORY", save_backup:"💾 Save backup (.mt)",
+    ver_eventos_mt:"📜 View / manage events ▼",
+    ver_mediciones_mt:"📊 View / correct dates ▼",
+    tab_leer_mt:"📷 Read document", tab_portapapeles_mt:"📋 Clipboard",
+    tab_manual_mt:"✏️ Manual entry", importar_datos_mt:"📋 IMPORT DATA",
+    lectura_docs_mt:"🤖 DOCUMENT READER", entrada_manual_mt:"✏️ MANUAL ENTRY",
+    informe_detallado:"DETAILED MEDICAL FOLLOW-UP REPORT",
+    informe_sintetico:"SUMMARY MEDICAL FOLLOW-UP REPORT",
+    patient_lbl:"Patient", generated_lbl:"Generated", period_lbl:"Period",
+    data_lbl:"Data", author_lbl:"Author",
+    warning_doc:"⚠ Informational document — Not a diagnosis",
+    anamnesis_title:"Anamnesis and Clinical Summary",
+    vascular_synthesis:"🧠 Vascular Analysis — Summary",
+    critical_finding:"🚨 CRITICAL FINDING — Vascular MRI ASCIRES 10/03/2026",
+    pharma_title:"⚠ Pharmacovigilance — CIMA/AEMPS",
+    ecg_pending:"🚨 ECG PENDING before Donepezil",
+    dabigatran_stopped:"🚨 Dabigatran DISCONTINUED — No anticoagulation",
+    pantoprazol_b12:"⚠ Long-term Pantoprazole → B12 deficiency",
+    tiotropio_donepezil:"⚠ Tiotropium + Donepezil → Antagonism",
+    donepezil_memantine:"✓ Donepezil + Memantine — SAFE",
+    observance_title:"💊 Therapeutic compliance",
+    last_values_title:"📊 Latest known values",
+    synth_table_title:"📋 Chronological synthesis table",
+    timeline_title:"🕐 Clinical timeline",
+    bacterio_title:"🦠 Bacteriology",
+    sources_title:"🏥 Documentary sources",
+    charts_title:"📈 Evolution charts — Significant parameters",
+    share_title:"Share this report",
+    save_pdf:"Save as PDF", copy_report:"Copy report", send_email:"Send by Email",
+    out_of_range:"⚠ Out of range", values_out_of_range:"⚠ VALUES OUT OF RANGE",
+    doc_not_medical:"Informational document — Does not replace professional medical advice.",
+    doctor_questions:"Questions for the doctor",
+    status_lbl:"Status", observation_lbl:"Note", date_lbl:"Date", source_lbl:"Source",
+    abandoned:"DISCONTINUED", prescribed:"PRESCRIBED",
+    suspended_ok:"SUSPENDED ✓", active_ok:"ACTIVE ✓", uncertain:"UNCERTAIN",
+    no_api_key:"⚠ Enter a Claude API key for automatic extraction.",
+    field_required:"Please fill in all required fields.",
+    event_added:"✓ Clinical event added successfully.",
+    no_export_data:"No data to export.",
+    bad_format:"Unrecognised format. Use a MediTrace .mt or .json backup.",
+    import_ok:"✅ {mes} readings · {ev} events · {med} medications restored",
+    change_patient:"Change patient",
+    pref_tips:"💬 Show contextual help",
   }
-  if (MT_debugLG) s += '(' + id + ') {';
-  /* Safety: if MT_curlangue not yet initialized */
-  var curLang = MT_curlangue || MT_langues['ES'] || {};
-  var m = curLang[id];
-  if (m === undefined) {
-    m = (MT_langues && MT_langues["ES"] && MT_langues["ES"][id]) ? MT_langues["ES"][id] : p;
-    if (MT_debugLG) m += '<b style="color:orange">*</b>';
-  }
-  /* Substitution variables {key} */
-  if (vars) {
-    Object.keys(vars).forEach(function(k) {
-      m = m.replace(new RegExp('\{' + k + '\}', 'g'), vars[k]);
-    });
-  }
-  s += m;
-  if (MT_debugLG) s += '}';
-  return s;
+};
+
+/* ── FONCTION UNIFIÉE ── */
+let currentLang = localStorage.getItem('mt_lang') || 'es';
+
+function t(key, vars) {
+  const lang = T[currentLang] || T.es;
+  let txt = lang[key] || T.es[key] || key;
+  if (vars) Object.keys(vars).forEach(k => {
+    txt = txt.replace(new RegExp('\\{' + k + '\\}', 'g'), vars[k]);
+  });
+  return txt;
 }
 
-function MT_tr(p, vars) { return MT_translate(p, vars); }
-
-function MT_setLangue(code) {
-  MT_codelangue = code.toUpperCase();
-  MT_curlangue = MT_langues[MT_codelangue] || MT_langues["ES"];
-  /* Traduire tous les éléments avec attribut [mt-translate] */
-  var lbls = document.querySelectorAll('[mt-translate]');
-  for (var i = 0; i < lbls.length; i++) {
-    var keyword = lbls[i].getAttribute('mt-key') || lbls[i].getAttribute('id');
-    if (keyword) lbls[i].innerHTML = MT_translate(keyword);
-  }
-  /* Traduire aussi les [data-i18n] via LANG existant (compatibilité) */
-  if (typeof LANG !== 'undefined' && LANG[code.toLowerCase()]) {
-    var t = LANG[code.toLowerCase()];
-    document.querySelectorAll('[data-i18n]').forEach(function(el) {
-      var k = el.dataset.i18n;
-      if (t[k]) el.innerHTML = t[k].replace(/\n/g, '<br>');
-    });
-  }
+function setLang(l) {
+  currentLang = l;
+  localStorage.setItem('mt_lang', l);
+  /* Traduire tous les éléments data-i18n */
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    const val = t(key);
+    if (val) el.innerHTML = val.replace(/\\n/g, '<br>');
+  });
+  /* Mettre à jour boutons langue */
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  const activeBtn = document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`);
+  if (activeBtn) activeBtn.classList.add('active');
+  /* Badge profil */
+  if (typeof updateProfileBadge === 'function') updateProfileBadge();
+  document.documentElement.lang = l;
+  fillParamSelect();
+  if (typeof translatePanel === 'function') translatePanel(T[l] || T.es);
 }
-/* ── FIN SYSTÈME TRADUCTION ── */
+
+/* Alias pour compatibilité avec ancien code */
+const LANG = T;
+function MT_tr(key, vars) { return t(key, vars); }
+function MT_setLangue(code) { setLang(code.toLowerCase()); }
 
 /* Configurer pdf.js worker */
 if (typeof pdfjsLib !== 'undefined') {
@@ -1701,177 +1700,7 @@ if (typeof pdfjsLib !== 'undefined') {
 /* ================================================================
    TRADUCTIONS
 ================================================================ */
-const LANG = {
-  es: {
-    tab_resumen:"Resumen", tab_curvas:"Curvas", tab_tabla:"Tabla",
-    tab_timeline:"Cronología", tab_farma:"⚠ Farmacovigilancia", tab_import:"📥 Datos",
-    nav_import:"📥 Datos", nav_reset:"⟳ Reiniciar",
-    welcome_title:"Bienvenido a MediTrace",
-    welcome_sub:"Ningún dato médico cargado todavía.\nEmpiece importando un PDF o añadiendo datos manualmente.",
-    welcome_btn:"→ Importar mi primer documento",
-    import_title:"Importar documentos médicos",
-    api_key_label:"Clave API Claude — para extracción automática",
-    api_key_note:"La clave se guarda en localStorage. No se envía a ningún servidor excepto api.anthropic.com.",
-    drop_title:"Arrastra un PDF aquí o haz clic para seleccionar",
-    drop_sub:"Informes de laboratorio · Notas de evolución · Informes de urgencias",
-    manual_entry:"Añadir valor manualmente",
-    lbl_date:"Fecha", lbl_source:"Fuente", lbl_param:"Parámetro", lbl_value:"Valor",
-    btn_add:"+ Añadir", btn_add_event:"+ Evento clínico", btn_show:"Mostrar",
-    current_data:"Datos en memoria",
-    last_values:"Últimos valores conocidos", key_charts:"Parámetros clave",
-    all_params:"Todos los parámetros", synth_table:"Tabla de síntesis",
-    clinical_timeline:"Cronología clínica", select_pdf:"Selecciona el PDF",
-    extracting:"Extrayendo datos del PDF...",
-    extract_ok:"✓ Extraídos", extract_err:"✗ Error de extracción",
-    no_key:"⚠ Introduce una clave API Claude para la extracción automática.",
-    confirm_reset:"¿Borrar todos los datos? Esta acción no se puede deshacer.",
-    no_data:"Sin datos",
-    del_title:"¿Eliminar este evento?", del_cancel:"Cancelar", del_confirm:"✕ Eliminar",
-    edit_label:"Editar:", edit_save:"✓ Guardar", edit_cancel:"Cancelar",
-    edit_hint:"' + (LANG[currentLang].edit_hint||'Haga clic en cualquier celda para editarla.') + '",
-    no_events:"' + (LANG[currentLang].no_events||'No hay eventos importados.') + '",
-    events_count:"evento(s)",
-    datos_memoria:"DATOS EN MEMORIA", guardar_backup:"Guardar backup (.mt)",
-    ver_eventos:"Ver / gestionar eventos importados", ver_mediciones:"Ver / corregir fechas de mediciones",
-    filtrar:"Filtrar:", todos:"Todos", ultima_import:"Última importación:",
-    tab_leer:"📷 Leer documento", tab_portapapeles:"📋 Desde portapapeles", tab_manual:"✏️ Entrada manual",
-    importar_datos:"IMPORTAR DATOS", copiar_importar:"Pegar e importar",
-    lectura_docs:"LECTURA DE DOCUMENTOS", leer_ocr:"📷 Leer documento (OCR)",
-    entrada_manual:"ENTRADA MANUAL DE VALORES",
-    selec_med:"— Seleccionar medicamento —", ir_a:"Ir a:",
-    btn_editar:"Editar", importar_este:"Importar este documento?",
-    paso1:"Pulse \"Copiar para Claude\" para copiar el texto extraído",
-    paso2:"Péguelo en su conversación con Claude",
-    paso3:"Claude le devolverá los datos en formato importable",
-    paso4:"Cópielos y use el botón Pegar e importar",
-    copiar_claude:"Copiar para Claude", texto_extraido:"TEXTO EXTRAÍDO",
-    avanzado:"Avanzado: extracción directa con clave API",
-    desc_leer:"Seleccione una imagen o un PDF escaneado. MediTrace extraerá el texto automáticamente.",
-    desc_pegar:"Copie los datos generados por Claude y pulse el botón para importarlos.",
-    despues_lectura:"Después de la lectura:",
-    med_prescriptor:"Prescrito por", med_receta:"Receta / Ordonnance",
-    med_motivo:"Motivo", med_reemplazo:"Reemplazado por", med_inicio:"Fecha inicio", med_fin:"Fecha fin",
-    med_estatuto:"Estatuto actual", med_en_curso:"En curso", med_nuevo:"Nuevo", med_prn:"Si necesario (PRN)",
-    med_suspendido:"Suspendido", med_abandonado:"Abandonado", med_terminado:"Terminado",
-    receta_publica:"Receta pública (financiada)", receta_privada:"Receta privada",
-    receta_no_fin:"No financiado (paciente paga)", receta_hospital:"Dispensación hospitalaria",
-    tab_ant:"Antecedentes", tab_vasc:"🧠 Análisis Vascular", tab_corr:"📊 Correlaciones",
-    tab_obs:"Observancia", tab_meds:"Medicamentos", tab_radar:"Radar", tab_bacterio:"Bacteriología",
-  },
-  fr: {
-    tab_resumen:"Résumé", tab_curvas:"Courbes", tab_tabla:"Tableau",
-    tab_timeline:"Chronologie", tab_farma:"⚠ Pharmacovigilance", tab_import:"📥 Données",
-    nav_import:"📥 Données", nav_reset:"⟳ Réinitialiser",
-    welcome_title:"Bienvenue dans MediTrace",
-    welcome_sub:"Aucune donnée médicale chargée.\nCommencez par importer un PDF ou saisir des données manuellement.",
-    welcome_btn:"→ Importer mon premier document",
-    import_title:"Importer des documents médicaux",
-    api_key_label:"Clé API Claude — pour l'extraction automatique",
-    api_key_note:"La clé est sauvegardée dans le localStorage. Elle n'est envoyée qu'à api.anthropic.com.",
-    drop_title:"Glissez un PDF ici ou cliquez pour sélectionner",
-    drop_sub:"Bilans de laboratoire · Notes d'évolution · Rapports d'urgences",
-    manual_entry:"Ajouter une valeur manuellement",
-    lbl_date:"Date", lbl_source:"Source", lbl_param:"Paramètre", lbl_value:"Valeur",
-    btn_add:"+ Ajouter", btn_add_event:"+ Événement", btn_show:"Afficher",
-    current_data:"Données en mémoire",
-    last_values:"Dernières valeurs connues", key_charts:"Paramètres clés",
-    all_params:"Tous les paramètres", synth_table:"Tableau de synthèse",
-    clinical_timeline:"Chronologie clinique", select_pdf:"Sélectionnez le PDF",
-    extracting:"Extraction des données du PDF...",
-    extract_ok:"✓ Extraits", extract_err:"✗ Erreur d'extraction",
-    no_key:"⚠ Entrez une clé API Claude pour l'extraction automatique.",
-    confirm_reset:"Effacer toutes les données ? Cette action est irréversible.",
-    no_data:"Pas de données",
-    del_title:"Supprimer cet événement ?", del_cancel:"Annuler", del_confirm:"✕ Supprimer",
-    edit_label:"Modifier :", edit_save:"✓ Enregistrer", edit_cancel:"Annuler",
-    edit_hint:"Cliquez sur une cellule pour la modifier.",
-    no_events:"Aucun événement importé.",
-    events_count:"événement(s)",
-    datos_memoria:"DONNÉES EN MÉMOIRE", guardar_backup:"Sauvegarder (.mt)",
-    ver_eventos:"Voir / gérer les événements importés", ver_mediciones:"Voir / corriger les dates de mesures",
-    filtrar:"Filtrer :", todos:"Tous", ultima_import:"Dernière importation :",
-    tab_leer:"📷 Lire un document", tab_portapapeles:"📋 Depuis presse-papiers", tab_manual:"✏️ Saisie manuelle",
-    importar_datos:"IMPORTER DES DONNÉES", copiar_importar:"Coller et importer",
-    lectura_docs:"LECTURE DE DOCUMENTS", leer_ocr:"📷 Lire un document (OCR)",
-    entrada_manual:"SAISIE MANUELLE DE VALEURS",
-    selec_med:"— Sélectionner un médicament —", ir_a:"Aller à :",
-    btn_editar:"Modifier", importar_este:"Importer ce document ?",
-    paso1:"Appuyez sur \"Copier pour Claude\" pour copier le texte extrait",
-    paso2:"Collez-le dans votre conversation avec Claude",
-    paso3:"Claude vous renverra les données en format importable",
-    paso4:"Copiez-les et utilisez le bouton Coller et importer",
-    copiar_claude:"Copier pour Claude", texto_extraido:"TEXTE EXTRAIT",
-    avanzado:"Avancé : extraction directe avec clé API",
-    desc_leer:"Sélectionnez une image ou un PDF scanné. MediTrace extraira le texte automatiquement.",
-    desc_pegar:"Copiez les données générées par Claude et appuyez sur le bouton pour les importer.",
-    despues_lectura:"Après la lecture :",
-    med_prescriptor:"Prescrit par", med_receta:"Ordonnance",
-    med_motivo:"Motif", med_reemplazo:"Remplacé par", med_inicio:"Date début", med_fin:"Date fin",
-    med_estatuto:"Statut actuel", med_en_curso:"En cours", med_nuevo:"Nouveau", med_prn:"Si nécessaire (PRN)",
-    med_suspendido:"Suspendu", med_abandonado:"Abandonné", med_terminado:"Terminé",
-    receta_publica:"Ordonnance publique (remboursée)", receta_privada:"Ordonnance privée",
-    receta_no_fin:"Non remboursé (patient paie)", receta_hospital:"Dispensation hospitalière",
-    tab_ant:"Antécédents", tab_vasc:"🧠 Analyse Vasculaire", tab_corr:"📊 Corrélations",
-    tab_obs:"Observance", tab_meds:"Médicaments", tab_radar:"Radar", tab_bacterio:"Bactériologie",
-  },
-  en: {
-    tab_resumen:"Summary", tab_curvas:"Charts", tab_tabla:"Table",
-    tab_timeline:"Timeline", tab_farma:"⚠ Pharmacovigilance", tab_import:"📥 Data",
-    nav_import:"📥 Data", nav_reset:"⟳ Reset",
-    welcome_title:"Welcome to MediTrace",
-    welcome_sub:"No medical data loaded yet.\nStart by importing a PDF or entering data manually.",
-    welcome_btn:"→ Import my first document",
-    import_title:"Import medical documents",
-    api_key_label:"Claude API key — for automatic extraction",
-    api_key_note:"The key is saved in localStorage. It is only sent to api.anthropic.com.",
-    drop_title:"Drag a PDF here or click to select",
-    drop_sub:"Laboratory reports · Progress notes · Emergency reports",
-    manual_entry:"Add value manually",
-    lbl_date:"Date", lbl_source:"Source", lbl_param:"Parameter", lbl_value:"Value",
-    btn_add:"+ Add", btn_add_event:"+ Clinical event", btn_show:"Show",
-    current_data:"Data in memory",
-    last_values:"Latest known values", key_charts:"Key parameters",
-    all_params:"All parameters", synth_table:"Synthesis table",
-    clinical_timeline:"Clinical timeline", select_pdf:"Select the PDF",
-    extracting:"Extracting data from PDF...",
-    extract_ok:"✓ Extracted", extract_err:"✗ Extraction error",
-    no_key:"⚠ Enter a Claude API key for automatic extraction.",
-    confirm_reset:"Delete all data? This action cannot be undone.",
-    no_data:"No data",
-    del_title:"Delete this event?", del_cancel:"Cancel", del_confirm:"✕ Delete",
-    edit_label:"Edit:", edit_save:"✓ Save", edit_cancel:"Cancel",
-    edit_hint:"Click on any cell to edit it.",
-    no_events:"No imported events.",
-    events_count:"event(s)",
-    datos_memoria:"DATA IN MEMORY", guardar_backup:"Save backup (.mt)",
-    ver_eventos:"View / manage imported events", ver_mediciones:"View / correct measurement dates",
-    filtrar:"Filter:", todos:"All", ultima_import:"Last import:",
-    tab_leer:"📷 Read document", tab_portapapeles:"📋 From clipboard", tab_manual:"✏️ Manual entry",
-    importar_datos:"IMPORT DATA", copiar_importar:"Paste and import",
-    lectura_docs:"DOCUMENT READER", leer_ocr:"📷 Read document (OCR)",
-    entrada_manual:"MANUAL VALUE ENTRY",
-    selec_med:"— Select medication —", ir_a:"Go to:",
-    btn_editar:"Edit", importar_este:"Import this document?",
-    paso1:"Press \"Copy for Claude\" to copy the extracted text",
-    paso2:"Paste it in your conversation with Claude",
-    paso3:"Claude will return the data in importable format",
-    paso4:"Copy them and use the Paste and import button",
-    copiar_claude:"Copy for Claude", texto_extraido:"EXTRACTED TEXT",
-    avanzado:"Advanced: direct extraction with API key",
-    desc_leer:"Select an image or scanned PDF. MediTrace will extract the text automatically.",
-    desc_pegar:"Copy the data generated by Claude and press the button to import them.",
-    despues_lectura:"After reading:",
-    med_prescriptor:"Prescribed by", med_receta:"Prescription",
-    med_motivo:"Reason", med_reemplazo:"Replaced by", med_inicio:"Start date", med_fin:"End date",
-    med_estatuto:"Current status", med_en_curso:"Active", med_nuevo:"New", med_prn:"As needed (PRN)",
-    med_suspendido:"Suspended", med_abandonado:"Discontinued", med_terminado:"Completed",
-    receta_publica:"Public prescription (covered)", receta_privada:"Private prescription",
-    receta_no_fin:"Not covered (patient pays)", receta_hospital:"Hospital dispensation",
-    tab_ant:"Medical History", tab_vasc:"🧠 Vascular Analysis", tab_corr:"📊 Correlations",
-    tab_obs:"Compliance", tab_meds:"Medications", tab_radar:"Radar", tab_bacterio:"Bacteriology",
-  }
-};
-let currentLang = 'es';
+
 function setLang(l) {
   currentLang = l;
   const t = LANG[l];
@@ -1888,7 +1717,7 @@ function setLang(l) {
   translatePanel(t);
 }
 
-function translatePanel(t) {
+function translatePanel(tObj) {
   var map = {
     'lbl-datos-memoria': '📊 ' + t.datos_memoria,
     'lbl-guardar-backup': '💾 ' + t.guardar_backup,
@@ -1986,7 +1815,7 @@ function paramTip(key, short) {
 function fillParamSelect() {
   const sel = document.getElementById('m-param');
   if (!sel) return;
-  sel.innerHTML = '<option value="">— ' + (LANG[currentLang].lbl_param||'Parámetro') + ' —</option>';
+  sel.innerHTML = '<option value="">— ' + (t('lbl_param')||'Parámetro') + ' —</option>';
 
   /* Paramètres prédéfinis */
   const optGroup1 = document.createElement('optgroup');
@@ -2569,7 +2398,7 @@ function _doImportJson(raw, resultEl, textareaId) {
     var btnRow = document.createElement('div');
     btnRow.style.cssText = 'display:flex;gap:10px;justify-content:flex-end';
     var btnCancel = document.createElement('button');
-    btnCancel.textContent = (LANG[currentLang].del_cancel || 'Cancelar');
+    btnCancel.textContent = (t('del_cancel') || 'Cancelar');
     btnCancel.className = 'btn';
     btnCancel.style.cssText = 'font-size:14px;padding:10px 20px';
     var btnImport = document.createElement('button');
@@ -2767,7 +2596,7 @@ Retourne UNIQUEMENT le JSON, sans markdown, sans backticks, sans commentaire.`;
 ================================================================ */
 async function extractPdf(file) {
   const apiKey = localStorage.getItem('mt_apikey') || document.getElementById('api-key-input').value;
-  if (!apiKey) { customAlert(MT_tr('no api key'), '', '🔑', 'var(--warn)'); return; }
+  if (!apiKey) { customAlert(t('no_api_key'), '', '🔑', 'var(--warn)'); return; }
 
   const pb = document.getElementById('progress-box');
   const pbar = document.getElementById('progress-bar');
@@ -2776,7 +2605,7 @@ async function extractPdf(file) {
 
   pb.style.display = 'block';
   pbar.style.background = 'var(--accent)';
-  ptitle.textContent = LANG[currentLang].extracting + ' ' + file.name;
+  ptitle.textContent = t('extracting') + ' ' + file.name;
   pbar.style.width = '5%';
   plog.innerHTML = '';
 
@@ -2884,7 +2713,7 @@ async function extractPdf(file) {
     const parsed = JSON.parse(clean);
 
     pbar.style.width = '90%';
-    plog.innerHTML += `→ ${LANG[currentLang].extract_ok} : ${Object.keys(parsed.valeurs||{}).length} paramètres · Date: ${parsed.date}<br>`;
+    plog.innerHTML += `→ ${t('extract_ok')} : ${Object.keys(parsed.valeurs||{}).length} paramètres · Date: ${parsed.date}<br>`;
 
     /* Sauvegarder mesures */
     const data = loadData();
@@ -2955,7 +2784,7 @@ async function extractPdf(file) {
   } catch(e) {
     pbar.style.width = '100%';
     pbar.style.background = 'var(--danger)';
-    plog.innerHTML += `✗ ${LANG[currentLang].extract_err}: ${e.message}<br>`;
+    plog.innerHTML += `✗ ${t('extract_err')}: ${e.message}<br>`;
   }
 }
 
@@ -2980,10 +2809,10 @@ function addManual() {
   /* Si "nouveau paramètre" sélectionné, enregistrer d'abord */
   if (key === '__NEW__') {
     key = registerCustomParam();
-    if (!key) { customAlert(MT_tr('field required'), '', '⚠️', 'var(--warn)'); return; }
+    if (!key) { customAlert(t('field_required'), '', '⚠️', 'var(--warn)'); return; }
   }
 
-  if (!date || !key || isNaN(val)) { customAlert(MT_tr('field required'), '', '⚠️', 'var(--warn)'); return; }
+  if (!date || !key || isNaN(val)) { customAlert(t('field_required'), '', '⚠️', 'var(--warn)'); return; }
 
   /* Sauvegarder la source pour réutilisation */
   addCustomSource(src);
@@ -3017,7 +2846,7 @@ function addManual() {
 function addEvent() {
   const date  = document.getElementById('m-date').value;
   const src   = getSelectedSource() || 'Manuel';
-  if (!date) { customAlert(MT_tr('field required'), '', '📅', 'var(--warn)'); return; }
+  if (!date) { customAlert(t('field_required'), '', '📅', 'var(--warn)'); return; }
   const title = prompt('Título del evento clínico:');
   if (!title) return;
   const text  = prompt('Descripción breve (opcional):') || '';
@@ -3029,12 +2858,12 @@ function addEvent() {
   saveEvents(evts);
   fillSourceList();
   document.getElementById('m-source-select').value = src;
-  customAlert(MT_tr('event added'), '', '✅', 'var(--accent2)');
+  customAlert(t('event_added'), '', '✅', 'var(--accent2)');
 }
 
 function updateDataSummary(data) {
   const el = document.getElementById('data-summary');
-  if (!data.length) { el.textContent = LANG[currentLang].no_data || 'Sin datos'; return; }
+  if (!data.length) { el.textContent = t('no_data') || 'Sin datos'; return; }
   const paramCount = new Set(data.flatMap(d => Object.keys(d.vals))).size;
   const evts = loadEvents();
   const meds = loadMeds();
@@ -3061,7 +2890,7 @@ function exportData() {
   const meds   = loadMeds();
   const bacts  = loadBacterio();
   const label  = getPatientLabel();
-  if (!data.length && !events.length && !meds.length) { customAlert(MT_tr('no export data'), '', '📂', 'var(--muted)'); return; }
+  if (!data.length && !events.length && !meds.length) { customAlert(t('no_export_data'), '', '📂', 'var(--muted)'); return; }
   const payload = {
     version: "MediTrace-2026",
     exported: new Date().toISOString(),
@@ -3116,11 +2945,11 @@ function _doImport(file, input) {
           if (parsed.custom_params)  { saveCustomParams(parsed.custom_params); Object.entries(parsed.custom_params).forEach(([k,p]) => { PARAMS[k] = p; }); }
           if (parsed.custom_sources) saveCustomSources(parsed.custom_sources);
           if (parsed.patient_label) setPatientLabel(parsed.patient_label);
-          customAlert('✅ ' + MT_tr('data in memory'),
-            MT_tr('import ok', {mes: parsed.mesures.length, ev: parsed.events?.length||0, med: parsed.medicaments?.length||0})
+          customAlert('✅ ' + t('data_in_memory'),
+            t('import_ok', {mes: parsed.mesures.length, ev: parsed.events?.length||0, med: parsed.medicaments?.length||0})
             + (parsed.patient_label ? '<br>👤 ' + parsed.patient_label : ''),
             '✅', 'var(--accent2)');
-        } else { customAlert(MT_tr('bad format'), '', '❌', 'var(--danger)'); return; }
+        } else { customAlert(t('bad_format'), '', '❌', 'var(--danger)'); return; }
       } else {
         const match   = text.match(/(?:const|let|var)\s+data\s*=\s*(\[[\s\S]*?\])\s*;/);
         const matchEv = text.match(/(?:const|let|var)\s+events\s*=\s*(\[[\s\S]*?\])\s*;/);
@@ -3152,11 +2981,11 @@ function buildImportList() {
   const filterType = filterEl ? filterEl.value : 'todos';
   const evts = filterType === 'todos' ? allEvts : allEvts.filter(function(e) { return e.type === filterType; });
   if (!allEvts.length) {
-    el.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:8px">' + (LANG[currentLang].no_events||'No hay eventos importados.') + '</div>';
+    el.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:8px">' + (t('no_events')||'No hay eventos importados.') + '</div>';
     return;
   }
 
-  let html = '<div style="font-size:11px;color:var(--muted);margin-bottom:6px">' + (LANG[currentLang].edit_hint||'Haga clic en cualquier celda para editarla.') + '</div>' +
+  let html = '<div style="font-size:11px;color:var(--muted);margin-bottom:6px">' + (t('edit_hint')||'Haga clic en cualquier celda para editarla.') + '</div>' +
     '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>' +
     '<th style="text-align:left;padding:6px 8px;border-bottom:2px solid var(--border);color:var(--muted);font-size:11px;width:90px">Fecha</th>' +
     '<th style="text-align:left;padding:6px 8px;border-bottom:2px solid var(--border);color:var(--muted);font-size:11px;width:90px">Tipo</th>' +
@@ -3185,7 +3014,7 @@ function buildImportList() {
   }
 
   html += '</tbody></table>';
-  html += '<div style="font-size:11px;color:var(--muted);margin-top:8px">' + (filterType !== 'todos' ? evts.length + '/' : '') + allEvts.length + ' ' + (LANG[currentLang].events_count||'evento(s)') + (filterType !== 'todos' ? ' (' + filterType + ')' : '') + '</div>';
+  html += '<div style="font-size:11px;color:var(--muted);margin-top:8px">' + (filterType !== 'todos' ? evts.length + '/' : '') + allEvts.length + ' ' + (t('events_count')||'evento(s)') + (filterType !== 'todos' ? ' (' + filterType + ')' : '') + '</div>';
   el.innerHTML = html;
 }
 
@@ -3242,11 +3071,11 @@ function editCell(idx, field, td) {
     var btnRow = document.createElement('div');
     btnRow.style.cssText = 'display:flex;gap:8px;margin-top:10px;justify-content:flex-end';
     var btnSave = document.createElement('button');
-    btnSave.textContent = (LANG[currentLang].edit_save||'\u2713 Guardar');
+    btnSave.textContent = (t('edit_save')||'\u2713 Guardar');
     btnSave.className = 'btn primary';
     btnSave.style.cssText = 'font-size:13px;padding:8px 18px';
     var btnCancel = document.createElement('button');
-    btnCancel.textContent = (LANG[currentLang].edit_cancel||'Cancelar');
+    btnCancel.textContent = (t('edit_cancel'));
     btnCancel.className = 'btn';
     btnCancel.style.cssText = 'font-size:13px;padding:8px 18px';
     btnRow.appendChild(btnCancel);
@@ -3300,7 +3129,7 @@ function deleteEvent(idx) {
   btnCancel.className = 'btn';
   btnCancel.style.cssText = 'font-size:14px;padding:10px 24px';
   var btnDelete = document.createElement('button');
-  btnDelete.textContent = (LANG[currentLang].del_confirm||'\u2715 Eliminar');
+  btnDelete.textContent = (t('del_confirm')||'\u2715 Eliminar');
   btnDelete.style.cssText = 'font-size:14px;padding:10px 24px;background:var(--danger);color:white;border:none;border-radius:6px;cursor:pointer;font-family:var(--sans);font-weight:600';
   btnRow.appendChild(btnCancel);
   btnRow.appendChild(btnDelete);
@@ -3388,8 +3217,8 @@ function deleteMesure(idx) {
     '<div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:20px">' + fmtDate(m.date) + ' \u2014 ' + (m.src||'') + ' \u2014 ' + Object.keys(m.vals||{}).length + ' valor(es)</div>';
   var btnRow = document.createElement('div');
   btnRow.style.cssText = 'display:flex;gap:10px;justify-content:center';
-  var btnC = document.createElement('button'); btnC.textContent = (LANG[currentLang].del_cancel||'Cancelar'); btnC.className = 'btn'; btnC.style.cssText = 'font-size:14px;padding:10px 24px';
-  var btnD = document.createElement('button'); btnD.textContent = (LANG[currentLang].del_confirm||'\u2715 Eliminar'); btnD.style.cssText = 'font-size:14px;padding:10px 24px;background:var(--danger);color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600';
+  var btnC = document.createElement('button'); btnC.textContent = (t('del_cancel')); btnC.className = 'btn'; btnC.style.cssText = 'font-size:14px;padding:10px 24px';
+  var btnD = document.createElement('button'); btnD.textContent = (t('del_confirm')||'\u2715 Eliminar'); btnD.style.cssText = 'font-size:14px;padding:10px 24px;background:var(--danger);color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600';
   btnRow.appendChild(btnC); btnRow.appendChild(btnD); box.appendChild(btnRow); overlay.appendChild(box); document.body.appendChild(overlay);
   btnD.onclick = function() { data.splice(idx, 1); saveData(data); document.body.removeChild(overlay); buildMesuresList(); updateDataSummary(data); };
   btnC.onclick = function() { document.body.removeChild(overlay); };
@@ -3475,7 +3304,7 @@ function exportPDF(mode) {
   const dateRange = data[0].date + ' \u2192 ' + data[data.length-1].date;
   const patLabel = getPatientLabel() || 'M.E.J.';
   const isDetailed = mode === 'detallado';
-  const titleType = MT_tr(isDetailed ? 'informe detallado' : 'informe sintetico');
+  const titleType = t(isDetailed ? 'informe_detallado' : 'informe_sintetico');
 
   /* Build exec summary alert list */
   let alertListHtml = alertParams.map(([k, info]) => {
@@ -3486,7 +3315,7 @@ function exportPDF(mode) {
   /* Build KPI cards */
   let kpiHtml = Object.entries(lastVals).filter(([k]) => PARAMS[k]).slice(0, isDetailed ? 16 : 8).map(([k, info]) => {
     const p = PARAMS[k]; const st = getStatus(k, info.v);
-    return '<div class="kpi-card ' + st + '"><div class="kpi-label">' + (p.label||k) + '</div><div class="kpi-value">' + info.v + ' <span class="kpi-unit">' + p.unit + '</span></div><div class="kpi-date">' + fmtDate(info.date) + '</div>' + (st==='bad' ? '<div class="kpi-bad">' + MT_tr('out of range') + '</div>' : '') + '</div>';
+    return '<div class="kpi-card ' + st + '"><div class="kpi-label">' + (p.label||k) + '</div><div class="kpi-value">' + info.v + ' <span class="kpi-unit">' + p.unit + '</span></div><div class="kpi-date">' + fmtDate(info.date) + '</div>' + (st==='bad' ? '<div class="kpi-bad">' + t('out_of_range') + '</div>' : '') + '</div>';
   }).join('');
 
   /* Build synthesis table — dates décroissantes (plus récent en haut) */
@@ -3529,11 +3358,11 @@ function exportPDF(mode) {
   }
 
   /* Build timeline */
-  let timelineHtml = isDetailed && events.length ? '<div class="section"><div class="section-title">' + MT_tr('timeline title') + ' (' + events.length + ')</div>' +
+  let timelineHtml = isDetailed && events.length ? '<div class="section"><div class="section-title">' + t('timeline_title') + ' (' + events.length + ')</div>' +
     [...events].reverse().map(ev => '<div class="tl-item"><div class="tl-dot ' + (ev.type||'laboratorio') + '"></div><div class="tl-content"><div class="tl-date">' + ev.date + ' \u00b7 ' + (ev.type||'').toUpperCase() + '</div><div class="tl-title">' + (ev.title||'') + '</div><div class="tl-text">' + (ev.text||'') + '</div></div></div>').join('') + '</div>' : '';
 
   /* Build bacterio */
-  let bacterioHtml = isDetailed && bacts.length ? '<div class="section"><div class="section-title">' + MT_tr('bacterio title') + ' (' + bacts.length + ')</div>' +
+  let bacterioHtml = isDetailed && bacts.length ? '<div class="section"><div class="section-title">' + t('bacterio_title') + ' (' + bacts.length + ')</div>' +
     bacts.map(b => {
       const isPos = b.germe && b.germe.toLowerCase() !== 'n\u00e9gatif' && b.germe.toLowerCase() !== 'negativo';
       return '<div class="alert ' + (isPos?'critical':'ok') + '"><div class="alert-title">' + (isPos?'\ud83d\udd34':'\ud83d\udfe2') + ' ' + (b.germe||'Resultado') + ' \u2014 ' + (b.prelevement||'') + ' ' + (b.quantite||'') + '</div>' +
@@ -3548,7 +3377,7 @@ function exportPDF(mode) {
     var allSources = new Set();
     data.forEach(function(m) { if (m.src) allSources.add(m.src); });
     events.forEach(function(e) { if (e.src) allSources.add(e.src); });
-    var sourcesHtml = isDetailed && allSources.size > 0 ? '<div class="section"><div class="section-title">' + MT_tr('sources title') + '</div>' +
+    var sourcesHtml = isDetailed && allSources.size > 0 ? '<div class="section"><div class="section-title">' + t('sources_title') + '</div>' +
       '<table><thead><tr><th>N\u00ba</th><th>Fuente / Establecimiento</th><th>Documentos</th></tr></thead><tbody>' +
       Array.from(allSources).sort().map(function(src, i) {
         var count = data.filter(function(d) { return d.src === src; }).length + events.filter(function(e) { return e.src === src; }).length;
@@ -3560,11 +3389,11 @@ function exportPDF(mode) {
   var shareSubject = 'MediTrace \u2014 Informe ' + shareType + ' \u2014 ' + patLabel;
   var shareBarHtml =
     '<div style="text-align:center;margin:16px 0;padding:14px;background:#f0f5fa;border:1px solid #cce;border-radius:8px" class="share-bar">' +
-    '<div style="font-size:15px;font-weight:700;color:#1a5276;margin-bottom:10px">' + MT_tr('share title') + '</div>' +
+    '<div style="font-size:15px;font-weight:700;color:#1a5276;margin-bottom:10px">' + t('share_title') + '</div>' +
     '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">' +
-    '<button onclick="window.print()" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#1a5276;border:none;cursor:pointer">' + MT_tr('save pdf') + '</button>' +
-    '<button onclick="copiarInforme()" id="btn-copiar" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#2ecc71;border:none;cursor:pointer">' + MT_tr('copy report') + '</button>' +
-    '<a style="display:inline-block;padding:10px 20px;border-radius:6px;text-decoration:none;font-size:14px;font-weight:600;color:white;background:#0088cc" href="mailto:?subject=' + encodeURIComponent(shareSubject) + '&body=Estimado%2Fa%20Doctor%2Fa%2C%0D%0A%0D%0AAdjunto%20el%20informe%20de%20seguimiento%20m%C3%A9dico%20(' + encodeURIComponent(shareType) + ')%20del%20paciente%20' + encodeURIComponent(patLabel) + '.%0D%0A%0D%0AQuedo%20a%20su%20disposici%C3%B3n.%0D%0A%0D%0AAtentamente%0D%0APierre-Henri%20Giraud">' + MT_tr('send email') + '</a>' +
+    '<button onclick="window.print()" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#1a5276;border:none;cursor:pointer">' + t('save_pdf') + '</button>' +
+    '<button onclick="copiarInforme()" id="btn-copiar" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#2ecc71;border:none;cursor:pointer">' + t('copy_report') + '</button>' +
+    '<a style="display:inline-block;padding:10px 20px;border-radius:6px;text-decoration:none;font-size:14px;font-weight:600;color:white;background:#0088cc" href="mailto:?subject=' + encodeURIComponent(shareSubject) + '&body=Estimado%2Fa%20Doctor%2Fa%2C%0D%0A%0D%0AAdjunto%20el%20informe%20de%20seguimiento%20m%C3%A9dico%20(' + encodeURIComponent(shareType) + ')%20del%20paciente%20' + encodeURIComponent(patLabel) + '.%0D%0A%0D%0AQuedo%20a%20su%20disposici%C3%B3n.%0D%0A%0D%0AAtentamente%0D%0APierre-Henri%20Giraud">' + t('send_email') + '</a>' +
     '</div>' +
     '<div id="copiar-feedback" style="font-size:12px;color:#2ecc71;margin-top:8px;min-height:20px"></div>' +
     '</div>';
@@ -3615,9 +3444,9 @@ function exportPDF(mode) {
     '</style></head><body><div class="page">' +
 
     '<div class="report-header"><div><div class="report-logo">Medi<span>Trace</span></div><div class="report-type">' + titleType + '</div></div>' +
-    '<div class="report-meta"><strong>Paciente:</strong> ' + patLabel + '<br><strong>' + MT_tr('generated') + ':</strong> ' + now + '<br><strong>Per\u00edodo:</strong> ' + dateRange + '<br><strong>' + MT_tr('data') + ':</strong> ' + data.length + ' fechas \u00b7 ' + events.length + ' eventos<br><strong>' + MT_tr('author') + ':</strong> Pierre-Henri Giraud \u00d7 Claude (Anthropic)<br>DOI: 10.5281/zenodo.19973451<br><strong>' + MT_tr('warning doc') + '</strong></div></div>' +
+    '<div class="report-meta"><strong>Paciente:</strong> ' + patLabel + '<br><strong>' + t('generated_lbl') + ':</strong> ' + now + '<br><strong>Per\u00edodo:</strong> ' + dateRange + '<br><strong>' + t('data_lbl') + ':</strong> ' + data.length + ' fechas \u00b7 ' + events.length + ' eventos<br><strong>' + t('author_lbl') + ':</strong> Pierre-Henri Giraud \u00d7 Claude (Anthropic)<br>DOI: 10.5281/zenodo.19973451<br><strong>' + t('warning_doc') + '</strong></div></div>' +
 
-    '<div class="exec-summary"><div class="exec-title">' + MT_tr('anamnesis title') + '</div>' +
+    '<div class="exec-summary"><div class="exec-title">' + t('anamnesis_title') + '</div>' +
     '<div style="font-size:15px;line-height:1.8;color:#1a1a2e;text-align:justify">' +
     'Paciente <strong>' + patLabel + '</strong>, mujer de 87 años, con antecedentes de tromboembolismo pulmonar bilateral recurrente (2016, 2022), ' +
     'ictus vertebrobasilar (septiembre 2021, diagnóstico tardío 27h), deterioro cognitivo progresivo (MMSE: 25→22→16 entre 2021-2024), ' +
@@ -3629,21 +3458,21 @@ function exportPDF(mode) {
     'Donepezilo prescrito, no iniciado (pendiente ECG 03/2026). Haloperidol suspendido (QTc). Hidroferol mensual en curso. ' +
     'Déficit crónico vitamina D (27→12 ng/mL). LDL 202 mg/dL.' +
     '</div>' +
-    (alertParams.length ? '<div style="margin-top:14px;padding-top:12px;border-top:1px solid #cce"><div style="font-size:15px;font-weight:700;color:#c0392b;margin-bottom:8px">' + MT_tr('values out of range') + ' (' + alertParams.length + ')</div>' + alertListHtml + '</div>' : '') +
+    (alertParams.length ? '<div style="margin-top:14px;padding-top:12px;border-top:1px solid #cce"><div style="font-size:15px;font-weight:700;color:#c0392b;margin-bottom:8px">' + t('values_out_of_range') + ' (' + alertParams.length + ')</div>' + alertListHtml + '</div>' : '') +
     '</div>' +
 
-    (isDetailed ? '<div class="section"><div class="section-title">\ud83e\udde0 An\u00e1lisis Vascular \u2014 S\u00edntesis</div><div class="alert critical"><div class="alert-title">\ud83d\udea8 HALLAZGO CR\u00cdTICO \u2014 IRM Vascular ASCIRES 10/03/2026</div>Obstrucci\u00f3n completa arteria car\u00f3tida interna izquierda. Leucoaraiosis Fazekas II-III.</div><table><thead><tr><th>Fecha</th><th>Exploraci\u00f3n</th><th>Hallazgo clave</th></tr></thead><tbody><tr><td>11/2016</td><td>TEP bilateral</td><td>HTpulmonar PAPs 55-60mmHg</td></tr><tr><td>09/2021</td><td>Ictus VB</td><td class="val-bad">Diagn\u00f3stico tard\u00edo 27h</td></tr><tr><td>12/2021</td><td>PET/CT FDG</td><td class="val-bad">Hipometabolismo frontal IZQ</td></tr><tr><td>01/2022</td><td>2\u00ba TEP agudo</td><td class="val-bad">Troponina 76.68</td></tr><tr><td>03/2026</td><td>IRM Vascular</td><td class="val-bad">Oclusi\u00f3n COMPLETA ACI izq</td></tr></tbody></table><div class="alert warn"><div class="alert-title">❓ ' + MT_tr('doctor questions') + '</div>1. \u00bfFue el ictus de 09/2021 el evento oclusivo inicial?<br>2. \u00bfDeterioro cognitivo vascular (DFT) vs Alzheimer?<br>3. \u00bfRiesgo del abandono anticoagulante con ACI ocluida?</div></div>' +
-    '<div class="section"><div class="section-title">\u26a0 Farmacovigilancia \u2014 CIMA/AEMPS</div><div class="alert critical"><div class="alert-title">\ud83d\udea8 ECG PENDIENTE antes de Donepezilo</div>Haloperidol suspendido (QTc). ECG prescrito 03/2026 a\u00fan no realizado.</div><div class="alert critical"><div class="alert-title">\ud83d\udea8 Dabigatr\u00e1n ABANDONADO</div>Sin anticoagulaci\u00f3n con ACI ocluida. Riesgo tromb\u00f3tico elevado.</div><div class="alert warn"><div class="alert-title">\u26a0 Pantoprazol largo plazo \u2192 D\u00e9ficit B12</div>B12=152 pg/mL (2022). Riesgo hipomagnesemia.</div><div class="alert warn"><div class="alert-title">\u26a0 Tiotropio + Donepezilo \u2192 Antagonismo</div>Revisar necesidad de ambos.</div><div class="alert ok"><div class="alert-title">' + MT_tr('donepezil memantine') + '</div>Sin interacciones relevantes.</div></div>' +
-    '<div class="section"><div class="section-title">\ud83d\udc8a Observancia terap\u00e9utica</div><table><thead><tr><th>Medicamento</th><th>' + MT_tr('status') + '</th><th>' + MT_tr('observation') + '</th></tr></thead><tbody><tr><td><strong>Dabigatr\u00e1n</strong></td><td style="color:#c0392b;font-weight:700">ABANDONADO</td><td>Decisi\u00f3n familiar 02/2025</td></tr><tr><td><strong>Donepezilo</strong></td><td style="color:#d68910;font-weight:700">PRESCRITO</td><td>Pendiente ECG</td></tr><tr><td><strong>Haloperidol</strong></td><td style="color:#1e8449;font-weight:700">SUSPENDIDO \u2713</td><td>Correcto (QTc)</td></tr><tr><td><strong>Hidroferol</strong></td><td style="color:#1e8449;font-weight:700">EN CURSO \u2713</td><td>Mensual</td></tr><tr><td><strong>Atorvastatina</strong></td><td style="color:#d68910;font-weight:700">INCIERTO</td><td>LDL 202 mg/dL</td></tr></tbody></table></div>' : '') +
+    (isDetailed ? '<div class="section"><div class="section-title">\ud83e\udde0 An\u00e1lisis Vascular \u2014 S\u00edntesis</div><div class="alert critical"><div class="alert-title">\ud83d\udea8 HALLAZGO CR\u00cdTICO \u2014 IRM Vascular ASCIRES 10/03/2026</div>Obstrucci\u00f3n completa arteria car\u00f3tida interna izquierda. Leucoaraiosis Fazekas II-III.</div><table><thead><tr><th>Fecha</th><th>Exploraci\u00f3n</th><th>Hallazgo clave</th></tr></thead><tbody><tr><td>11/2016</td><td>TEP bilateral</td><td>HTpulmonar PAPs 55-60mmHg</td></tr><tr><td>09/2021</td><td>Ictus VB</td><td class="val-bad">Diagn\u00f3stico tard\u00edo 27h</td></tr><tr><td>12/2021</td><td>PET/CT FDG</td><td class="val-bad">Hipometabolismo frontal IZQ</td></tr><tr><td>01/2022</td><td>2\u00ba TEP agudo</td><td class="val-bad">Troponina 76.68</td></tr><tr><td>03/2026</td><td>IRM Vascular</td><td class="val-bad">Oclusi\u00f3n COMPLETA ACI izq</td></tr></tbody></table><div class="alert warn"><div class="alert-title">❓ ' + t('doctor_questions') + '</div>1. \u00bfFue el ictus de 09/2021 el evento oclusivo inicial?<br>2. \u00bfDeterioro cognitivo vascular (DFT) vs Alzheimer?<br>3. \u00bfRiesgo del abandono anticoagulante con ACI ocluida?</div></div>' +
+    '<div class="section"><div class="section-title">\u26a0 Farmacovigilancia \u2014 CIMA/AEMPS</div><div class="alert critical"><div class="alert-title">\ud83d\udea8 ECG PENDIENTE antes de Donepezilo</div>Haloperidol suspendido (QTc). ECG prescrito 03/2026 a\u00fan no realizado.</div><div class="alert critical"><div class="alert-title">\ud83d\udea8 Dabigatr\u00e1n ABANDONADO</div>Sin anticoagulaci\u00f3n con ACI ocluida. Riesgo tromb\u00f3tico elevado.</div><div class="alert warn"><div class="alert-title">\u26a0 Pantoprazol largo plazo \u2192 D\u00e9ficit B12</div>B12=152 pg/mL (2022). Riesgo hipomagnesemia.</div><div class="alert warn"><div class="alert-title">\u26a0 Tiotropio + Donepezilo \u2192 Antagonismo</div>Revisar necesidad de ambos.</div><div class="alert ok"><div class="alert-title">' + t('donepezil_memantine') + '</div>Sin interacciones relevantes.</div></div>' +
+    '<div class="section"><div class="section-title">\ud83d\udc8a Observancia terap\u00e9utica</div><table><thead><tr><th>Medicamento</th><th>' + t('status_lbl') + '</th><th>' + t('observation_lbl') + '</th></tr></thead><tbody><tr><td><strong>Dabigatr\u00e1n</strong></td><td style="color:#c0392b;font-weight:700">ABANDONADO</td><td>Decisi\u00f3n familiar 02/2025</td></tr><tr><td><strong>Donepezilo</strong></td><td style="color:#d68910;font-weight:700">PRESCRITO</td><td>Pendiente ECG</td></tr><tr><td><strong>Haloperidol</strong></td><td style="color:#1e8449;font-weight:700">SUSPENDIDO \u2713</td><td>Correcto (QTc)</td></tr><tr><td><strong>Hidroferol</strong></td><td style="color:#1e8449;font-weight:700">EN CURSO \u2713</td><td>Mensual</td></tr><tr><td><strong>Atorvastatina</strong></td><td style="color:#d68910;font-weight:700">INCIERTO</td><td>LDL 202 mg/dL</td></tr></tbody></table></div>' : '') +
 
-    '<div class="section"><div class="section-title">' + MT_tr('last values title') + '</div><div class="kpi-grid">' + kpiHtml + '</div></div>' +
+    '<div class="section"><div class="section-title">' + t('last_values_title') + '</div><div class="kpi-grid">' + kpiHtml + '</div></div>' +
 
-    '<div class="section"><div class="section-title">\ud83d\udccb Tabla de s\u00edntesis cronol\u00f3gica</div><table><thead><tr><th>' + MT_tr('date') + '</th><th>' + MT_tr('source') + '</th><th>Hb</th><th>Leuc.</th><th>Gluc.</th><th>Creat.</th><th>FG</th><th>Colest.</th><th>PCR</th><th>TSH</th><th>VitD</th></tr></thead><tbody>' + tableRowsDesc + '</tbody></table></div>' +
+    '<div class="section"><div class="section-title">\ud83d\udccb Tabla de s\u00edntesis cronol\u00f3gica</div><table><thead><tr><th>' + t('date_lbl') + '</th><th>' + t('source_lbl') + '</th><th>Hb</th><th>Leuc.</th><th>Gluc.</th><th>Creat.</th><th>FG</th><th>Colest.</th><th>PCR</th><th>TSH</th><th>VitD</th></tr></thead><tbody>' + tableRowsDesc + '</tbody></table></div>' +
 
     timelineHtml + bacterioHtml + sourcesHtml + chartsHtml +
 
     shareBarHtml +
-    '<div class="report-footer"><span>MediTrace v2026.4 \u2014 ' + titleType + ' \u2014 ' + patLabel + '</span><span>' + MT_tr('doc not medical') + '</span></div>' +
+    '<div class="report-footer"><span>MediTrace v2026.4 \u2014 ' + titleType + ' \u2014 ' + patLabel + '</span><span>' + t('doc_not_medical') + '</span></div>' +
     '</div>' +
     '<scr' + 'ipt>' +
     'function copiarInforme() {' +'  var c = document.querySelector(".page");' +'  if (c) {' +'    navigator.clipboard.writeText(c.innerText).then(function() {' +'      var btn = document.getElementById("btn-copiar");' +'      btn.textContent = "Copiado!"; btn.style.background = "#27ae60";' +'      var fb = document.getElementById("copiar-feedback");' +'      if (fb) fb.textContent = "Informe copiado al portapapeles";' +'      setTimeout(function() { btn.textContent = "Copiar informe"; btn.style.background = "#2ecc71"; if(fb) fb.textContent=""; }, 3000);' +'    });' +'  }' +'}' +
@@ -3689,7 +3518,7 @@ function customConfirm(title, message, onOk) {
   bx.style.cssText = 'background:var(--surface);border:2px solid var(--accent);border-radius:12px;padding:24px;width:90%;max-width:440px;text-align:center';
   bx.innerHTML = '<div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:12px">' + title + '</div><div style="font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.7;text-align:left">' + message + '</div>';
   var br = document.createElement('div'); br.style.cssText = 'display:flex;gap:10px;justify-content:center';
-  var bc = document.createElement('button'); bc.textContent = (LANG[currentLang].del_cancel||'Cancelar'); bc.className = 'btn'; bc.style.cssText = 'font-size:14px;padding:10px 24px';
+  var bc = document.createElement('button'); bc.textContent = (t('del_cancel')); bc.className = 'btn'; bc.style.cssText = 'font-size:14px;padding:10px 24px';
   var bo = document.createElement('button'); bo.textContent = 'Confirmar'; bo.className = 'btn primary'; bo.style.cssText = 'font-size:14px;padding:10px 24px';
   br.appendChild(bc); br.appendChild(bo); bx.appendChild(br); ov.appendChild(bx); document.body.appendChild(ov);
   bo.onclick = function() { document.body.removeChild(ov); if (onOk) onOk(); };
@@ -4026,7 +3855,7 @@ function buildTimeline() {
   const evts = loadEvents();
   el.innerHTML = '';
   if (!evts.length) {
-    el.innerHTML = `<div style="color:var(--muted);font-family:var(--mono);font-size:12px">${LANG[currentLang].no_data}</div>`;
+    el.innerHTML = `<div style="color:var(--muted);font-family:var(--mono);font-size:12px">${t('no_data')}</div>`;
     return;
   }
 
@@ -4204,7 +4033,7 @@ function openPdf(filename) {
   document.getElementById('pdf-modal-body').innerHTML = `
     <div class="pdf-drop" onclick="document.getElementById('pdf-view-input').click()">
       <div style="font-size:36px">📄</div>
-      <div>${LANG[currentLang].select_pdf}</div>
+      <div>${t('select_pdf')}</div>
       <div style="font-family:var(--mono);font-size:10px;color:var(--accent);margin-top:8px">${filename}</div>
     </div>`;
   document.getElementById('pdf-modal').classList.add('open');
@@ -5865,7 +5694,7 @@ window.addEventListener('load', () => {
   updatePatientBadge();
   initProfile();
   initTips();
-  MT_setLangue((localStorage.getItem('mt_lang') || 'es').toUpperCase());
+  setLang(localStorage.getItem('mt_lang') || 'es');
 
   /* Version avec date/heure */
   var vl = document.getElementById('version-label');
