@@ -3681,10 +3681,10 @@ function exportPDF(mode) {
     '@media print { body{font-size:15px} .page{padding:8mm 10mm} .anamnesis{page-break-after:always} .section{page-break-inside:avoid} .share-bar{display:none} #page-indicator{display:none} @page{size:A4;margin:12mm 10mm 18mm 10mm} .print-page-footer{display:block;position:fixed;bottom:0;left:0;right:0;text-align:center;font-size:9px;color:#888;padding:4px} } .print-page-footer{display:none}' +
     '</style></head><body><div class="page">' +
 
+    shareBarHtml +
     '<div class="report-header"><div><div class="report-logo">Medi<span>Trace</span></div><div class="report-type">' + titleType + '</div></div>' +
     '<div class="report-meta"><strong>Paciente:</strong> ' + patLabel + '<br><strong>' + t('generated_lbl') + ':</strong> ' + now + '<br><strong>Per\u00edodo:</strong> ' + dateRange + '<br><strong>' + t('data_lbl') + ':</strong> ' + data.length + ' fechas \u00b7 ' + events.length + ' eventos<br><strong>' + t('author_lbl') + ':</strong> Pierre-Henri Giraud \u00d7 Claude (Anthropic)<br>DOI: 10.5281/zenodo.19973451<br><strong>' + t('warning_doc') + '</strong></div></div>' +
 
-    shareBarHtml +
     '<div class="exec-summary"><div class="exec-title">' + t('anamnesis_title') + '</div>' +
     '<div style="font-size:15px;line-height:1.8;color:#1a1a2e;text-align:justify">' +
     'Paciente <strong>' + patLabel + '</strong>, mujer de 87 años, con antecedentes de tromboembolismo pulmonar bilateral recurrente (2016, 2022), ' +
