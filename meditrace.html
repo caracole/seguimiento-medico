@@ -3497,6 +3497,78 @@ function enviarEmailInforme() {
   window.location.href = url.substring(0, 2000);
 }
 
+function copiarInforme() {
+  var win = window._informeWin;
+  if (!win || win.closed) {
+    customAlert('Sin informe', 'Primero genera el informe con el botón Informe PDF.', '⚠️', 'var(--warn)');
+    return;
+  }
+  try {
+    var c = win.document.querySelector('.page');
+    if (c) {
+      win.navigator.clipboard.writeText(c.innerText).then(function() {
+        customAlert('✓ Copiado', 'Informe copiado al portapapeles.', '✅', 'var(--accent2)');
+      }).catch(function() {
+        win.document.execCommand('selectAll');
+        win.document.execCommand('copy');
+        customAlert('✓ Copiado', 'Informe copiado al portapapeles.', '✅', 'var(--accent2)');
+      });
+    }
+  } catch(e) {
+    customAlert('Error', 'No se pudo copiar: ' + e.message, '❌', 'var(--danger)');
+  }
+}
+
+function enviarEmailInforme() {
+  var data = loadData();
+  var events = loadEvents();
+  var patLabel = getPatientLabel() || 'Paciente';
+  var now = new Date().toLocaleDateString();
+  var nl = '\n';
+  var sep = '----------------------------';
+
+  var body = 'Estimado/a Doctor/a,' + nl + nl;
+  body += 'Le envio el resumen del informe MediTrace de seguimiento medico longitudinal.' + nl + nl;
+  body += sep + nl;
+  body += 'PACIENTE: ' + patLabel + nl;
+  body += 'FECHA: ' + now + nl;
+  body += 'DATOS: ' + data.length + ' mediciones - ' + events.length + ' eventos clinicos' + nl;
+  body += sep + nl + nl;
+
+  if (data.length > 0) {
+    var last = data[data.length - 1];
+    body += 'ULTIMOS VALORES (' + last.date + ' - ' + (last.src || '') + '):' + nl;
+    var keyP = ['hemoglobina','glucosa','creatinina','filtrado','colesterol','ldl','vitamina_d','hba1c','pcr','tsh'];
+    keyP.forEach(function(k) {
+      if (last.vals && last.vals[k] !== undefined) {
+        var p = PARAMS[k];
+        body += '  - ' + (p ? p.label : k) + ': ' + last.vals[k] + ' ' + (p ? p.unit : '') + nl;
+      }
+    });
+    body += nl;
+  }
+
+  if (events.length > 0) {
+    body += 'EVENTOS RECIENTES:' + nl;
+    events.slice(-3).reverse().forEach(function(ev) {
+      body += '  - ' + ev.date + ' - ' + (ev.title || '') + nl;
+    });
+    body += nl;
+  }
+
+  body += sep + nl;
+  body += 'NOTA: Este email contiene un resumen de texto.' + nl;
+  body += 'Para el PDF completo: MediTrace → Informe PDF → Guardar como PDF' + nl;
+  body += 'y adjuntelo manualmente a este email.' + nl + nl;
+  body += 'MediTrace v2026 - caracole.github.io/seguimiento-medico' + nl;
+  body += 'DOI: 10.5281/zenodo.19973451' + nl;
+
+  var subject = 'MediTrace - Informe - ' + patLabel + ' - ' + now;
+  var url = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+  window.location.href = url.substring(0, 2000);
+}
+
+
 function exportPDF(mode) {
   mode = mode || 'detallado';
   const data   = loadData();
