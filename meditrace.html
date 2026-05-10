@@ -2544,7 +2544,7 @@ function _doImportJson(raw, resultEl, textareaId) {
 
     /* Afficher l'aperçu dans un popup et attendre confirmation */
     var overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);display:flex;justify-content:center;align-items:center';
     var box = document.createElement('div');
     box.style.cssText = 'background:var(--surface);border:2px solid var(--accent2);border-radius:12px;padding:24px;width:90%;max-width:480px';
     box.innerHTML = '<div style="font-size:18px;font-weight:700;color:var(--accent2);margin-bottom:12px">📋 Importar este documento?</div>' +
@@ -3224,7 +3224,7 @@ function editCell(idx, field, td) {
   /* Si le texte est long (>40 car) ou champ titre/src, utiliser un popup textarea */
   if (currentVal.length > 40 || field === 'title' || field === 'text') {
     var overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);display:flex;justify-content:center;align-items:center';
     var box = document.createElement('div');
     box.style.cssText = 'background:var(--surface);border:2px solid var(--accent);border-radius:12px;padding:20px;width:90%;max-width:500px';
     box.innerHTML = '<div style="font-family:var(--mono);font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px">Editar: ' + field + '</div>';
@@ -3279,7 +3279,7 @@ function deleteEvent(idx) {
 
   /* Popup personnalisé au lieu du confirm natif */
   var overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);display:flex;justify-content:center;align-items:center';
   var box = document.createElement('div');
   box.style.cssText = 'background:var(--surface);border:2px solid var(--danger);border-radius:12px;padding:24px;width:90%;max-width:420px;text-align:center';
   box.innerHTML = '<div style="font-size:32px;margin-bottom:12px">\u26a0\ufe0f</div>' +
@@ -3374,7 +3374,7 @@ function deleteMesure(idx) {
   if (idx < 0 || idx >= data.length) return;
   var m = data[idx];
   var overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);display:flex;justify-content:center;align-items:center';
   var box = document.createElement('div');
   box.style.cssText = 'background:var(--surface);border:2px solid var(--danger);border-radius:12px;padding:24px;width:90%;max-width:420px;text-align:center';
   box.innerHTML = '<div style="font-size:32px;margin-bottom:12px">\u26a0\ufe0f</div>' +
@@ -3456,70 +3456,104 @@ function enviarEmailInforme() {
   var patLabel = getPatientLabel() || 'Paciente';
   var now = new Date().toLocaleDateString();
 
-  /* Build well-formatted plain text */
-  var L = [];
-  L.push('Estimado/a Doctor/a,');
-  L.push('');
-  L.push('Resumen del informe MediTrace de seguimiento medico longitudinal.');
-  L.push('');
-  L.push('============================================================');
-  L.push('PACIENTE : ' + patLabel);
-  L.push('FECHA    : ' + now);
-  L.push('DATOS    : ' + data.length + ' mediciones | ' + events.length + ' eventos');
-  L.push('============================================================');
-  L.push('');
+  /* Build HTML for display in modal */
+  var html = '<div style="font-family:Arial,sans-serif;font-size:13px;line-height:1.7;color:#1a1a2e">';
+  html += '<p><strong>Estimado/a Doctor/a,</strong><br>';
+  html += 'Informe MediTrace de seguimiento m&eacute;dico longitudinal.</p>';
+  html += '<table style="border-collapse:collapse;width:100%;margin:8px 0">';
+  html += '<tr style="background:#1a5276;color:white"><td style="padding:4px 8px" colspan="2"><strong>PACIENTE: ' + patLabel + ' &nbsp;|&nbsp; ' + now + '</strong></td></tr>';
+  html += '<tr style="background:#eaf4fb"><td style="padding:3px 8px">Mediciones</td><td style="padding:3px 8px"><strong>' + data.length + '</strong></td></tr>';
+  html += '<tr><td style="padding:3px 8px">Eventos cl&iacute;nicos</td><td style="padding:3px 8px"><strong>' + events.length + '</strong></td></tr>';
+  html += '</table>';
 
   if (data.length > 0) {
     var last = data[data.length - 1];
-    L.push('ULTIMOS VALORES (' + last.date + ' | ' + (last.src || '') + ')');
-    L.push('------------------------------------------------------------');
+    html += '<p style="margin:8px 0 4px"><strong>&#218;ltimos valores (' + last.date + ')</strong></p>';
+    html += '<table style="border-collapse:collapse;width:100%;font-size:12px">';
     var kp = [
-      ['hemoglobina','Hemoglobina    '],['glucosa','Glucosa        '],
-      ['creatinina','Creatinina     '],['filtrado','Filtrado glom. '],
-      ['colesterol','Colesterol     '],['ldl','LDL            '],
-      ['vitamina_d','Vitamina D     '],['hba1c','HbA1c          '],
-      ['pcr','PCR            '],['tsh','TSH            ']
+      ['hemoglobina','Hemoglobina'],['glucosa','Glucosa'],
+      ['creatinina','Creatinina'],['filtrado','Filtrado glom.'],
+      ['colesterol','Colesterol'],['ldl','LDL'],
+      ['vitamina_d','Vitamina D'],['hba1c','HbA1c'],
+      ['pcr','PCR'],['tsh','TSH']
     ];
-    kp.forEach(function(item) {
+    kp.forEach(function(item, idx) {
       if (last.vals && last.vals[item[0]] !== undefined) {
         var p = PARAMS[item[0]];
-        L.push('  ' + item[1] + ': ' + last.vals[item[0]] + ' ' + (p ? p.unit : ''));
+        var val = last.vals[item[0]];
+        var st = getStatus(item[0], val);
+        var color = st === 'bad' ? '#c0392b' : '#1e8449';
+        var bg = idx % 2 === 0 ? '#eaf4fb' : 'white';
+        html += '<tr style="background:' + bg + '">';
+        html += '<td style="padding:2px 8px">' + item[1] + '</td>';
+        html += '<td style="padding:2px 8px;font-weight:700;color:' + color + '">' + val + ' ' + (p ? p.unit : '') + '</td>';
+        html += '</tr>';
       }
     });
-    L.push('');
+    html += '</table>';
   }
 
   if (events.length > 0) {
-    L.push('EVENTOS RECIENTES');
-    L.push('------------------------------------------------------------');
-    events.slice(-5).reverse().forEach(function(ev) {
-      L.push('  ' + ev.date + ' | ' + (ev.title || ''));
+    html += '<p style="margin:8px 0 4px"><strong>Eventos recientes</strong></p>';
+    html += '<table style="border-collapse:collapse;width:100%;font-size:12px">';
+    events.slice(-4).reverse().forEach(function(ev, idx) {
+      var bg = idx % 2 === 0 ? '#eaf4fb' : 'white';
+      html += '<tr style="background:' + bg + '">';
+      html += '<td style="padding:2px 8px;white-space:nowrap">' + ev.date + '</td>';
+      html += '<td style="padding:2px 8px">' + (ev.title || '') + '</td>';
+      html += '</tr>';
     });
-    L.push('');
+    html += '</table>';
   }
 
-  L.push('============================================================');
-  L.push('NOTA: Para el PDF completo:');
-  L.push('  MediTrace > Informe PDF > Guardar como PDF');
-  L.push('  y adjuntelo manualmente a este email.');
-  L.push('');
-  L.push('MediTrace v2026 | caracole.github.io/seguimiento-medico');
-  L.push('DOI: 10.5281/zenodo.19973451');
+  html += '<p style="margin-top:10px;font-size:11px;color:#888">MediTrace v2026 &middot; caracole.github.io/seguimiento-medico &middot; DOI: 10.5281/zenodo.19973451</p>';
+  html += '</div>';
 
-  var body = L.join('\r\n');
-  var subject = 'MediTrace | Informe | ' + patLabel + ' | ' + now;
+  /* Show in modal with copy button */
+  var ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);display:flex;justify-content:center;align-items:center;backdrop-filter:blur(4px)';
+  var bx = document.createElement('div');
+  bx.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:14px;width:90%;max-width:560px;max-height:85vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 16px 48px rgba(0,0,0,0.4)';
+  bx.innerHTML =
+    '<div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">' +
+    '<div style="font-family:var(--mono);font-size:12px;font-weight:600;color:var(--accent)">📧 ' + t('send_email') + '</div>' +
+    '<button id="close-email-modal" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--muted)">✕</button>' +
+    '</div>' +
+    '<div style="padding:16px 20px;overflow-y:auto;flex:1">' +
+    '<div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:8px">Copie este contenido y p&eacute;guelo en su email:</div>' +
+    '<div id="email-preview" style="background:white;border:1px solid var(--border);border-radius:8px;padding:12px;max-height:320px;overflow-y:auto">' + html + '</div>' +
+    '</div>' +
+    '<div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap">' +
+    '<button id="copy-email-btn" class="btn primary" style="font-size:12px">📋 Copiar contenido</button>' +
+    '<a href="mailto:?subject=' + encodeURIComponent('MediTrace | Informe | ' + patLabel + ' | ' + now) + '" class="btn" style="font-size:12px;text-decoration:none">✉ Abrir email (texto)</a>' +
+    '<button id="close-email-btn" class="btn" style="font-size:12px">Cerrar</button>' +
+    '</div>';
+  ov.appendChild(bx);
+  document.body.appendChild(ov);
 
-  customConfirm(
-    '📧 ' + t('send_email'),
-    'Se abrira su cliente de email con el resumen del informe en el cuerpo del mensaje.<br><br>' +
-    '<strong>Nota:</strong> Los clientes de email no admiten adjuntos automaticos.<br>' +
-    'Para enviar el PDF completo: guardelo primero con <strong>Guardar como PDF</strong> y adjuntelo manualmente.',
-    function() {
-      var url = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-      window.location.href = url.length > 1900 ? url.substring(0, 1900) : url;
+  document.getElementById('close-email-modal').onclick =
+  document.getElementById('close-email-btn').onclick = function() { document.body.removeChild(ov); };
+  ov.onclick = function(e) { if (e.target === ov) document.body.removeChild(ov); };
+
+  document.getElementById('copy-email-btn').onclick = function() {
+    var preview = document.getElementById('email-preview');
+    if (navigator.clipboard && window.ClipboardItem) {
+      var blob = new Blob([preview.innerHTML], {type: 'text/html'});
+      var item = new ClipboardItem({'text/html': blob});
+      navigator.clipboard.write([item]).then(function() {
+        document.getElementById('copy-email-btn').textContent = '✓ Copiado!';
+      }).catch(function() {
+        /* Fallback text */
+        navigator.clipboard.writeText(preview.innerText);
+        document.getElementById('copy-email-btn').textContent = '✓ Copiado (texto)!';
+      });
+    } else {
+      navigator.clipboard.writeText(preview.innerText);
+      document.getElementById('copy-email-btn').textContent = '✓ Copiado!';
     }
-  );
+  };
 }
+
 
 function copiarInforme(sourceWin) {
   /* sourceWin = la fenêtre popup du rapport (passée en paramètre) */
@@ -3782,7 +3816,7 @@ function exportPDF(mode) {
 ================================================================ */
 function customConfirm(title, message, onOk) {
   var ov = document.createElement('div');
-  ov.style.cssText = 'position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);display:flex;justify-content:center;align-items:center';
   var bx = document.createElement('div');
   bx.style.cssText = 'background:var(--surface);border:2px solid var(--accent);border-radius:12px;padding:24px;width:90%;max-width:440px;text-align:center';
   bx.innerHTML = '<div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:12px">' + title + '</div><div style="font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.7;text-align:left">' + message + '</div>';
@@ -3837,7 +3871,7 @@ function nuevoPaciente() {
 }
 function _npLabel() {
   var ov = document.createElement('div');
-  ov.style.cssText = 'position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);display:flex;justify-content:center;align-items:center';
   var bx = document.createElement('div');
   bx.style.cssText = 'background:var(--surface);border:2px solid var(--accent);border-radius:12px;padding:24px;width:90%;max-width:440px';
   bx.innerHTML = '<div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:12px">Nuevo paciente</div><div style="font-size:14px;color:var(--muted);margin-bottom:12px">Etiqueta del nuevo paciente:</div>';
@@ -5479,7 +5513,7 @@ function jumpToMed(id) {
 
 function editMedStatut(medName) {
   var ov = document.createElement('div');
-  ov.style.cssText = 'position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);display:flex;justify-content:center;align-items:center';
   var bx = document.createElement('div');
   bx.style.cssText = 'background:var(--surface);border:2px solid var(--accent);border-radius:12px;padding:24px;width:90%;max-width:480px';
   bx.innerHTML = '<div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:16px">Editar: ' + medName + '</div>';
