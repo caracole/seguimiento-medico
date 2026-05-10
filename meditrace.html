@@ -3664,10 +3664,30 @@ function anonymizeData(data, events) {
 
 function exportPDF(mode) {
   mode = mode || 'detallado';
-  const data   = loadData();
-  const events = loadEvents();
-  const meds   = loadMeds();
-  const bacts  = loadBacterio();
+  /* ── Anonymisation ── */
+  const chkAnon = document.getElementById('chk-anonimizar');
+  const doAnon  = chkAnon && chkAnon.checked;
+
+  /* ── Loading indicator ── */
+  const loadingEl = document.createElement('div');
+  loadingEl.id = 'pdf-loading';
+  loadingEl.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(14,17,23,0.85);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:16px;backdrop-filter:blur(4px)';
+  loadingEl.innerHTML = '<div style="font-family:var(--serif);font-size:28px;font-weight:700;color:white">Medi<span style="font-style:italic;color:var(--accent)">Trace</span></div>' +
+    '<div style="font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:2px">' + (doAnon ? '🔒 ANONIMIZANDO...' : '⏳ GENERANDO INFORME...') + '</div>' +
+    '<div style="width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite"></div>';
+  document.body.appendChild(loadingEl);
+
+  setTimeout(function() {
+
+  var rawData   = loadData();
+  var rawEvents = loadEvents();
+  var rawMeds   = loadMeds();
+  var rawBacts  = loadBacterio();
+  var anonResult = doAnon ? anonymizeData(rawData, rawEvents) : null;
+  const data    = doAnon ? anonResult.data   : rawData;
+  const events  = doAnon ? anonResult.events : rawEvents;
+  const meds    = rawMeds;
+  const bacts   = rawBacts;
   if (!data.length) { customAlert('Sin datos', 'No hay datos que exportar. Carga primero un archivo o añade datos manualmente.', '📂', 'var(--muted)'); return; }
 
   const lastVals = {};
@@ -3877,6 +3897,8 @@ function exportPDF(mode) {
   const filename = 'MediTrace_' + (isDetailed ? 'Detallado' : 'Sintetico') /* keep EN for filename */ + '_' + patLabel.replace(/[^a-zA-Z0-9]/g,'_') + '_' + new Date().toISOString().slice(0,10);
   const win = window.open('', '_blank');
   win.document.open(); win.document.write(html); win.document.close();
+  if(document.getElementById('pdf-loading')) document.body.removeChild(document.getElementById('pdf-loading'));
+  }, 80); /* end setTimeout */
   win.document.title = filename; win.focus();
 }
 
