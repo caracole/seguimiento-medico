@@ -475,7 +475,7 @@ body.no-tips [data-tip]::before { display: none !important; }
 <!-- TOP BAR — Ligne 1: Logo + Patient + Mode couleur + Langues -->
 <div class="topbar">
   <div style="display:flex;align-items:center;gap:12px">
-    <a href="index.html" class="topbar-logo">Medi<span>Trace</span></a>
+    <a href="#" onclick="showStartupModal(); return false;" class="topbar-logo" data-tip-key="tip_logo">Medi<span>Trace</span></a>
     <span style="font-size:10px;color:rgba(255,255,255,0.5);margin-left:4px" id="version-label">v2026.4</span>
     <span id="patient-badge" style="display:none;padding:4px 10px;background:rgba(74,143,232,0.2);border:1px solid var(--accent);border-radius:6px;font-size:13px"></span>
   </div>
@@ -609,7 +609,8 @@ body.no-tips [data-tip]::before { display: none !important; }
           💬 Mostrar ayuda contextual
         </label>
         <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">
-          v2026.4 · <a href="https://caracole.github.io/seguimiento-medico/" target="_blank" style="color:var(--accent)">GNU GPL v3</a>
+          <a href="index.html" style="color:var(--accent)">🏠 Inicio</a>
+          &nbsp;·&nbsp; v2026.4 · <a href="https://caracole.github.io/seguimiento-medico/" target="_blank" style="color:var(--accent)">GNU GPL v3</a>
         </span>
       </div>
     </div>
@@ -1468,6 +1469,7 @@ const T = {
     farma_title_full:"⚠ Farmacovigilancia — Interacciones & Contraindicaciones · Fuente: CIMA/AEMPS",
     pref_tips:"💬 Mostrar ayuda contextual",
     /* Tooltips */
+    tip_logo:"🏠 Menú principal — perfil, paciente, preferencias",
     tip_profile:"👤 Cambiar perfil o seleccionar paciente",
     tip_theme:"☀️ Cambiar entre tema claro y oscuro",
     tip_lang_es:"Cambiar idioma a Español",
@@ -1621,6 +1623,7 @@ const T = {
     farma_title_full:"⚠ Pharmacovigilance — Interactions & Contre-indications · Source : CIMA/AEMPS",
     pref_tips:"💬 Afficher l'aide contextuelle",
     /* Tooltips */
+    tip_logo:"🏠 Menu principal — profil, patient, préférences",
     tip_profile:"👤 Changer de profil ou sélectionner un patient",
     tip_theme:"☀️ Basculer entre thème clair et sombre",
     tip_lang_es:"Passer en Espagnol",
@@ -1774,6 +1777,7 @@ const T = {
     farma_title_full:"⚠ Pharmacovigilance — Interactions & Contraindications · Source: CIMA/AEMPS",
     pref_tips:"💬 Show contextual help",
     /* Tooltips */
+    tip_logo:"🏠 Main menu — profile, patient, preferences",
     tip_profile:"👤 Change profile or select a patient",
     tip_theme:"☀️ Toggle between light and dark theme",
     tip_lang_es:"Switch to Spanish",
