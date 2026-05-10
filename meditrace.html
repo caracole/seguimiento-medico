@@ -3450,6 +3450,53 @@ function closeInformeDialog() {
 /* ================================================================
    EXPORT PDF — Rapport médical
 ================================================================ */
+function enviarEmailInforme() {
+  var data = loadData();
+  var events = loadEvents();
+  var patLabel = getPatientLabel() || 'Paciente';
+  var now = new Date().toLocaleDateString();
+  var sep = '----------------------------';
+  var nl = '\n';
+
+  var body = 'Estimado/a Doctor/a,' + nl + nl;
+  body += 'Resumen informe MediTrace de seguimiento medico.' + nl + nl;
+  body += sep + nl;
+  body += 'PACIENTE: ' + patLabel + nl;
+  body += 'FECHA: ' + now + nl;
+  body += 'DATOS: ' + data.length + ' mediciones - ' + events.length + ' eventos' + nl;
+  body += sep + nl + nl;
+
+  if (data.length > 0) {
+    var last = data[data.length - 1];
+    body += 'ULTIMOS VALORES (' + last.date + '):' + nl;
+    var keyP = ['hemoglobina','glucosa','creatinina','filtrado','colesterol','ldl','vitamina_d','hba1c','pcr','tsh'];
+    keyP.forEach(function(k) {
+      if (last.vals && last.vals[k] !== undefined) {
+        var p = PARAMS[k];
+        body += '  - ' + (p ? p.label : k) + ': ' + last.vals[k] + ' ' + (p ? p.unit : '') + nl;
+      }
+    });
+    body += nl;
+  }
+
+  if (events.length > 0) {
+    body += 'EVENTOS RECIENTES:' + nl;
+    events.slice(-3).reverse().forEach(function(ev) {
+      body += '  - ' + ev.date + ' - ' + (ev.title || '') + nl;
+    });
+    body += nl;
+  }
+
+  body += sep + nl;
+  body += 'NOTA: Para el PDF completo: MediTrace → Informe → Guardar como PDF' + nl;
+  body += 'y adjuntelo manualmente a este email.' + nl + nl;
+  body += 'MediTrace v2026 - caracole.github.io/seguimiento-medico' + nl;
+
+  var subject = 'MediTrace - Informe - ' + patLabel + ' - ' + now;
+  var url = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+  window.location.href = url.substring(0, 2000);
+}
+
 function exportPDF(mode) {
   mode = mode || 'detallado';
   const data   = loadData();
@@ -3557,7 +3604,7 @@ function exportPDF(mode) {
     '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">' +
     '<button onclick="window.print()" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#1a5276;border:none;cursor:pointer">' + t('save_pdf') + '</button>' +
     '<button onclick="copiarInforme()" id="btn-copiar" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#2ecc71;border:none;cursor:pointer">' + t('copy_report') + '</button>' +
-    '<a style="display:inline-block;padding:10px 20px;border-radius:6px;text-decoration:none;font-size:14px;font-weight:600;color:white;background:#0088cc" href="mailto:?subject=' + encodeURIComponent(shareSubject) + '&body=Estimado%2Fa%20Doctor%2Fa%2C%0D%0A%0D%0AAdjunto%20el%20informe%20de%20seguimiento%20m%C3%A9dico%20(' + encodeURIComponent(shareType) + ')%20del%20paciente%20' + encodeURIComponent(patLabel) + '.%0D%0A%0D%0AQuedo%20a%20su%20disposici%C3%B3n.%0D%0A%0D%0AAtentamente%0D%0APierre-Henri%20Giraud">' + t('send_email') + '</a>' +
+    '<button onclick="enviarEmailInforme()" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#0088cc;border:none;cursor:pointer">' + t('send_email') + '</button>' +
     '</div>' +
     '<div id="copiar-feedback" style="font-size:12px;color:#2ecc71;margin-top:8px;min-height:20px"></div>' +
     '</div>';
