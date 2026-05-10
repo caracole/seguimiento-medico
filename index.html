@@ -422,7 +422,7 @@ footer {
   <a href="meditrace.html" class="hero-cta">
     <span data-i18n="cta">→ Acceder al dossier</span>
   </a>
-  <div class="hero-version">v2026.2 · <span data-i18n="updated">Actualizado</span> Mayo 2026</div>
+  <div class="hero-version"><span data-i18n="updated">Actualizado</span> Mayo 2026</div>
 </div>
 
 <!-- ══════════════════════════════════════════
@@ -812,7 +812,9 @@ function setLang(l) {
     const k = el.dataset.i18n;
     if (t[k] !== undefined) el.innerHTML = t[k];
   });
-  document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`).classList.add('active');
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  const activeBtn = document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`);
+  if (activeBtn) activeBtn.classList.add('active');
   document.documentElement.lang = l;
   localStorage.setItem('meditrace_lang', l);
 }
