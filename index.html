@@ -816,11 +816,11 @@ function setLang(l) {
   const activeBtn = document.querySelector(`.lang-btn[onclick="setLang('${l}')"]`);
   if (activeBtn) activeBtn.classList.add('active');
   document.documentElement.lang = l;
-  localStorage.setItem('meditrace_lang', l);
+  localStorage.setItem('mt_lang', l);
 }
 
 /* Restaurer la langue */
-const saved = localStorage.getItem('meditrace_lang');
+const saved = localStorage.getItem('mt_lang');
 if (saved && T[saved]) setLang(saved);
 else setLang('es');
 </script>

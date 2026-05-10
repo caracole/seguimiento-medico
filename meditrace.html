@@ -3710,8 +3710,7 @@ function exportPDF(mode) {
   var shareSubject = 'MediTrace \u2014 Informe ' + shareType + ' \u2014 ' + patLabel;
   var shareBarHtml =
     '<div class="share-bar">' +
-    '<span class="share-title">' + t('save_pdf') + '</span>' +
-    '<button onclick="window.print()" style="padding:4px 16px;border-radius:4px;font-size:11px;font-weight:600;color:white;background:#1a5276;border:none;cursor:pointer">🖨 ' + t('save_pdf') + '</button>' +
+    '<button onclick="window.print()" title="' + t('save_pdf') + '" style="padding:4px 12px;border-radius:4px;font-size:15px;color:white;background:#1a5276;border:none;cursor:pointer">🖨</button>' +
     '</div>';
 
     const html = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"/>' +
