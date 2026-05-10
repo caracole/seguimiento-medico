@@ -3455,53 +3455,84 @@ function enviarEmailInforme() {
   var events = loadEvents();
   var patLabel = getPatientLabel() || 'Paciente';
   var now = new Date().toLocaleDateString();
-  var sep = '----------------------------';
-  var nl = '\n';
 
-  var body = 'Estimado/a Doctor/a,' + nl + nl;
-  body += 'Resumen informe MediTrace de seguimiento medico.' + nl + nl;
-  body += sep + nl;
-  body += 'PACIENTE: ' + patLabel + nl;
-  body += 'FECHA: ' + now + nl;
-  body += 'DATOS: ' + data.length + ' mediciones - ' + events.length + ' eventos' + nl;
-  body += sep + nl + nl;
+  /* Build well-formatted plain text */
+  var L = [];
+  L.push('Estimado/a Doctor/a,');
+  L.push('');
+  L.push('Resumen del informe MediTrace de seguimiento medico longitudinal.');
+  L.push('');
+  L.push('============================================================');
+  L.push('PACIENTE : ' + patLabel);
+  L.push('FECHA    : ' + now);
+  L.push('DATOS    : ' + data.length + ' mediciones | ' + events.length + ' eventos');
+  L.push('============================================================');
+  L.push('');
 
   if (data.length > 0) {
     var last = data[data.length - 1];
-    body += 'ULTIMOS VALORES (' + last.date + '):' + nl;
-    var keyP = ['hemoglobina','glucosa','creatinina','filtrado','colesterol','ldl','vitamina_d','hba1c','pcr','tsh'];
-    keyP.forEach(function(k) {
-      if (last.vals && last.vals[k] !== undefined) {
-        var p = PARAMS[k];
-        body += '  - ' + (p ? p.label : k) + ': ' + last.vals[k] + ' ' + (p ? p.unit : '') + nl;
+    L.push('ULTIMOS VALORES (' + last.date + ' | ' + (last.src || '') + ')');
+    L.push('------------------------------------------------------------');
+    var kp = [
+      ['hemoglobina','Hemoglobina    '],['glucosa','Glucosa        '],
+      ['creatinina','Creatinina     '],['filtrado','Filtrado glom. '],
+      ['colesterol','Colesterol     '],['ldl','LDL            '],
+      ['vitamina_d','Vitamina D     '],['hba1c','HbA1c          '],
+      ['pcr','PCR            '],['tsh','TSH            ']
+    ];
+    kp.forEach(function(item) {
+      if (last.vals && last.vals[item[0]] !== undefined) {
+        var p = PARAMS[item[0]];
+        L.push('  ' + item[1] + ': ' + last.vals[item[0]] + ' ' + (p ? p.unit : ''));
       }
     });
-    body += nl;
+    L.push('');
   }
 
   if (events.length > 0) {
-    body += 'EVENTOS RECIENTES:' + nl;
-    events.slice(-3).reverse().forEach(function(ev) {
-      body += '  - ' + ev.date + ' - ' + (ev.title || '') + nl;
+    L.push('EVENTOS RECIENTES');
+    L.push('------------------------------------------------------------');
+    events.slice(-5).reverse().forEach(function(ev) {
+      L.push('  ' + ev.date + ' | ' + (ev.title || ''));
     });
-    body += nl;
+    L.push('');
   }
 
-  body += sep + nl;
-  body += 'NOTA: Para el PDF completo: MediTrace → Informe → Guardar como PDF' + nl;
-  body += 'y adjuntelo manualmente a este email.' + nl + nl;
-  body += 'MediTrace v2026 - caracole.github.io/seguimiento-medico' + nl;
+  L.push('============================================================');
+  L.push('NOTA: Para el PDF completo:');
+  L.push('  MediTrace > Informe PDF > Guardar como PDF');
+  L.push('  y adjuntelo manualmente a este email.');
+  L.push('');
+  L.push('MediTrace v2026 | caracole.github.io/seguimiento-medico');
+  L.push('DOI: 10.5281/zenodo.19973451');
 
-  var subject = 'MediTrace - Informe - ' + patLabel + ' - ' + now;
-  var url = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-  window.location.href = url.substring(0, 2000);
+  var body = L.join('\r\n');
+  var subject = 'MediTrace | Informe | ' + patLabel + ' | ' + now;
+
+  customConfirm(
+    '📧 ' + t('send_email'),
+    'Se abrira su cliente de email con el resumen del informe en el cuerpo del mensaje.<br><br>' +
+    '<strong>Nota:</strong> Los clientes de email no admiten adjuntos automaticos.<br>' +
+    'Para enviar el PDF completo: guardelo primero con <strong>Guardar como PDF</strong> y adjuntelo manualmente.',
+    function() {
+      var url = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+      window.location.href = url.length > 1900 ? url.substring(0, 1900) : url;
+    }
+  );
 }
 
 function copiarInforme(sourceWin) {
   /* sourceWin = la fenêtre popup du rapport (passée en paramètre) */
   var win = sourceWin || window._informeWin;
   if (!win || win.closed) {
-    customAlert('Sin informe', 'Primero genera el informe con el boton Informe PDF.', '⚠️', 'var(--warn)');
+    /* No popup window — copy patient summary from data */
+    var data = loadData();
+    var patLabel = getPatientLabel() || 'Paciente';
+    var summary = 'MediTrace | ' + patLabel + ' | ' + new Date().toLocaleDateString() + '\n';
+    summary += data.length + ' mediciones | ' + loadEvents().length + ' eventos\n';
+    navigator.clipboard.writeText(summary).then(function() {
+      customAlert('✓ Copiado', 'Resumen copiado. Abre el Informe PDF para copiar el informe completo.', '✅', 'var(--accent2)');
+    });
     return;
   }
   try {
