@@ -1377,7 +1377,7 @@ const T = {
     edit_label:"Editar:", edit_save:"✓ Guardar", edit_cancel:"Cancelar",
     no_events:"No hay eventos clínicos registrados.", events_count:"evento(s)",
     /* Panel datos */
-    datos_memoria:"DATOS EN MEMORIA", guardar_backup:"💾 Guardar backup (.mt)",
+    datos_memoria:"DATOS EN MEMORIA", guardar_backup:"💾 Guardar datos del paciente",
     ver_eventos:"📜 Ver / gestionar eventos importados ▼",
     ver_mediciones:"📊 Ver / corregir fechas de mediciones ▼",
     filtrar:"Filtrar:", todos:"Todos", ultima_import:"Última importación:",
@@ -1407,7 +1407,7 @@ const T = {
     receta_publica:"Receta pública (financiada)", receta_privada:"Receta privada",
     receta_no_fin:"No financiado (paciente paga)", receta_hospital:"Dispensación hospitalaria",
     /* MT keys (ancien système) */
-    data_in_memory:"DATOS EN MEMORIA", save_backup:"💾 Guardar backup (.mt)",
+    data_in_memory:"DATOS EN MEMORIA", save_backup:"💾 Guardar datos del paciente",
     ver_eventos_mt:"📜 Ver / gestionar eventos importados ▼",
     ver_mediciones_mt:"📊 Ver / corregir fechas de mediciones ▼",
     tab_leer_mt:"📷 Leer documento", tab_portapapeles_mt:"📋 Desde portapapeles",
@@ -1492,15 +1492,15 @@ const T = {
     profile_medico:"Médico", profile_medico_sub:"Vista clínica completa",
     profile_paciente:"Paciente", profile_paciente_sub:"Vista personal",
     profile_familia:"Familia", profile_familia_sub:"Vista simplificada",
-    btn_nuevo_paciente:"+ Nuevo paciente", btn_restaurar_mt:"📂 Restaurar .mt",
+    btn_nuevo_paciente:"+ Nuevo paciente", btn_restaurar_mt:"📂 Restaurar datos",
     tip_medico:"Vista clínica completa con farmacovigilancia y análisis vascular",
     tip_paciente:"Vista personal con glosario y curvas de evolución",
     tip_familia:"Vista simplificada con explicaciones en lenguaje sencillo",
-    tip_backup_btn:"💾 Descarga todos los datos como archivo MediTrace-Paciente-Fecha.mt",
+    tip_backup_btn:"💾 Guarda los datos del paciente en un archivo descargable",
     tip_radar:"🕸️ Vista de conjunto — Radar de parámetros biológicos",
     tip_meds:"💊 Historial completo de medicamentos con períodos y observancia",
     tip_bact:"🦠 Resultados de cultivos y antibiogramas",
-    tip_tab_leer:"🤖 Extracción automática con Claude API — arrastra tu PDF médico",
+    tip_tab_leer:"📷 OCR: lee el PDF y extrae los valores automáticamente — requiere conexión a internet",
     tip_tab_clip:"📋 Pega texto copiado de un PDF o documento médico",
     tip_tab_manual:"✏️ Introduce valores manualmente: fecha, parámetro y valor",
   },
@@ -1535,7 +1535,7 @@ const T = {
     del_cancel:"Annuler", del_confirm:"✕ Supprimer",
     edit_label:"Modifier :", edit_save:"✓ Enregistrer", edit_cancel:"Annuler",
     no_events:"Aucun événement clinique enregistré.", events_count:"événement(s)",
-    datos_memoria:"DONNÉES EN MÉMOIRE", guardar_backup:"💾 Sauvegarder (.mt)",
+    datos_memoria:"DONNÉES EN MÉMOIRE", guardar_backup:"💾 Sauvegarder les données patient",
     ver_eventos:"📜 Voir / gérer les événements importés ▼",
     ver_mediciones:"📊 Voir / corriger les dates de mesures ▼",
     filtrar:"Filtrer :", todos:"Tous", ultima_import:"Dernière importation :",
@@ -1645,15 +1645,15 @@ const T = {
     profile_medico:"Médecin", profile_medico_sub:"Vue clinique complète",
     profile_paciente:"Patient", profile_paciente_sub:"Vue personnelle",
     profile_familia:"Famille", profile_familia_sub:"Vue simplifiée",
-    btn_nuevo_paciente:"+ Nouveau patient", btn_restaurar_mt:"📂 Restaurer .mt",
+    btn_nuevo_paciente:"+ Nouveau patient", btn_restaurar_mt:"📂 Restaurer données",
     tip_medico:"Vue clinique complète avec pharmacovigilance et analyse vasculaire",
     tip_paciente:"Vue personnelle avec glossaire et courbes d'évolution",
     tip_familia:"Vue simplifiée avec explications en langage accessible",
-    tip_backup_btn:"💾 Télécharge toutes les données comme fichier MediTrace-Patient-Date.mt",
+    tip_backup_btn:"💾 Sauvegarde les données patient dans un fichier téléchargeable",
     tip_radar:"🕸️ Vue d'ensemble — Radar des paramètres biologiques",
     tip_meds:"💊 Historique complet des médicaments avec périodes et observance",
     tip_bact:"🦠 Résultats de cultures et antibiogrammes",
-    tip_tab_leer:"🤖 Extraction automatique via Claude API — glissez votre PDF médical",
+    tip_tab_leer:"📷 OCR : lit le PDF et extrait les valeurs automatiquement — connexion internet requise",
     tip_tab_clip:"📋 Collez le texte copié d'un PDF ou document médical",
     tip_tab_manual:"✏️ Saisissez les valeurs manuellement : date, paramètre et valeur",
   },
@@ -1688,7 +1688,7 @@ const T = {
     del_cancel:"Cancel", del_confirm:"✕ Delete",
     edit_label:"Edit:", edit_save:"✓ Save", edit_cancel:"Cancel",
     no_events:"No clinical events recorded.", events_count:"event(s)",
-    datos_memoria:"DATA IN MEMORY", guardar_backup:"💾 Save backup (.mt)",
+    datos_memoria:"DATA IN MEMORY", guardar_backup:"💾 Save patient data",
     ver_eventos:"📜 View / manage imported events ▼",
     ver_mediciones:"📊 View / correct measurement dates ▼",
     filtrar:"Filter:", todos:"All", ultima_import:"Last import:",
@@ -1798,15 +1798,15 @@ const T = {
     profile_medico:"Doctor", profile_medico_sub:"Full clinical view",
     profile_paciente:"Patient", profile_paciente_sub:"Personal view",
     profile_familia:"Family", profile_familia_sub:"Simplified view",
-    btn_nuevo_paciente:"+ New patient", btn_restaurar_mt:"📂 Restore .mt",
+    btn_nuevo_paciente:"+ New patient", btn_restaurar_mt:"📂 Restore data",
     tip_medico:"Full clinical view with pharmacovigilance and vascular analysis",
     tip_paciente:"Personal view with glossary and evolution charts",
     tip_familia:"Simplified view with plain language explanations",
-    tip_backup_btn:"💾 Downloads all data as MediTrace-Patient-Date.mt file",
+    tip_backup_btn:"💾 Saves patient data in a downloadable file",
     tip_radar:"🕸️ Overview — Biological parameters radar chart",
     tip_meds:"💊 Complete medication history with periods and compliance",
     tip_bact:"🦠 Culture results and antibiograms",
-    tip_tab_leer:"🤖 Automatic extraction via Claude API — drag your medical PDF",
+    tip_tab_leer:"📷 OCR: reads the PDF and extracts values automatically — internet connection required",
     tip_tab_clip:"📋 Paste text copied from a PDF or medical document",
     tip_tab_manual:"✏️ Enter values manually: date, parameter and value",
   }
@@ -3069,7 +3069,7 @@ function importData(input) {
   const hasData = loadData().length || loadEvents().length || loadMeds().length;
   if (hasData) {
     customConfirm('⚠️ Datos existentes',
-      'Los datos del paciente actual serán reemplazados por el archivo importado.<br><br>Se recomienda hacer un <strong>💾 Backup .mt</strong> antes de continuar.',
+      'Los datos del paciente actual serán reemplazados por el archivo importado.<br><br>Se recomienda <strong>guardar los datos del paciente</strong> antes de continuar.',
       function() { _doImport(file, input); }
     );
     return;
@@ -3698,7 +3698,7 @@ function customAlert(title, message, icon='ℹ️', color='var(--accent)') {
 
 function confirmReset() {
   customConfirm('Reiniciar MediTrace',
-    'Esta acción eliminará <strong>todos los datos</strong> del paciente actual.<br><br>Se recomienda hacer un <strong>Backup .mt</strong> antes.',
+    'Esta acción eliminará <strong>todos los datos</strong> del paciente actual.<br><br>Se recomienda <strong>guardar los datos del paciente</strong> antes.',
     function() { localStorage.removeItem(STORE_KEY); localStorage.removeItem(EVENT_KEY); localStorage.removeItem(MED_KEY); localStorage.removeItem(PATIENT_LABEL_KEY); location.reload(); }
   );
 }
@@ -5693,7 +5693,7 @@ function loadPatient(label) {
   const data = loadData();
   if (data.length > 0) {
     customConfirm('Cambiar de paciente',
-      'Los datos actuales se guardarán en backup antes de cambiar de paciente.',
+      'Se recomienda guardar los datos del paciente antes de continuar.',
       function() { exportData(); setTimeout(() => { _loadPatientAfterSave(label); }, 800); }
     );
     return;
