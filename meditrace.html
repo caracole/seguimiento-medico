@@ -3650,15 +3650,47 @@ function anonymizeData(data, events) {
   /* Deep copy to avoid modifying original */
   var aData = JSON.parse(JSON.stringify(data));
   var aEvents = JSON.parse(JSON.stringify(events));
+
+  /* Get real patient name to replace it */
+  var realPatLabel = getPatientLabel() || '';
+
+  function anonAll(text) {
+    if (!text) return text;
+    var result = anonymizeText(text);
+    /* Replace patient name */
+    if (realPatLabel) {
+      var parts = realPatLabel.trim().split(/\s+/);
+      /* Replace full name */
+      result = result.split(realPatLabel).join('Paciente X');
+      /* Replace each part (>3 chars) */
+      parts.forEach(function(p) {
+        if (p.length > 3) {
+          result = result.split(p).join('X');
+        }
+      });
+    }
+    /* Replace numbers that look like IDs (6-10 digits) */
+    /* Nº Colegial (identificador médico) */
+    result = result.replace(/N[º°\.\s]?\s*[Cc][Oo][Ll][\s\.:]?\s*\d+/g, 'Nº Col. XXXXXXXX');
+    result = result.replace(/[Cc]olegiado\s*N[º°]?\s*:?\s*\d+/gi, 'Colegiado Nº XXXXXXXX');
+    /* Numbers that look like IDs (6-10 digits) */
+    result = result.replace(/\d{6,10}/g, 'XXXXXXXX');
+    /* Replace DNI/NIF patterns */
+    result = result.replace(/\d{8}[A-Z]/g, 'XXXXXXXXX');
+    /* Replace SIP patterns */
+    result = result.replace(/(?:SIP|NHC|HC|N[º°]|num[.]?)\s*:?\s*[\d\/]+/gi, 'Nº: XXXXXXXX');
+    return result;
+  }
+
   aData.forEach(function(d) {
-    if (d.src) d.src = anonymizeText(d.src);
+    if (d.src) d.src = anonAll(d.src);
   });
   aEvents.forEach(function(e) {
-    if (e.title) e.title = anonymizeText(e.title);
-    if (e.text)  e.text  = anonymizeText(e.text);
-    if (e.src)   e.src   = anonymizeText(e.src);
+    if (e.title) e.title = anonAll(e.title);
+    if (e.text)  e.text  = anonAll(e.text);
+    if (e.src)   e.src   = anonAll(e.src);
   });
-  return { data: aData, events: aEvents };
+  return { data: aData, events: aEvents, anonPatLabel: realPatLabel ? 'Paciente X' : '' };
 }
 
 
@@ -3698,7 +3730,7 @@ function exportPDF(mode) {
   const alertParams = Object.entries(lastVals).filter(([k, info]) => PARAMS[k] && getStatus(k, info.v) === 'bad');
   const now = new Date().toLocaleDateString('es-ES');
   const dateRange = data[0].date + ' \u2192 ' + data[data.length-1].date;
-  const patLabel = getPatientLabel() || 'M.E.J.';
+  const patLabel = doAnon ? 'Paciente X' : (getPatientLabel() || 'M.E.J.');
   const isDetailed = mode === 'detallado';
   const titleType = t(isDetailed ? 'informe_detallado' : 'informe_sintetico');
 
