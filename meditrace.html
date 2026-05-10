@@ -475,7 +475,7 @@ body.no-tips [data-tip]::before { display: none !important; }
 <!-- TOP BAR — Ligne 1: Logo + Patient + Mode couleur + Langues -->
 <div class="topbar">
   <div style="display:flex;align-items:center;gap:12px">
-    <a href="#" onclick="showStartupModal(); return false;" class="topbar-logo" data-tip-key="tip_logo">Medi<span>Trace</span></a>
+    <a href="#" onclick="showStartupModal(); return false;" class="topbar-logo" data-tip-key="tip_logo">← Medi<span>Trace</span></a>
     <span style="font-size:10px;color:rgba(255,255,255,0.5);margin-left:4px" id="version-label">v2026.4</span>
     <span id="patient-badge" style="display:none;padding:4px 10px;background:rgba(74,143,232,0.2);border:1px solid var(--accent);border-radius:6px;font-size:13px"></span>
   </div>
@@ -566,7 +566,7 @@ body.no-tips [data-tip]::before { display: none !important; }
       </div>
 
       <!-- Profil -->
-      <div style="font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:12px;text-align:center" data-i18n="who_accesses">¿QUIÉN ACCEDE?</div>
+      <div style="font-family:var(--mono);font-size:14px;letter-spacing:2px;color:var(--accent);font-weight:700;margin-bottom:16px;text-align:center" data-i18n="who_accesses">¿QUIÉN ACCEDE?</div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px" id="profil-btns">
         <button onclick="setProfile('medico')" data-profile="medico" data-tip-key="tip_medico" class="profil-btn" style="background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 8px;cursor:pointer;transition:all .2s;text-align:center">
           <div style="font-size:28px;margin-bottom:6px">👨‍⚕️</div>
@@ -1469,7 +1469,7 @@ const T = {
     farma_title_full:"⚠ Farmacovigilancia — Interacciones & Contraindicaciones · Fuente: CIMA/AEMPS",
     pref_tips:"💬 Mostrar ayuda contextual",
     /* Tooltips */
-    tip_logo:"🏠 Menú principal — perfil, paciente, preferencias",
+    tip_logo:"← Retorno página inicial · Menú principal",
     tip_profile:"👤 Cambiar perfil o seleccionar paciente",
     tip_theme:"☀️ Cambiar entre tema claro y oscuro",
     tip_lang_es:"Cambiar idioma a Español",
@@ -1623,7 +1623,7 @@ const T = {
     farma_title_full:"⚠ Pharmacovigilance — Interactions & Contre-indications · Source : CIMA/AEMPS",
     pref_tips:"💬 Afficher l'aide contextuelle",
     /* Tooltips */
-    tip_logo:"🏠 Menu principal — profil, patient, préférences",
+    tip_logo:"← Retour page initiale · Menu principal",
     tip_profile:"👤 Changer de profil ou sélectionner un patient",
     tip_theme:"☀️ Basculer entre thème clair et sombre",
     tip_lang_es:"Passer en Espagnol",
@@ -1777,7 +1777,7 @@ const T = {
     farma_title_full:"⚠ Pharmacovigilance — Interactions & Contraindications · Source: CIMA/AEMPS",
     pref_tips:"💬 Show contextual help",
     /* Tooltips */
-    tip_logo:"🏠 Main menu — profile, patient, preferences",
+    tip_logo:"← Back to home page · Main menu",
     tip_profile:"👤 Change profile or select a patient",
     tip_theme:"☀️ Toggle between light and dark theme",
     tip_lang_es:"Switch to Spanish",
@@ -3060,11 +3060,20 @@ function exportData() {
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
-  const safeLabel = (label || 'Patient').replace(/[^a-zA-Z0-9_-]/g, '_');
+  /* Nom patient sans underscore, espaces conservés puis encodés */
+  const cleanLabel = (label || 'Patient').replace(/_/g, ' ').trim();
   var d = new Date();
-  var ts = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  var yy  = String(d.getFullYear()).slice(2);
+  var mo  = String(d.getMonth()+1).padStart(2,'0');
+  var dd  = String(d.getDate()).padStart(2,'0');
+  var hh  = String(d.getHours()).padStart(2,'0');
+  var mi  = String(d.getMinutes()).padStart(2,'0');
+  var ss  = String(d.getSeconds()).padStart(2,'0');
+  var ts  = yy + '-' + mo + '-' + dd + '_' + hh + '-' + mi + '-' + ss;
+  /* Pour le nom de fichier, remplacer espaces par tirets */
+  const safeLabel = cleanLabel.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-áéíóúüñÁÉÍÓÚÜÑ]/g, '');
   a.href     = url;
-  a.download = 'MediTrace-' + safeLabel + '-' + ts + '.mt';
+  a.download = 'MediTrace_' + safeLabel + '_' + ts + '.mt';
   a.click();
   URL.revokeObjectURL(url);
 }
