@@ -3456,101 +3456,118 @@ function enviarEmailInforme() {
   var patLabel = getPatientLabel() || 'Paciente';
   var now = new Date().toLocaleDateString();
 
-  /* Build HTML for display in modal */
-  var html = '<div style="font-family:Arial,sans-serif;font-size:13px;line-height:1.7;color:#1a1a2e">';
-  html += '<p><strong>Estimado/a Doctor/a,</strong><br>';
-  html += 'Informe MediTrace de seguimiento m&eacute;dico longitudinal.</p>';
-  html += '<table style="border-collapse:collapse;width:100%;margin:8px 0">';
-  html += '<tr style="background:#1a5276;color:white"><td style="padding:4px 8px" colspan="2"><strong>PACIENTE: ' + patLabel + ' &nbsp;|&nbsp; ' + now + '</strong></td></tr>';
-  html += '<tr style="background:#eaf4fb"><td style="padding:3px 8px">Mediciones</td><td style="padding:3px 8px"><strong>' + data.length + '</strong></td></tr>';
-  html += '<tr><td style="padding:3px 8px">Eventos cl&iacute;nicos</td><td style="padding:3px 8px"><strong>' + events.length + '</strong></td></tr>';
-  html += '</table>';
+  /* Build plain text — universally compatible with ALL email clients */
+  var L = [];
+  L.push('Estimado/a Doctor/a,');
+  L.push('');
+  L.push('Le transmito el resumen del informe MediTrace de seguimiento medico longitudinal.');
+  L.push('');
+  L.push('==========================================================');
+  L.push('  PACIENTE : ' + patLabel);
+  L.push('  FECHA    : ' + now);
+  L.push('  DATOS    : ' + data.length + ' mediciones | ' + events.length + ' eventos');
+  L.push('==========================================================');
+  L.push('');
 
   if (data.length > 0) {
     var last = data[data.length - 1];
-    html += '<p style="margin:8px 0 4px"><strong>&#218;ltimos valores (' + last.date + ')</strong></p>';
-    html += '<table style="border-collapse:collapse;width:100%;font-size:12px">';
+    L.push('ULTIMOS VALORES (' + last.date + ' | ' + (last.src || '') + ')');
+    L.push('----------------------------------------------------------');
     var kp = [
-      ['hemoglobina','Hemoglobina'],['glucosa','Glucosa'],
-      ['creatinina','Creatinina'],['filtrado','Filtrado glom.'],
-      ['colesterol','Colesterol'],['ldl','LDL'],
-      ['vitamina_d','Vitamina D'],['hba1c','HbA1c'],
-      ['pcr','PCR'],['tsh','TSH']
+      ['hemoglobina','Hemoglobina   '],['glucosa','Glucosa       '],
+      ['creatinina','Creatinina    '],['filtrado','Filtrado glom.'],
+      ['colesterol','Colesterol    '],['ldl','LDL           '],
+      ['vitamina_d','Vitamina D    '],['hba1c','HbA1c         '],
+      ['pcr','PCR           '],['tsh','TSH           ']
     ];
-    kp.forEach(function(item, idx) {
+    kp.forEach(function(item) {
       if (last.vals && last.vals[item[0]] !== undefined) {
         var p = PARAMS[item[0]];
         var val = last.vals[item[0]];
         var st = getStatus(item[0], val);
-        var color = st === 'bad' ? '#c0392b' : '#1e8449';
-        var bg = idx % 2 === 0 ? '#eaf4fb' : 'white';
-        html += '<tr style="background:' + bg + '">';
-        html += '<td style="padding:2px 8px">' + item[1] + '</td>';
-        html += '<td style="padding:2px 8px;font-weight:700;color:' + color + '">' + val + ' ' + (p ? p.unit : '') + '</td>';
-        html += '</tr>';
+        var warn = st === 'bad' ? ' !' : '';
+        L.push('  ' + item[1] + ' : ' + val + ' ' + (p ? p.unit : '') + warn);
       }
     });
-    html += '</table>';
+    L.push('');
   }
 
   if (events.length > 0) {
-    html += '<p style="margin:8px 0 4px"><strong>Eventos recientes</strong></p>';
-    html += '<table style="border-collapse:collapse;width:100%;font-size:12px">';
-    events.slice(-4).reverse().forEach(function(ev, idx) {
-      var bg = idx % 2 === 0 ? '#eaf4fb' : 'white';
-      html += '<tr style="background:' + bg + '">';
-      html += '<td style="padding:2px 8px;white-space:nowrap">' + ev.date + '</td>';
-      html += '<td style="padding:2px 8px">' + (ev.title || '') + '</td>';
-      html += '</tr>';
+    L.push('EVENTOS RECIENTES');
+    L.push('----------------------------------------------------------');
+    events.slice(-5).reverse().forEach(function(ev) {
+      L.push('  ' + ev.date + ' | ' + (ev.title || ''));
     });
-    html += '</table>';
+    L.push('');
   }
 
-  html += '<p style="margin-top:10px;font-size:11px;color:#888">MediTrace v2026 &middot; caracole.github.io/seguimiento-medico &middot; DOI: 10.5281/zenodo.19973451</p>';
-  html += '</div>';
+  L.push('==========================================================');
+  L.push('NOTA: Para el informe PDF completo:');
+  L.push('  MediTrace > Informe PDF > Guardar como PDF');
+  L.push('  y adjuntelo manualmente a este email.');
+  L.push('');
+  L.push('MediTrace v2026 | caracole.github.io/seguimiento-medico');
+  L.push('DOI: 10.5281/zenodo.19973451');
 
-  /* Show in modal with copy button */
-  var ov = document.createElement('div');
-  ov.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.6);display:flex;justify-content:center;align-items:center;backdrop-filter:blur(4px)';
-  var bx = document.createElement('div');
-  bx.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:14px;width:90%;max-width:560px;max-height:85vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 16px 48px rgba(0,0,0,0.4)';
-  bx.innerHTML =
-    '<div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">' +
-    '<div style="font-family:var(--mono);font-size:12px;font-weight:600;color:var(--accent)">📧 ' + t('send_email') + '</div>' +
-    '<button id="close-email-modal" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--muted)">✕</button>' +
+  var body = L.join('\n');
+  var subject = 'MediTrace | Informe | ' + patLabel + ' | ' + now;
+
+  /* Show modal IN the report popup window if open, else in main window */
+  var targetWin = (window._informeWin && !window._informeWin.closed) ? window._informeWin : window;
+  var targetDoc = targetWin.document;
+
+  /* Create modal in target window */
+  var ov = targetDoc.createElement('div');
+  ov.id = 'email-modal-overlay';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.65);display:flex;justify-content:center;align-items:center;backdrop-filter:blur(4px)';
+
+  ov.innerHTML =
+    '<div style="background:white;border-radius:14px;width:90%;max-width:500px;box-shadow:0 16px 48px rgba(0,0,0,0.4);overflow:hidden">' +
+    '<div style="background:#1a5276;padding:12px 18px;display:flex;justify-content:space-between;align-items:center">' +
+    '<span style="font-family:Arial;font-size:13px;font-weight:700;color:white">📧 Preparar email</span>' +
+    '<button id="em-close" style="background:none;border:none;color:white;font-size:18px;cursor:pointer;line-height:1">✕</button>' +
     '</div>' +
-    '<div style="padding:16px 20px;overflow-y:auto;flex:1">' +
-    '<div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:8px">Copie este contenido y p&eacute;guelo en su email:</div>' +
-    '<div id="email-preview" style="background:white;border:1px solid var(--border);border-radius:8px;padding:12px;max-height:320px;overflow-y:auto">' + html + '</div>' +
+    '<div style="padding:16px 18px">' +
+    '<p style="font-family:Arial;font-size:12px;color:#555;margin:0 0 10px">Contenido listo para copiar y pegar en su email:</p>' +
+    '<textarea id="em-text" style="width:100%;height:200px;font-family:monospace;font-size:11px;border:1px solid #cce;border-radius:6px;padding:8px;resize:vertical;color:#1a1a2e;line-height:1.6" readonly>' + body + '</textarea>' +
     '</div>' +
-    '<div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap">' +
-    '<button id="copy-email-btn" class="btn primary" style="font-size:12px">📋 Copiar contenido</button>' +
-    '<a href="mailto:?subject=' + encodeURIComponent('MediTrace | Informe | ' + patLabel + ' | ' + now) + '" class="btn" style="font-size:12px;text-decoration:none">✉ Abrir email (texto)</a>' +
-    '<button id="close-email-btn" class="btn" style="font-size:12px">Cerrar</button>' +
+    '<div style="padding:10px 18px 14px;display:flex;gap:8px;flex-wrap:wrap">' +
+    '<button id="em-copy" style="padding:7px 16px;background:#2ecc71;color:white;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">📋 Copiar texto</button>' +
+    '<button id="em-mailto" style="padding:7px 16px;background:#0088cc;color:white;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer">✉ Abrir email</button>' +
+    '<button id="em-close2" style="padding:7px 16px;background:#eee;color:#555;border:none;border-radius:6px;font-size:12px;cursor:pointer">Cerrar</button>' +
+    '</div>' +
     '</div>';
-  ov.appendChild(bx);
-  document.body.appendChild(ov);
 
-  document.getElementById('close-email-modal').onclick =
-  document.getElementById('close-email-btn').onclick = function() { document.body.removeChild(ov); };
-  ov.onclick = function(e) { if (e.target === ov) document.body.removeChild(ov); };
+  targetDoc.body.appendChild(ov);
 
-  document.getElementById('copy-email-btn').onclick = function() {
-    var preview = document.getElementById('email-preview');
-    if (navigator.clipboard && window.ClipboardItem) {
-      var blob = new Blob([preview.innerHTML], {type: 'text/html'});
-      var item = new ClipboardItem({'text/html': blob});
-      navigator.clipboard.write([item]).then(function() {
-        document.getElementById('copy-email-btn').textContent = '✓ Copiado!';
-      }).catch(function() {
-        /* Fallback text */
-        navigator.clipboard.writeText(preview.innerText);
-        document.getElementById('copy-email-btn').textContent = '✓ Copiado (texto)!';
+  /* Close buttons */
+  function closeModal() { if (ov.parentNode) ov.parentNode.removeChild(ov); }
+  targetDoc.getElementById('em-close').onclick = closeModal;
+  targetDoc.getElementById('em-close2').onclick = closeModal;
+  ov.onclick = function(e) { if (e.target === ov) closeModal(); };
+
+  /* Copy plain text */
+  targetDoc.getElementById('em-copy').onclick = function() {
+    var ta = targetDoc.getElementById('em-text');
+    ta.select();
+    try {
+      targetWin.navigator.clipboard.writeText(ta.value).then(function() {
+        targetDoc.getElementById('em-copy').textContent = '✓ Copiado!';
+        setTimeout(function() {
+          if (targetDoc.getElementById('em-copy'))
+            targetDoc.getElementById('em-copy').textContent = '📋 Copiar texto';
+        }, 2000);
       });
-    } else {
-      navigator.clipboard.writeText(preview.innerText);
-      document.getElementById('copy-email-btn').textContent = '✓ Copiado!';
+    } catch(e) {
+      targetDoc.execCommand('copy');
+      targetDoc.getElementById('em-copy').textContent = '✓ Copiado!';
     }
+  };
+
+  /* Open email client */
+  var url = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+  targetDoc.getElementById('em-mailto').onclick = function() {
+    targetWin.location.href = url.length > 1900 ? url.substring(0,1900) : url;
   };
 }
 
