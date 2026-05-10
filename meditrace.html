@@ -534,6 +534,11 @@ body.no-tips [data-tip]::before { display: none !important; }
   <div style="background:var(--surface);border:2px solid var(--accent);border-radius:16px;padding:32px 28px;max-width:500px;width:90%;text-align:center">
     <div style="font-family:var(--serif);font-size:24px;font-weight:700;color:var(--text);margin-bottom:8px">📄 Generar Informe</div>
     <div style="font-size:15px;color:var(--muted);margin-bottom:24px">Elija el tipo de informe a generar</div>
+    <!-- Anonymization option -->
+    <label style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surface2);border-radius:8px;cursor:pointer;margin-bottom:4px;font-size:13px;color:var(--muted)">
+      <input type="checkbox" id="chk-anonimizar" style="width:16px;height:16px;cursor:pointer;accent-color:var(--accent)"/>
+      🔒 Anonimizar nombres de médicos/especialistas
+    </label>
     <div style="display:flex;flex-direction:column;gap:12px">
       <button onclick="exportPDF('detallado');closeInformeDialog()" style="background:var(--accent);color:white;border:none;border-radius:10px;padding:18px 24px;font-size:17px;font-weight:600;cursor:pointer;text-align:left;font-family:var(--sans);transition:all .15s">
         📄 <strong>Informe Detallado</strong>
@@ -3607,6 +3612,56 @@ function copiarInforme(sourceWin) {
 }
 
 
+/* ── ANONYMISATION DES NOMS DE MÉDECINS ── */
+var _anonMap = {};
+var _anonCounters = {};
+
+function anonymizeText(text) {
+  if (!text) return text;
+  var result = text;
+
+  /* Patterns: Dr. Apellido, Dra. Apellido, Dr. Nombre Apellido */
+  var patterns = [
+    /* Dra. Apellido Apellido */
+    /Dra?\.\s+[A-ZÁÉÍÓÚÜÑ][a-záéíóúüñ]+(?:\s+[A-ZÁÉÍÓÚÜÑ][a-záéíóúüñ]+)*/g,
+    /* Dr. Inicial. Apellido */
+    /Dr\.\s+[A-Z]\.\s+[A-ZÁÉÍÓÚÜÑ][a-záéíóúüñ]+/g,
+  ];
+
+  patterns.forEach(function(pat) {
+    result = result.replace(pat, function(match) {
+      if (_anonMap[match]) return _anonMap[match];
+      /* Detect gender: Dra. = feminine */
+      var prefix = match.startsWith('Dra') ? 'Dra.' : 'Dr.';
+      var key = prefix === 'Dra.' ? 'F' : 'M';
+      _anonCounters[key] = (_anonCounters[key] || 0) + 1;
+      var letter = String.fromCharCode(64 + _anonCounters[key]); /* A, B, C... */
+      var anon = prefix + ' ' + letter + '.';
+      _anonMap[match] = anon;
+      return anon;
+    });
+  });
+  return result;
+}
+
+function anonymizeData(data, events) {
+  _anonMap = {};
+  _anonCounters = {};
+  /* Deep copy to avoid modifying original */
+  var aData = JSON.parse(JSON.stringify(data));
+  var aEvents = JSON.parse(JSON.stringify(events));
+  aData.forEach(function(d) {
+    if (d.src) d.src = anonymizeText(d.src);
+  });
+  aEvents.forEach(function(e) {
+    if (e.title) e.title = anonymizeText(e.title);
+    if (e.text)  e.text  = anonymizeText(e.text);
+    if (e.src)   e.src   = anonymizeText(e.src);
+  });
+  return { data: aData, events: aEvents };
+}
+
+
 function exportPDF(mode) {
   mode = mode || 'detallado';
   const data   = loadData();
@@ -3708,9 +3763,11 @@ function exportPDF(mode) {
   /* Share bar HTML */
   var shareType = isDetailed ? 'Detallado' : 'Sint\u00e9tico';
   var shareSubject = 'MediTrace \u2014 Informe ' + shareType + ' \u2014 ' + patLabel;
+  var anonNote = doAnon ? ' <span style="font-size:9px;color:#e8a44a;margin-left:6px">🔒 ' + (currentLang === 'fr' ? 'Anonymisé' : currentLang === 'en' ? 'Anonymised' : 'Anonimizado') + '</span>' : '';
   var shareBarHtml =
     '<div class="share-bar">' +
     '<button onclick="window.print()" style="padding:4px 14px;border-radius:4px;font-size:11px;font-weight:600;color:white;background:#1a5276;border:none;cursor:pointer">🖨 ' + t('save_pdf') + '</button>' +
+    anonNote +
     '</div>';
 
     const html = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"/>' +
