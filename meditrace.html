@@ -3497,19 +3497,20 @@ function enviarEmailInforme() {
   window.location.href = url.substring(0, 2000);
 }
 
-function copiarInforme() {
-  /* Appelé depuis la fenêtre popup du rapport via window.opener */
-  var win = window._informeWin;
+function copiarInforme(sourceWin) {
+  /* sourceWin = la fenêtre popup du rapport (passée en paramètre) */
+  var win = sourceWin || window._informeWin;
   if (!win || win.closed) {
     customAlert('Sin informe', 'Primero genera el informe con el boton Informe PDF.', '⚠️', 'var(--warn)');
     return;
   }
   try {
-    var text = win.document.body.innerText || '';
+    var text = win.document.body.innerText || win.document.documentElement.innerText || '';
+    /* Remove share bar text from copy */
+    text = text.replace(/Compartir.*?Email/s, '').trim();
     navigator.clipboard.writeText(text).then(function() {
       customAlert('✓ Copiado', 'Informe copiado al portapapeles.', '✅', 'var(--accent2)');
     }).catch(function() {
-      /* Fallback */
       var ta = document.createElement('textarea');
       ta.value = text;
       document.body.appendChild(ta);
@@ -3626,14 +3627,12 @@ function exportPDF(mode) {
   var shareType = isDetailed ? 'Detallado' : 'Sint\u00e9tico';
   var shareSubject = 'MediTrace \u2014 Informe ' + shareType + ' \u2014 ' + patLabel;
   var shareBarHtml =
-    '<div style="text-align:center;margin:16px 0;padding:14px;background:#f0f5fa;border:1px solid #cce;border-radius:8px" class="share-bar">' +
-    '<div style="font-size:15px;font-weight:700;color:#1a5276;margin-bottom:10px">' + t('share_title') + '</div>' +
-    '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">' +
-    '<button onclick="window.print()" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#1a5276;border:none;cursor:pointer">' + t('save_pdf') + '</button>' +
-    '<button onclick="window.opener ? window.opener.copiarInforme() : copiarInforme()" id="btn-copiar" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#2ecc71;border:none;cursor:pointer">' + t('copy_report') + '</button>' +
-    '<button onclick="window.opener ? window.opener.enviarEmailInforme() : enviarEmailInforme()" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#0088cc;border:none;cursor:pointer">' + t('send_email') + '</button>' +
-    '</div>' +
-    '<div id="copiar-feedback" style="font-size:12px;color:#2ecc71;margin-top:8px;min-height:20px"></div>' +
+    '<div class="share-bar">' +
+    '<span class="share-title">' + t('share_title') + '</span>' +
+    '<button onclick="window.print()" style="padding:4px 14px;border-radius:4px;font-size:11px;font-weight:600;color:white;background:#1a5276;border:none;cursor:pointer">' + t('save_pdf') + '</button>' +
+    '<button onclick="window.opener ? window.opener.copiarInforme(window) : null" id="btn-copiar" style="padding:4px 14px;border-radius:4px;font-size:11px;font-weight:600;color:white;background:#2ecc71;border:none;cursor:pointer">' + t('copy_report') + '</button>' +
+    '<button onclick="window.opener ? window.opener.enviarEmailInforme() : null" style="padding:4px 14px;border-radius:4px;font-size:11px;font-weight:600;color:white;background:#0088cc;border:none;cursor:pointer">' + t('send_email') + '</button>' +
+    '<span id="copiar-feedback" style="font-size:10px;color:#2ecc71;margin-left:8px"></span>' +
     '</div>';
 
     const html = '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"/>' +
@@ -3678,7 +3677,7 @@ function exportPDF(mode) {
     '.tl-dot.neurologia { background:#7d3c98 } .tl-dot.laboratorio { background:#1e8449 } .tl-dot.bacteriologia { background:#e8a44a }' +
     '.tl-content { flex:1 } .tl-date { font-size:12px;color:#888 } .tl-title { font-size:15px;font-weight:700;margin:2px 0 } .tl-text { font-size:13px;color:#444;line-height:1.6 }' +
     '.report-footer { border-top:2px solid #1a5276;margin-top:24px;padding-top:10px;font-size:10px;color:#888;display:flex;justify-content:space-between }' +
-    '.share-bar { position:sticky; top:0; z-index:100; background:white; box-shadow:0 2px 8px rgba(0,0,0,0.15); border-radius:0 !important; margin:0 !important; border-left:none !important; border-right:none !important; } ' +
+    '.share-bar { position:sticky; top:0; z-index:100; background:#f0f5fa; box-shadow:0 2px 6px rgba(0,0,0,0.12); padding:6px 16px; margin:0; border-radius:0; border-bottom:1px solid #cce; display:flex; align-items:center; gap:8px; flex-wrap:wrap; } .share-title { font-size:11px; font-weight:700; color:#1a5276; white-space:nowrap; margin-right:4px; } ' +
     '@media print { body{font-size:15px} .page{padding:8mm 10mm} .anamnesis{page-break-after:always} .section{page-break-inside:avoid} .share-bar{display:none} #page-indicator{display:none} @page{size:A4;margin:12mm 10mm 18mm 10mm} .print-page-footer{display:block;position:fixed;bottom:0;left:0;right:0;text-align:center;font-size:9px;color:#888;padding:4px} } .print-page-footer{display:none}' +
     '</style></head><body><div class="page">' +
 
