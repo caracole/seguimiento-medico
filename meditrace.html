@@ -3498,74 +3498,29 @@ function enviarEmailInforme() {
 }
 
 function copiarInforme() {
+  /* Appelé depuis la fenêtre popup du rapport via window.opener */
   var win = window._informeWin;
   if (!win || win.closed) {
-    customAlert('Sin informe', 'Primero genera el informe con el botón Informe PDF.', '⚠️', 'var(--warn)');
+    customAlert('Sin informe', 'Primero genera el informe con el boton Informe PDF.', '⚠️', 'var(--warn)');
     return;
   }
   try {
-    var c = win.document.querySelector('.page');
-    if (c) {
-      win.navigator.clipboard.writeText(c.innerText).then(function() {
-        customAlert('✓ Copiado', 'Informe copiado al portapapeles.', '✅', 'var(--accent2)');
-      }).catch(function() {
-        win.document.execCommand('selectAll');
-        win.document.execCommand('copy');
-        customAlert('✓ Copiado', 'Informe copiado al portapapeles.', '✅', 'var(--accent2)');
-      });
-    }
+    var text = win.document.body.innerText || '';
+    navigator.clipboard.writeText(text).then(function() {
+      customAlert('✓ Copiado', 'Informe copiado al portapapeles.', '✅', 'var(--accent2)');
+    }).catch(function() {
+      /* Fallback */
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      customAlert('✓ Copiado', 'Informe copiado al portapapeles.', '✅', 'var(--accent2)');
+    });
   } catch(e) {
     customAlert('Error', 'No se pudo copiar: ' + e.message, '❌', 'var(--danger)');
   }
-}
-
-function enviarEmailInforme() {
-  var data = loadData();
-  var events = loadEvents();
-  var patLabel = getPatientLabel() || 'Paciente';
-  var now = new Date().toLocaleDateString();
-  var nl = '\n';
-  var sep = '----------------------------';
-
-  var body = 'Estimado/a Doctor/a,' + nl + nl;
-  body += 'Le envio el resumen del informe MediTrace de seguimiento medico longitudinal.' + nl + nl;
-  body += sep + nl;
-  body += 'PACIENTE: ' + patLabel + nl;
-  body += 'FECHA: ' + now + nl;
-  body += 'DATOS: ' + data.length + ' mediciones - ' + events.length + ' eventos clinicos' + nl;
-  body += sep + nl + nl;
-
-  if (data.length > 0) {
-    var last = data[data.length - 1];
-    body += 'ULTIMOS VALORES (' + last.date + ' - ' + (last.src || '') + '):' + nl;
-    var keyP = ['hemoglobina','glucosa','creatinina','filtrado','colesterol','ldl','vitamina_d','hba1c','pcr','tsh'];
-    keyP.forEach(function(k) {
-      if (last.vals && last.vals[k] !== undefined) {
-        var p = PARAMS[k];
-        body += '  - ' + (p ? p.label : k) + ': ' + last.vals[k] + ' ' + (p ? p.unit : '') + nl;
-      }
-    });
-    body += nl;
-  }
-
-  if (events.length > 0) {
-    body += 'EVENTOS RECIENTES:' + nl;
-    events.slice(-3).reverse().forEach(function(ev) {
-      body += '  - ' + ev.date + ' - ' + (ev.title || '') + nl;
-    });
-    body += nl;
-  }
-
-  body += sep + nl;
-  body += 'NOTA: Este email contiene un resumen de texto.' + nl;
-  body += 'Para el PDF completo: MediTrace → Informe PDF → Guardar como PDF' + nl;
-  body += 'y adjuntelo manualmente a este email.' + nl + nl;
-  body += 'MediTrace v2026 - caracole.github.io/seguimiento-medico' + nl;
-  body += 'DOI: 10.5281/zenodo.19973451' + nl;
-
-  var subject = 'MediTrace - Informe - ' + patLabel + ' - ' + now;
-  var url = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-  window.location.href = url.substring(0, 2000);
 }
 
 
@@ -3675,8 +3630,8 @@ function exportPDF(mode) {
     '<div style="font-size:15px;font-weight:700;color:#1a5276;margin-bottom:10px">' + t('share_title') + '</div>' +
     '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">' +
     '<button onclick="window.print()" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#1a5276;border:none;cursor:pointer">' + t('save_pdf') + '</button>' +
-    '<button onclick="copiarInforme()" id="btn-copiar" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#2ecc71;border:none;cursor:pointer">' + t('copy_report') + '</button>' +
-    '<button onclick="enviarEmailInforme()" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#0088cc;border:none;cursor:pointer">' + t('send_email') + '</button>' +
+    '<button onclick="window.opener ? window.opener.copiarInforme() : copiarInforme()" id="btn-copiar" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#2ecc71;border:none;cursor:pointer">' + t('copy_report') + '</button>' +
+    '<button onclick="window.opener ? window.opener.enviarEmailInforme() : enviarEmailInforme()" style="padding:10px 20px;border-radius:6px;font-size:14px;font-weight:600;color:white;background:#0088cc;border:none;cursor:pointer">' + t('send_email') + '</button>' +
     '</div>' +
     '<div id="copiar-feedback" style="font-size:12px;color:#2ecc71;margin-top:8px;min-height:20px"></div>' +
     '</div>';
